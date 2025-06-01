@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCorp - Detalhes da Campanha (Dark Mode)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6', // Blue-500
+                        secondary: '#2563eb', // Blue-600
+                        accent: '#1d4ed8', // Blue-700
+                        // Dark mode specific colors (using Tailwind's slate palette as a base)
+                        darkBg: '#0f172a', // slate-900
+                        darkCard: '#1e293b', // slate-800
+                        darkCardHover: '#334155', // slate-700
+                        darkBorder: '#334155', // slate-700 (can also use slate-600 #475569)
+                        darkTextPrimary: '#e2e8f0', // slate-200
+                        darkTextSecondary: '#94a3b8', // slate-400
+                        success: '#10b981', // Green-500
+                        warning: '#f59e0b', // Amber-500
+                        danger: '#ef4444' // Red-500
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Updated for dark mode */
+            background: linear-gradient(to bottom, #0f172a, #1e293b); /* slate-900 to slate-800 */
+            min-height: 100vh;
+            color: #e2e8f0; /* Default text color: slate-200 */
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            /* Adjusted shadow for dark mode - can be subtle or a light glow */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .player-card:hover { /* Already uses card styles, but can be distinct if needed */
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0,0,0, 0.3);
+        }
+        
+        .status-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .session-item {
+            border-left: 3px solid #3b82f6; /* primary color - blue-500 */
+            transition: all 0.3s ease;
+        }
+        
+        .session-item:hover {
+            border-left: 3px solid #2563eb; /* secondary color - blue-600 */
+            background-color: #334155; /* slate-700 (darkCardHover) */
+        }
+    </style>
+</head>
+<body class="min-h-screen text-darkTextPrimary"> <!-- Default text color set in CSS, can override with Tailwind -->
+    <!-- Navbar -->
+    <nav class="bg-darkCard shadow-md py-4"> <!-- Changed bg-white to bg-darkCard, shadow-sm to shadow-md for better visibility -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-cube text-white"></i>
+                    </div>
+                    <!-- Changed text-gray-800 to text-darkTextPrimary -->
+                    <span class="ml-3 text-xl font-bold text-darkTextPrimary">Neo<span class="text-blue-500">Corp</span></span>
+                </div>
+                <div class="flex items-center">
+                    <div class="ml-3 relative">
+                        <div class="flex items-center">
+                            <div class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                                <span class="font-medium">JD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Campaign Header -->
+        <div class="text-center mb-10">
+            <!-- Changed text-gray-800 to text-darkTextPrimary -->
+            <h1 class="text-3xl md:text-4xl font-bold text-darkTextPrimary mb-4"><%= campain.name %></h1>
+            <!-- Adjusted status badge colors -->
+            <div class="inline-flex items-center justify-center px-5 py-2 rounded-full 
+                        <%= campain.active ? 'bg-green-700 bg-opacity-30' : 'bg-gray-700 bg-opacity-40' %> 
+                        border <%= campain.active ? 'border-green-500' : 'border-gray-600' %>">
+                <span class="status-indicator w-3 h-3 rounded-full mr-2 <%= campain.active ? 'bg-green-400' : 'bg-gray-500' %>"></span>
+                <!-- Changed text-gray-700 to text-darkTextSecondary for lighter text on dark badge -->
+                <span class="font-medium text-darkTextSecondary"><%= campain.active ? 'Sessão em Andamento' : 'Campanha Inativa' %></span>
+            </div>
+        </div>
+
+        <!-- Campaign Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Campaign Info -->
+            <div class="lg:col-span-2">
+                <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
+                <div class="card bg-darkCard rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Visão Geral</h2>
+                    
+                    <div class="mb-8">
+                        <!-- Changed text-gray-600 to text-darkTextSecondary -->
+                        <p class="campaign-description text-darkTextSecondary leading-relaxed"><%= campain.description %></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Changed bg-blue-50 to bg-darkCardHover or a slightly different dark shade -->
+                        <div class="bg-darkCardHover p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3">
+                                    <i class="fas fa-crown text-white"></i>
+                                </div>
+                                <div>
+                                    <!-- Adjusted text colors -->
+                                    <div class="text-darkTextSecondary text-sm">Mestre do Jogo</div>
+                                    <div class="text-darkTextPrimary font-medium"><%= campain.gameMaster %></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Changed bg-blue-50 to bg-darkCardHover -->
+                        <div class="bg-darkCardHover p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
+                                    <i class="fas fa-dice-d20 text-white"></i>
+                                </div>
+                                <div>
+                                    <!-- Adjusted text colors -->
+                                    <div class="text-darkTextSecondary text-sm">Sistema</div>
+                                    <div class="text-darkTextPrimary font-medium"><%= campain.system %></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Session Timeline -->
+                <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
+                <div class="card bg-darkCard rounded-xl p-6 mt-8">
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Histórico de Sessões</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Session items: bg-white removed (will inherit from card or use style), border-gray-100 to border-darkBorder -->
+                        <div class="session-item p-4 rounded-lg border border-darkBorder"> <!-- bg-white removed, using style for hover -->
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <!-- Adjusted text colors -->
+                                    <h3 class="font-bold text-lg text-darkTextPrimary">Sessão #3</h3>
+                                    <p class="text-darkTextSecondary">Confronto final na Torre do Arcanista</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-blue-400 font-medium">12/06/2023</div> <!-- Lighter blue for better contrast -->
+                                    <div class="text-sm text-darkTextSecondary">3h 45m</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="session-item p-4 rounded-lg border border-darkBorder">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-lg text-darkTextPrimary">Sessão #2</h3>
+                                    <p class="text-darkTextSecondary">Explorando as Catacumbas Esquecidas</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-blue-400 font-medium">05/06/2023</div>
+                                    <div class="text-sm text-darkTextSecondary">4h 10m</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="session-item p-4 rounded-lg border border-darkBorder">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-lg text-darkTextPrimary">Sessão #1</h3>
+                                    <p class="text-darkTextSecondary">Encontro na Taberna do Dragão</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-blue-400 font-medium">29/05/2023</div>
+                                    <div class="text-sm text-darkTextSecondary">3h 20m</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Players & Actions -->
+            <div class="space-y-8">
+                <!-- Players Card -->
+                <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
+                <div class="card bg-darkCard rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Jogadores</h2>
+                    
+                    <div class="players-grid grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-2">
+                        <% for(let character of campain.players) { %>
+                            <!-- Changed bg-blue-50 to bg-darkCardHover, border-blue-100 to border-darkBorder or specific blue border -->
+                            <div class="player-card bg-darkCardHover rounded-lg p-4 transition-all duration-300 cursor-pointer border border-darkBorder">
+                                <div class="flex items-center">
+                                    <div class="player-avatar w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold mr-3">
+                                        <%= character.charAt(0) %>
+                                    </div>
+                                    <div class="player-info">
+                                        <!-- Changed text-gray-800 to text-darkTextPrimary -->
+                                        <span class="player-name font-medium text-darkTextPrimary"><%= character %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <!-- Action Button - Gradients should look fine on dark, text is already white -->
+                <% if(campain.active) { %>
+                    <button id="joinButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <i class="fas fa-play mr-2"></i> Entrar na Sessão
+                    </button>
+                <% } else { %>
+                    <button id="backButton" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
+                    </button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('backButton')?.addEventListener('click', () => {
+            window.location.href = "/dashboard"
+        })
+        
+        document.getElementById('joinButton')?.addEventListener('click', () => {
+            // Show loading state
+            const btn = document.getElementById('joinButton');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Conectando...';
+            btn.disabled = true;
+            
+            // Logic to join session
+            fetch(`/campains/<%= campain.id %>/join`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if(response.ok) {
+                    window.location.href = `/session/<%= campain.id %>`;
+                } else {
+                    // Revert button state on error
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    // Consider a more user-friendly dark mode alert/toast here in a real app
+                    alert('Erro ao entrar na sessão. Tente novamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                // Revert button state on error
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('Erro ao conectar. Verifique sua conexão.');
+            });
+        });
+    </script>
+</body>
+</html>

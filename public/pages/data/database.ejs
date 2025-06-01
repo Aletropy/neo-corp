@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCorp - Painel de Dados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Although we are manually styling for dark, this can be useful
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#2563eb',
+                        accent: '#1d4ed8',
+                        dark: '#0f172a',      // Main background
+                        darker: '#0a1120',    // Slightly darker variant
+                        card: '#1e293b',      // Card backgrounds
+                        cardHover: '#334155', // Card hover
+                        borderDark: '#334155',// Borders in dark mode
+                        textPrimaryDark: '#e2e8f0', // Primary text
+                        textSecondaryDark: '#94a3b8',// Secondary text
+                        light: '#f8fafc',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* dark */
+            color: #e2e8f0; /* textPrimaryDark */
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-table { /* Renamed from .card to avoid conflict if used elsewhere */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #1e293b; /* card */
+            border: 1px solid #334155; /* borderDark */
+        }
+        
+        .active-tab {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-left: 4px solid #3b82f6; /* primary */
+            color: #3b82f6; /* primary */
+        }
+        
+        .active-tab i {
+            color: #3b82f6; /* primary */
+        }
+        
+        .tab-btn:hover:not(.active-tab) {
+            background-color: rgba(30, 41, 59, 0.5); /* card with opacity */
+        }
+        
+        input, textarea, select {
+            background-color: #1e293b; /* card */
+            border-color: #334155; /* borderDark */
+            color: #e2e8f0; /* textPrimaryDark */
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3b82f6; /* primary */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .modal {
+            background-color: rgba(0, 0, 0, 0.7);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            background-color: #1e293b; /* card */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Scrollbar for dark mode */
+        .modal-content::-webkit-scrollbar, .table-responsive::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content::-webkit-scrollbar-track, .table-responsive::-webkit-scrollbar-track {
+            background: #334155; /* borderDark */
+            border-radius: 4px;
+        }
+        .modal-content::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb {
+            background: #4b5563; /* gray-600 for thumb */
+            border-radius: 4px;
+        }
+        .modal-content::-webkit-scrollbar-thumb:hover, .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* gray-500 for hover */
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .filter-input {
+            background-color: #0f172a; /* dark */
+        }
+    </style>
+</head>
+<body class="bg-darker">
+    <!-- Navbar Superior -->
+    <nav class="bg-dark shadow-lg">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cube text-white"></i>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-white">Neo<span class="text-blue-400">Corp</span></span>
+                    </div>
+                     <span class="ml-6 text-lg font-semibold text-gray-300">Painel de Dados</span>
+                </div>
+                <div class="flex items-center">
+                     <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
+                    </a>
+                    <div class="ml-3 relative">
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-2">Admin</span>
+                            <div class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                                <span class="font-medium">A</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Sidebar -->
+        <aside class="w-64 min-h-screen pr-6">
+            <div class="bg-card rounded-xl shadow-sm p-4 border border-borderDark">
+                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg active-tab" data-tab="powers">
+                    <i class="fas fa-bolt text-gray-400 w-6 mr-3 text-center"></i>
+                    <span>Poderes</span>
+                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%= poderes.length %></span>
+                </button>
+                
+                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg" data-tab="rituals">
+                    <i class="fas fa-book-skull text-gray-400 w-6 mr-3 text-center"></i>
+                    <span>Rituais</span>
+                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%= rituals.length %></span>
+                </button>
+                
+                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg" data-tab="items">
+                    <i class="fas fa-box-archive text-gray-400 w-6 mr-3 text-center"></i>
+                    <span>Itens</span>
+                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%= items.length %></span>
+                </button>
+
+                <button class="tab-btn w-full flex items-center p-3 rounded-lg" data-tab="weapons">
+                    <i class="fas fa-wand-sparkles text-gray-400 w-6 mr-3 text-center"></i> <!-- Changed icon for distinction -->
+                    <span>Armas</span>
+                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%= weapons.length %></span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Powers Tab -->
+            <div id="powers" class="tab-content active">
+                <div class="bg-card rounded-xl shadow-sm p-6 border border-borderDark">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-borderDark">
+                        <h2 class="text-xl font-bold text-textPrimaryDark">Gerenciar Poderes (<%= poderes.length %>)</h2>
+                        <button class="btn-add-power px-4 py-2 bg-primary hover:bg-secondary text-white font-medium rounded-lg shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Poder
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="filterPowersInput" placeholder="Buscar poderes por nome, tipo, origem..." class="filter-input w-full px-4 py-2 border border-borderDark rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-textPrimaryDark placeholder-textSecondaryDark">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="min-w-full divide-y divide-borderDark">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Tipo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Origem</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Elemento</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-card divide-y divide-borderDark" id="powersTableBody">
+                                <% poderes.forEach(poder => { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-textPrimaryDark"><%= poder.name %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= poder.isHabilidade ? 'Habilidade' : 'Poder' %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark">
+                                        <% if (poder.fromClasse) { %><%= poder.fromClasse %><% } %>
+                                        <% if (poder.fromTrilha) { %> / <%= poder.fromTrilha %><% } %>
+                                        <% if (!poder.fromClasse && !poder.fromTrilha) { %> Geral <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= poder.elemento || 'N/A' %></td>
+                                    <td class="px-6 py-4 text-sm text-textSecondaryDark max-w-xs truncate" title="<%= poder.description %>"><%= poder.description %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-primary hover:text-secondary mr-2">Editar</button>
+                                        <button class="text-danger hover:text-red-700">Excluir</button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <tr id="powersNoDataRow" style="display: <%= poderes.length === 0 ? '' : 'none' %>;">
+                                    <td colspan="6" class="text-center py-4 text-textSecondaryDark">
+                                        <% if (poderes.length === 0) { %>
+                                            Nenhum poder cadastrado.
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rituals Tab -->
+            <div id="rituals" class="tab-content">
+                 <div class="bg-card rounded-xl shadow-sm p-6 border border-borderDark">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-borderDark">
+                        <h2 class="text-xl font-bold text-textPrimaryDark">Gerenciar Rituais (<%= rituals.length %>)</h2>
+                        <button class="btn-add-ritual px-4 py-2 bg-primary hover:bg-secondary text-white font-medium rounded-lg shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Ritual
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="filterRitualsInput" placeholder="Buscar rituais por nome, círculo, elemento..." class="filter-input w-full px-4 py-2 border border-borderDark rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-textPrimaryDark placeholder-textSecondaryDark">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="min-w-full divide-y divide-borderDark">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Círculo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Elemento</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Alcance</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Duração</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-card divide-y divide-borderDark" id="ritualsTableBody">
+                                <% rituals.forEach(ritual => { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-textPrimaryDark"><%= ritual.name %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= ritual.circle %>º</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= ritual.element %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark" data-enum-display="RitualRange.<%= ritual.range %>"><%= ritual.range %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark" data-enum-display="RitualDuration.<%= ritual.duration %>"><%= ritual.duration %></td>
+                                    <td class="px-6 py-4 text-sm text-textSecondaryDark max-w-xs truncate" title="<%= ritual.description %>"><%= ritual.description %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-primary hover:text-secondary mr-2">Editar</button>
+                                        <button class="text-danger hover:text-red-700">Excluir</button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <tr id="ritualsNoDataRow" style="display: <%= rituals.length === 0 ? '' : 'none' %>;">
+                                    <td colspan="7" class="text-center py-4 text-textSecondaryDark">
+                                        <% if (rituals.length === 0) { %>
+                                            Nenhum ritual cadastrado.
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Tab -->
+            <div id="items" class="tab-content">
+                 <div class="bg-card rounded-xl shadow-sm p-6 border border-borderDark">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-borderDark">
+                        <h2 class="text-xl font-bold text-textPrimaryDark">Gerenciar Itens (<%= items.length %>)</h2>
+                        <button class="btn-add-item px-4 py-2 bg-primary hover:bg-secondary text-white font-medium rounded-lg shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Item
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="filterItemsInput" placeholder="Buscar itens por nome, categoria..." class="filter-input w-full px-4 py-2 border border-borderDark rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-textPrimaryDark placeholder-textSecondaryDark">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="min-w-full divide-y divide-borderDark">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Categoria</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Espaços</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-card divide-y divide-borderDark" id="itemsTableBody">
+                                <% items.forEach(item => { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-textPrimaryDark"><%= item.name %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= item.category %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= item.storage %></td>
+                                    <td class="px-6 py-4 text-sm text-textSecondaryDark max-w-xs truncate" title="<%= item.description %>"><%= item.description %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-primary hover:text-secondary mr-2">Editar</button>
+                                        <button class="text-danger hover:text-red-700">Excluir</button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <tr id="itemsNoDataRow" style="display: <%= items.length === 0 ? '' : 'none' %>;">
+                                    <td colspan="5" class="text-center py-4 text-textSecondaryDark">
+                                        <% if (items.length === 0) { %>
+                                            Nenhum item cadastrado.
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weapons Tab -->
+            <div id="weapons" class="tab-content">
+                 <div class="bg-card rounded-xl shadow-sm p-6 border border-borderDark">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-borderDark">
+                        <h2 class="text-xl font-bold text-textPrimaryDark">Gerenciar Armas (<%= weapons.length %>)</h2>
+                        <button class="btn-add-weapon px-4 py-2 bg-primary hover:bg-secondary text-white font-medium rounded-lg shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Arma
+                        </button>
+                    </div>
+                     <div class="mb-4">
+                        <input type="text" id="filterWeaponsInput" placeholder="Buscar armas por nome, tipo, proficiência..." class="filter-input w-full px-4 py-2 border border-borderDark rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-textPrimaryDark placeholder-textSecondaryDark">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="min-w-full divide-y divide-borderDark">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Categoria</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Espaços</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Tipo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Emp.</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Prof.</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-textSecondaryDark uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-card divide-y divide-borderDark" id="weaponsTableBody">
+                                <% weapons.forEach(weapon => { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-textPrimaryDark"><%= weapon.name %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= weapon.category %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= weapon.storage %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= weapon.weaponType.replace(/_/g, ' ') %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= weapon.grip.replace(/_/g, ' ') %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-textSecondaryDark"><%= weapon.proficiency %></td>
+                                    <td class="px-6 py-4 text-sm text-textSecondaryDark max-w-xs truncate" title="<%= weapon.description %>"><%= weapon.description %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-primary hover:text-secondary mr-2">Editar</button>
+                                        <button class="text-danger hover:text-red-700">Excluir</button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <tr id="weaponsNoDataRow" style="display: <%= weapons.length === 0 ? '' : 'none' %>;">
+                                    <td colspan="8" class="text-center py-4 text-textSecondaryDark">
+                                        <% if (weapons.length === 0) { %>
+                                            Nenhuma arma cadastrada.
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Power Modal -->
+    <div id="addPowerModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <form id="addPowerForm">
+                <h3 class="text-lg font-medium leading-6 text-textPrimaryDark mb-4">Adicionar Novo Poder</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="powerName" class="block text-sm font-medium text-textSecondaryDark">Nome</label>
+                        <input type="text" name="powerName" id="powerName" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="isHabilidade" id="isHabilidade" class="h-4 w-4 text-primary border-gray-600 rounded">
+                        <label for="isHabilidade" class="ml-2 block text-sm text-textSecondaryDark">É uma Habilidade?</label>
+                    </div>
+                    <div>
+                        <label for="powerDescription" class="block text-sm font-medium text-textSecondaryDark">Descrição</label>
+                        <textarea name="powerDescription" id="powerDescription" rows="4" required class="mt-1 block w-full rounded-md shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label for="powerFromClasse" class="block text-sm font-medium text-textSecondaryDark">Classe de Origem (Opcional)</label>
+                        <input type="text" name="powerFromClasse" id="powerFromClasse" class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="powerFromTrilha" class="block text-sm font-medium text-textSecondaryDark">Trilha de Origem (Opcional)</label>
+                        <input type="text" name="powerFromTrilha" id="powerFromTrilha" class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="powerElemento" class="block text-sm font-medium text-textSecondaryDark">Elemento (Opcional)</label>
+                        <input type="text" name="powerElemento" id="powerElemento" class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" class="btn-cancel-modal px-4 py-2 text-sm font-medium text-gray-300 bg-cardHover hover:bg-gray-600 rounded-md">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Ritual Modal -->
+    <div id="addRitualModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <form id="addRitualForm">
+                <h3 class="text-lg font-medium leading-6 text-textPrimaryDark mb-4">Adicionar Novo Ritual</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="ritualName" class="block text-sm font-medium text-textSecondaryDark">Nome</label>
+                        <input type="text" name="ritualName" id="ritualName" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                     <div>
+                        <label for="ritualCirculo" class="block text-sm font-medium text-textSecondaryDark">Círculo</label>
+                        <select name="ritualCirculo" id="ritualCirculo" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="1">1º Círculo</option>
+                            <option value="2">2º Círculo</option>
+                            <option value="3">3º Círculo</option>
+                            <option value="4">4º Círculo</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="ritualElemento" class="block text-sm font-medium text-textSecondaryDark">Elemento</label>
+                        <input type="text" name="ritualElemento" id="ritualElemento" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="ritualRange" class="block text-sm font-medium text-textSecondaryDark">Alcance</label>
+                        <select name="ritualRange" id="ritualRange" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="pessoal">Pessoal</option>
+                            <option value="toque">Toque</option>
+                            <option value="curto">Curto</option>
+                            <option value="medio">Médio</option>
+                            <option value="longe">Longe</option>
+                            <option value="extremo">Extremo</option>
+                            <option value="ilimitado">Ilimitado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ritualDuration" class="block text-sm font-medium text-textSecondaryDark">Duração</label>
+                        <select name="ritualDuration" id="ritualDuration" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="instantanea">Instantânea</option>
+                            <option value="cena">Cena</option>
+                            <option value="sustentada">Sustentada</option>
+                            <option value="definida">Definida</option>
+                            <option value="permantente">Permanente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label for="ritualDescription" class="block text-sm font-medium text-textSecondaryDark">Descrição</label>
+                    <textarea name="ritualDescription" id="ritualDescription" rows="4" required class="mt-1 block w-full rounded-md shadow-sm p-2"></textarea>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" class="btn-cancel-modal px-4 py-2 text-sm font-medium text-gray-300 bg-cardHover hover:bg-gray-600 rounded-md">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <form id="addItemForm">
+                <h3 class="text-lg font-medium leading-6 text-textPrimaryDark mb-4">Adicionar Novo Item</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="itemName" class="block text-sm font-medium text-textSecondaryDark">Nome</label>
+                        <input type="text" name="itemName" id="itemName" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                     <div>
+                        <label for="itemCategory" class="block text-sm font-medium text-textSecondaryDark">Categoria (0-4)</label>
+                        <input type="number" name="itemCategory" id="itemCategory" min="0" max="4" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                     <div>
+                        <label for="itemStorage" class="block text-sm font-medium text-textSecondaryDark">Espaços</label>
+                        <input type="number" name="itemStorage" id="itemStorage" min="0" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="itemDescription" class="block text-sm font-medium text-textSecondaryDark">Descrição</label>
+                        <textarea name="itemDescription" id="itemDescription" rows="4" required class="mt-1 block w-full rounded-md shadow-sm p-2"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" class="btn-cancel-modal px-4 py-2 text-sm font-medium text-gray-300 bg-cardHover hover:bg-gray-600 rounded-md">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Weapon Modal -->
+    <div id="addWeaponModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <form id="addWeaponForm">
+                <h3 class="text-lg font-medium leading-6 text-textPrimaryDark mb-4">Adicionar Nova Arma</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="weaponName" class="block text-sm font-medium text-textSecondaryDark">Nome</label>
+                        <input type="text" name="weaponName" id="weaponName" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="weaponCategory" class="block text-sm font-medium text-textSecondaryDark">Categoria (0-4)</label>
+                        <input type="number" name="weaponCategory" id="weaponCategory" min="0" max="4" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="weaponStorage" class="block text-sm font-medium text-textSecondaryDark">Espaços</label>
+                        <input type="number" name="weaponStorage" id="weaponStorage" min="0" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="weaponType" class="block text-sm font-medium text-textSecondaryDark">Tipo de Arma</label>
+                        <select name="weaponType" id="weaponType" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="corpo_a_corpo">Corpo a Corpo</option>
+                            <option value="arremessavel">Arremessável</option>
+                            <option value="distancia">Distância</option>
+                            <option value="fogo">Fogo</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="weaponGrip" class="block text-sm font-medium text-textSecondaryDark">Empunhadura</label>
+                        <select name="weaponGrip" id="weaponGrip" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="leve">Leve</option>
+                            <option value="uma_mao">Uma Mão</option>
+                            <option value="duas_maos">Duas Mãos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="weaponProficiency" class="block text-sm font-medium text-textSecondaryDark">Proficiência</label>
+                        <select name="weaponProficiency" id="weaponProficiency" required class="mt-1 block w-full rounded-md shadow-sm p-2">
+                            <option value="simples">Simples</option>
+                            <option value="tatica">Tática</option>
+                            <option value="pesada">Pesada</option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="mt-4">
+                    <label for="weaponDescription" class="block text-sm font-medium text-textSecondaryDark">Descrição</label>
+                    <textarea name="weaponDescription" id="weaponDescription" rows="3" required class="mt-1 block w-full rounded-md shadow-sm p-2"></textarea>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" class="btn-cancel-modal px-4 py-2 text-sm font-medium text-gray-300 bg-cardHover hover:bg-gray-600 rounded-md">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active-tab');
+                    btn.classList.add('hover:bg-gray-800'); 
+                });
+                button.classList.add('active-tab');
+                button.classList.remove('hover:bg-gray-800');
+                
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Modal Handling
+        const modals = {
+            power: document.getElementById('addPowerModal'),
+            ritual: document.getElementById('addRitualModal'),
+            item: document.getElementById('addItemModal'),
+            weapon: document.getElementById('addWeaponModal')
+        };
+
+        const openModal = (modal) => {
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex'); 
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
+        };
+
+        const closeModal = (modal) => {
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        document.querySelector('.btn-add-power').addEventListener('click', () => openModal(modals.power));
+        document.querySelector('.btn-add-ritual').addEventListener('click', () => openModal(modals.ritual));
+        document.querySelector('.btn-add-item').addEventListener('click', () => openModal(modals.item));
+        document.querySelector('.btn-add-weapon').addEventListener('click', () => openModal(modals.weapon));
+
+        document.querySelectorAll('.btn-cancel-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                closeModal(btn.closest('.modal'));
+            });
+        });
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                Object.values(modals).forEach(modal => closeModal(modal));
+            }
+        });
+         Object.values(modals).forEach(modal => {
+            if (modal) {
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) { 
+                        closeModal(modal);
+                    }
+                });
+            }
+        });
+
+
+        // Form Submissions (placeholder)
+        document.getElementById('addPowerForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Novo poder salvo (simulação)!');
+            closeModal(modals.power);
+        });
+        document.getElementById('addRitualForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Novo ritual salvo (simulação)!');
+            closeModal(modals.ritual);
+        });
+        document.getElementById('addItemForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Novo item salvo (simulação)!');
+            closeModal(modals.item);
+        });
+        document.getElementById('addWeaponForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Nova arma salva (simulação)!');
+            closeModal(modals.weapon);
+        });
+
+        // Enum display helper
+        const enumDisplayMap = {
+            RitualRange: {
+                pessoal: "Pessoal", toque: "Toque", curto: "Curto", medio: "Médio",
+                longe: "Longe", extremo: "Extremo", ilimitado: "Ilimitado"
+            },
+            RitualDuration: {
+                instantanea: "Instantânea", cena: "Cena", sustentada: "Sustentada",
+                definida: "Definida", permantente: "Permanente"
+            }
+        };
+
+        document.querySelectorAll('[data-enum-display]').forEach(el => {
+            const [enumName, enumKey] = el.dataset.enumDisplay.split('.');
+            if (enumDisplayMap[enumName] && enumDisplayMap[enumName][enumKey]) {
+                el.textContent = enumDisplayMap[enumName][enumKey];
+            }
+        });
+
+        // Table Filtering Logic
+        function setupTableFilter(inputId, tableBodyId, noDataRowId, originalEmptyText) {
+            const filterInput = document.getElementById(inputId);
+            const tableBody = document.getElementById(tableBodyId);
+            const noDataRow = document.getElementById(noDataRowId);
+
+            if (!filterInput || !tableBody || !noDataRow) {
+                console.warn("Filter elements missing for input:", inputId);
+                return;
+            }
+            const noDataCell = noDataRow.querySelector('td');
+            // Get all TRs from the tbody that are NOT the noDataRow
+            const initialDataRows = Array.from(tableBody.querySelectorAll('tr:not(#' + noDataRowId + ')'));
+
+            filterInput.addEventListener('keyup', () => {
+                const filterText = filterInput.value.toLowerCase().trim();
+                let visibleRowsCount = 0;
+
+                initialDataRows.forEach(row => {
+                    if (filterText === "") {
+                        row.style.display = ''; // Show row if filter is empty
+                    } else {
+                        const rowText = row.textContent.toLowerCase();
+                        if (rowText.includes(filterText)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                    // Count visible rows after display style is set
+                    if (row.style.display !== 'none') {
+                        visibleRowsCount++;
+                    }
+                });
+                
+                if (initialDataRows.length === 0) { // No data rows to begin with
+                    noDataRow.style.display = '';
+                    noDataCell.textContent = originalEmptyText;
+                } else if (filterText !== "" && visibleRowsCount === 0) { // Filter applied, no results found
+                    noDataRow.style.display = '';
+                    noDataCell.textContent = `Nenhum resultado encontrado para "${filterInput.value}".`;
+                } else { // Results found OR filter is empty and data rows exist
+                    noDataRow.style.display = 'none';
+                }
+            });
+
+            // Set initial state of the noDataRow (in case it was not handled by EJS for some reason, or for consistency)
+             if (initialDataRows.length === 0) {
+                noDataRow.style.display = '';
+                noDataCell.textContent = originalEmptyText;
+            } else {
+                noDataRow.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTableFilter('filterPowersInput', 'powersTableBody', 'powersNoDataRow', 'Nenhum poder cadastrado.');
+            setupTableFilter('filterRitualsInput', 'ritualsTableBody', 'ritualsNoDataRow', 'Nenhum ritual cadastrado.');
+            setupTableFilter('filterItemsInput', 'itemsTableBody', 'itemsNoDataRow', 'Nenhum item cadastrado.');
+            setupTableFilter('filterWeaponsInput', 'weaponsTableBody', 'weaponsNoDataRow', 'Nenhuma arma cadastrada.');
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCorp - Character Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/scripts/character/originPopulator.js" defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        combatent: '#fd5f5f',
+                        especialista: '#519afa',
+                        ocultista: '#b341ff',
+                        dark: '#1e293b',
+                        light: '#f8fafc',
+                        accent: '#ffcb3d'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a2e, #1a1a4f, #2d0f36);
+            min-height: 100vh;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .class-card {
+            transition: all 0.3s ease;
+        }
+        
+        .class-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #334155;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: #ffcb3d;
+            transform: scale(1.3);
+        }
+        
+        .origin-card {
+            transition: all 0.4s ease;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .origin-card:hover {
+            transform: scale(1.03);
+        }
+
+        .origin-card > div:first-child {
+            flex-shrink: 0; /* Keep header fixed size */
+        }
+        
+        .origin-slider-viewport {
+            max-height: 60vh;
+            overflow: hidden;
+        }
+
+        .origin-slider-container {
+            transition: transform 0.5s ease;
+        }
+        
+        .selected {
+            border: 3px solid #ffcb3d;
+            box-shadow: 0 0 20px rgba(255, 203, 61, 0.5);
+        }
+        
+        .scroll-content {
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #1e293b;
+        }
+        
+        .scroll-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scroll-content::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+        
+        .scroll-content::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 10px;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(to right, #ffcb3d, #ff9a3d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Initial Welcome Screen -->
+    <div id="welcomeScreen" class="bg-gray-900 rounded-2xl p-8 max-w-2xl w-full text-center animate-in border border-gray-700">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-user-plus text-white text-4xl"></i>
+        </div>
+        
+        <h1 class="text-4xl font-bold text-white mb-3">Neo<span class="text-gradient">Corp</span> Foundations</h1>
+        <h2 class="text-xl text-accent font-medium mb-6">Crie um novo personagem</h2>
+        
+        <p class="text-gray-400 mb-8 max-w-lg mx-auto">
+            Prepare-se para uma nova jornada! Crie seu personagem único com habilidades especiais, uma história cativante e uma aparência marcante.
+        </p>
+        
+        <div class="bg-gray-800 rounded-xl p-6 mb-8 text-left max-w-lg mx-auto">
+            <div class="flex items-start mb-4">
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center mr-3 mt-1">
+                    <i class="fas fa-lightbulb text-white"></i>
+                </div>
+                <p class="text-gray-300">
+                    Nunca jogou um RPG antes? <a href="/character/tips" class="text-accent font-medium hover:underline">Leia essas dicas aqui</a>, eu juro é rapidinho :)
+                </p>
+            </div>
+        </div>
+        
+        <button id="startButton" class="w-full max-w-xs py-4 px-6 bg-gradient-to-r from-accent to-amber-500 hover:from-amber-500 hover:to-accent text-gray-900 font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+            Começar Agora <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+    </div>
+    
+    <!-- Form Container -->
+    <form id="characterForm" method="post" class="w-full max-w-4xl hidden">
+        <!-- Progress Indicator -->
+        <div class="step-indicator">
+            <div class="step active" data-step="0"></div>
+            <div class="step" data-step="1"></div>
+            <div class="step" data-step="2"></div>
+            <div class="step" data-step="3"></div>
+            <div class="step" data-step="4"></div>
+            <div class="step" data-step="5"></div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container mb-8 bg-gray-700 rounded-full">
+            <div id="progressBar" class="progress-fill bg-gradient-to-r from-accent to-amber-500 rounded-full" style="width: 16.66%"></div>
+        </div>
+        
+        <!-- Step 1: Character Name -->
+        <div id="card-0" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">1</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Nome do Personagem</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-6">
+                Escolha um nome que reflita a personalidade e história do seu personagem. Pode ser algo épico ou simples, o importante é que tenha significado para você. Não escolha um nome estranho ou engraçado para o seu personagem. Pode parecer legal no começo, porém isso interfere bastante no enriquecimento e aprofundamento do personagem e da história. ;)
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-gray-300 text-sm font-medium mb-2">Nome completo</label>
+                <input 
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-accent focus:border-accent transition" 
+                    name="name" 
+                    type="text" 
+                    placeholder="Ex: Aric Valerius"
+                    autocomplete="off"
+                >
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="card-1" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">2</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Idade do Personagem</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-6">
+                A idade <span class="font-bold text-red">NÃO</span> afeta a experiência, sabedoria e habilidades do seu personagem. Escolha uma idade entre 18 e 70 anos que se encaixe na história que você imagina.
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-gray-300 text-sm font-medium mb-2">Idade (18-70)</label>
+                <input 
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-accent focus:border-accent transition" 
+                    name="age" 
+                    type="number" 
+                    min="18"
+                    max="70"
+                    placeholder="Ex: 28"
+                    autocomplete="off"
+                >
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="card-2" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">3</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Aparência Física</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-2">
+                Quando alguém olha para o seu personagem, o que ela vê?
+            </p>
+            <p class="text-gray-500 text-sm mb-6">
+                Descreva características marcantes, estilo de roupa, postura, cicatrizes, tatuagens e qualquer detalhe visual que torne seu personagem único.
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-gray-300 text-sm font-medium mb-2">Descrição da aparência</label>
+                <textarea 
+                    class="w-full h-48 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-accent focus:border-accent transition" 
+                    name="appearenceDescription" 
+                    placeholder="Descreva a aparência do seu personagem..."
+                    autocomplete="off"
+                ></textarea>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Personality Description -->
+        <div id="card-3" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">4</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Personalidade e História</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-2">
+                Quem é seu personagem por dentro? Quais são seus sonhos, medos e motivações?
+            </p>
+            <p class="text-accent text-sm mb-6">
+                Não se apresse aqui :) Tome seu tempo para criar um personagem com mais imersão e detalhes.
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-gray-300 text-sm font-medium mb-2">Descrição da personalidade</label>
+                <textarea 
+                    class="w-full h-48 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-accent focus:border-accent transition" 
+                    name="description" 
+                    placeholder="Descreva a personalidade, hábitos, desejos, sonhos, traumas..."
+                    autocomplete="off"
+                ></textarea>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Class Selection -->
+        <div id="card-4" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">5</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Escolha sua Classe</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-8 text-center max-w-2xl mx-auto">
+                Cada classe oferece habilidades únicas e um estilo de jogo diferente. Escolha a que melhor se encaixa na sua visão de personagem.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Combatent Card -->
+                <div class="class-card bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl border border-combatent overflow-hidden">
+                    <div class="p-5 border-b border-combatent">
+                        <h3 class="text-xl font-bold text-combatent text-center mb-4">Combatente</h3>
+                        <p class="text-gray-300 text-sm mb-4 text-center">
+                            Um perito em armas brancas e de fogo, este agente serve como a linha de frente na luta contra o Outro Lado.
+                        </p>
+                    </div>
+                    <div class="scroll-content p-5 max-h-80 overflow-y-auto">
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE VIDA INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">20+<span class="text-combatent">VIGOR</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>4 PV (+Vig)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE ESFORÇO INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">2+<span class="text-combatent">PRESENÇA</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>2 PE (+Pre)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">SANIDADE INICIAL</h5>
+                        <p class="text-gray-400 mb-4">12<br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>3 SAN</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PERÍCIAS TREINADAS</h5>
+                        <ul class="text-gray-400 text-sm mb-4 list-disc pl-5">
+                            <li>Luta <span class="text-gray-500">ou</span> Pontaria</li>
+                            <li>Fortitude <span class="text-gray-500">ou</span> Reflexos</li>
+                            <li>1+<span class="text-combatent">Intelecto</span> perícias adicionais</li>
+                        </ul>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PROFICIÊNCIAS</h5>
+                        <p class="text-gray-400">Armas simples<br>Armas táticas<br>Proteções leves</p>
+                    </div>
+                    <div class="p-4 text-center">
+                        <button type="button" class="select-class-btn w-full py-3 bg-combatent text-white font-bold rounded-lg hover:bg-red-500 transition" data-class="combatente">
+                            Selecionar Combatente
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Especialista Card -->
+                <div class="class-card bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl border border-especialista overflow-hidden">
+                    <div class="p-5 border-b border-especialista">
+                        <h3 class="text-xl font-bold text-especialista text-center mb-4">Especialista</h3>
+                        <p class="text-gray-300 text-sm mb-4 text-center">
+                            Com conhecimento, esperteza e lábia, este agente é focado em resolver problemas diversos. Eclético
+                        </p>
+                    </div>
+                    <div class="scroll-content p-5 max-h-80 overflow-y-auto">
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE VIDA INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">16+<span class="text-especialista">VIGOR</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>3 PV (+Vig)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE ESFORÇO INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">3+<span class="text-especialista">PRESENÇA</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>3 PE (+Pre)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">SANIDADE INICIAL</h5>
+                        <p class="text-gray-400 mb-4">16<br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>4 SAN</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PERÍCIAS TREINADAS</h5>
+                        <ul class="text-gray-400 text-sm mb-4 list-disc pl-5">
+                            <li>Uma quantidade de perícias à sua escolha igual a 7 + <span class="text-especialista">Intelecto</span></li>
+                        </ul>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PROFICIÊNCIAS</h5>
+                        <p class="text-gray-400">Armas simples<br>Proteções leves</p>
+                    </div>
+                    <div class="p-4 text-center">
+                        <button type="button" class="select-class-btn w-full py-3 bg-especialista text-white font-bold rounded-lg hover:bg-blue-500 transition" data-class="especialista">
+                            Selecionar Especialista
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Ocultista Card -->
+                <div class="class-card bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl border border-ocultista overflow-hidden">
+                    <div class="p-5 border-b border-ocultista">
+                        <h3 class="text-xl font-bold text-ocultista text-center mb-4">Ocultista</h3>
+                        <p class="text-gray-300 text-sm mb-4 text-center">
+                            Um estudioso do paranormal, que busca entender os mistérios dos elementos e usá-los a seu favor.
+                        </p>
+                    </div>
+                    <div class="scroll-content p-5 max-h-80 overflow-y-auto">
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE VIDA INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">12+<span class="text-ocultista">VIGOR</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>2 PV (+Vig)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PONTOS DE ESFORÇO INICIAIS</h5>
+                        <p class="text-gray-400 mb-4">4+<span class="text-ocultista">PRESENÇA</span><br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>4 PE (+Pre)</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">SANIDADE INICIAL</h5>
+                        <p class="text-gray-400 mb-4">20<br>
+                        <small class="text-gray-500 text-xs">A cada novo nível de exposição:<br>5 SAN</small></p>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PERÍCIAS TREINADAS</h5>
+                        <ul class="text-gray-400 text-sm mb-4 list-disc pl-5">
+                            <li>Ocultismo e Vontade</li>
+                            <li>3+<span class="text-ocultista">Intelecto</span> perícias adicionais</li>
+                        </ul>
+                        
+                        <h5 class="font-semibold text-gray-200 mb-2">PROFICIÊNCIAS</h5>
+                        <p class="text-gray-400">Armas simples</p>
+                    </div>
+                    <div class="p-4 text-center">
+                        <button type="button" class="select-class-btn w-full py-3 bg-ocultista text-white font-bold rounded-lg hover:bg-purple-500 transition" data-class="ocultista">
+                            Selecionar Ocultista
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between mt-8">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 6: Origin Selection -->
+        <div id="card-5" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">6</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Escolha sua Origem</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-6 text-center max-w-2xl mx-auto">
+                Qual o seu passado? Escolha uma origem que defina parte da sua história e conceda habilidades únicas.
+            </p>
+            
+            <div class="origin-slider-viewport overflow-hidden mb-6 p-8">
+                <div class="origin-slider-container flex transition-transform duration-500" id="originSlider">
+                    <!-- Origin Cards will be populated by originPopulator.js -->
+                    
+                </div>
+            </div>
+            
+            <div class="flex justify-center mb-6">
+                <button id="prevOrigin" type="button" class="px-4 py-2 bg-gray-700 text-gray-300 rounded-l-lg hover:bg-gray-600">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="nextOrigin" type="button" class="px-4 py-2 bg-gray-700 text-gray-300 rounded-r-lg hover:bg-gray-600">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow hover:from-green-600 hover:to-emerald-700 transition">
+                    Criar Personagem <i class="fas fa-check ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <script defer>
+        let currentPage = 0;
+        const totalPages = 6;
+        let selectedClass = null;
+        
+        // Initialize the character creator
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start button
+            document.getElementById('startButton')?.addEventListener('click', () => {
+                const welcomeScreen = document.getElementById('welcomeScreen');
+                const form = document.getElementById('characterForm');
+                welcomeScreen.classList.add('hidden');
+                form.classList.remove('hidden');
+                document.getElementById('card-0').classList.remove('hidden');                
+                updateProgress();
+            });
+            
+            // Next step buttons
+            document.querySelectorAll('.next-step-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentPage < totalPages - 1) {
+                        document.getElementById(`card-${currentPage}`).classList.add('hidden');
+                        currentPage++;
+                        document.getElementById(`card-${currentPage}`).classList.remove('hidden');
+                        updateProgress();
+                    }
+                });
+            });
+            
+            // Previous step buttons
+            document.querySelectorAll('.prev-step-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentPage > 0) {
+                        document.getElementById(`card-${currentPage}`).classList.add('hidden');
+                        currentPage--;
+                        document.getElementById(`card-${currentPage}`).classList.remove('hidden');
+                        updateProgress();
+                    }
+                });
+            });
+            
+            // Class selection
+            document.querySelectorAll('.select-class-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove selection from all buttons
+                    document.querySelectorAll('.select-class-btn').forEach(b => {
+                        b.classList.remove('ring-2', 'ring-offset-2', 'ring-white');
+                    });
+                    
+                    btn.classList.add('ring-2', 'ring-offset-2', 'ring-white');
+                    selectedClass = btn.getAttribute('data-class').toLowerCase();
+
+                    document.getElementById("classe-input")?.remove();
+
+                    const input = document.createElement("input");
+                    input.id = "classe-input"
+                    input.type = "hidden"
+                    input.value = selectedClass
+                    input.name = "classe"
+
+                    document.getElementById("characterForm").appendChild(input);
+                });
+            });
+
+            let translation = 0;
+            
+            // Origin navigation
+            document.getElementById('nextOrigin')?.addEventListener('click', () => {
+                const slider = document.getElementById('originSlider');
+                translation -= 320;
+                slider.style.transform = `translateX(${translation}px)`;
+            });
+            
+            document.getElementById('prevOrigin')?.addEventListener('click', () => {
+                const slider = document.getElementById('originSlider');
+                translation += 320;
+                slider.style.transform = `translateX(${translation}px)`;
+            });
+        });
+        
+        // Update progress bar and step indicators
+        function updateProgress() {
+            // Update progress bar
+            const progressPercentage = (currentPage + 1) / totalPages * 100;
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index <= currentPage) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

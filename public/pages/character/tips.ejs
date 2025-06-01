@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCorp - Character Tips</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#2563eb',
+                        accent: '#1d4ed8',
+                        light: '#f8fafc',
+                        dark: '#1e293b',
+                        tipYellow: '#fcd34d'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a2e, #1a1a4f, #2d0f36);
+        }
+        
+        .tip-card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tip-header {
+            text-shadow: 0 0 8px rgba(252, 211, 77, 0.8);
+        }
+        
+        .tip-item {
+            transition: all 0.3s ease;
+        }
+        
+        .tip-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .neon-btn {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        .neon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="tip-card bg-gray-800 rounded-xl p-6 max-w-md w-full">
+        <div class="mb-8 text-center">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-lightbulb text-white text-2xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white">Dicas para Criação de Personagens</h1>
+            <p class="text-gray-400 mt-2">Aprenda a criar personagens memoráveis</p>
+        </div>
+        
+        <div class="space-y-8 max-h-[500px] overflow-y-auto pr-2">
+            <!-- Tip 1 -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">1. Se inspire em pessoas, personagens ou arquétipos que você já conhece</h3>
+                <p class="text-gray-300 mb-2">— Pegue traços de alguém real (um amigo extrovertido, um professor sábio) ou fictício (um herói de filme, um vilão de série).</p>
+                <p class="text-gray-300 mb-2">— Exemplo: <em class="text-blue-300">"Meu personagem age como meu tio desastrado, mas tem a coragem da Hermione do Harry Potter."</em></p>
+                <p class="text-gray-300">— Isso ajuda a ter um "modelo" para imitar na hora de interpretar.</p>
+            </div>
+            
+            <!-- Tip 2 -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">2. Defina 3 palavras-chave para a personalidade</h3>
+                <p class="text-gray-300 mb-2">— Escolha <strong class="text-blue-300">3 adjetivos</strong> que resumam seu personagem (ex: <em class="text-blue-300">curioso, arrogante, leal</em>).</p>
+                <p class="text-gray-300 mb-2">— Use-os como guia: antes de agir, pergunte: <em class="text-blue-300">"O que alguém [curioso] faria aqui?"</em></p>
+                <p class="text-gray-300">— Isso simplifica a atuação e mantém o personagem consistente.</p>
+            </div>
+            
+            <!-- Tip 3 -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">3. Crie um passado curto com um objetivo claro</h3>
+                <p class="text-gray-300 mb-2">— Pense em <strong class="text-blue-300">1 evento marcante</strong> no passado e <strong class="text-blue-300">1 desejo/motivação</strong>.</p>
+                <p class="text-gray-300 mb-2">— Exemplo: <em class="text-blue-300">"Foi traído por um amigo e agora busca vingança"</em> ou <em class="text-blue-300">"Quer provar que é capaz de ser um líder, apesar da insegurança."</em></p>
+                <p class="text-gray-300">— Isso dá direção ao personagem e cria conexões com a história do RPG.</p>
+            </div>
+            
+            <!-- Tip 4 -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">4. Inclua uma fraqueza ou conflito interno</h3>
+                <p class="text-gray-300 mb-2">— Ninguém é perfeito! Adicione um <strong class="text-blue-300">defeito</strong> (ex: <em class="text-blue-300">medo de água, impulsividade</em>) ou um <strong class="text-blue-300">dilema moral</strong> (ex: <em class="text-blue-300">honra vs. sobrevivência</em>).</p>
+                <p class="text-gray-300">— Isso gera oportunidades de crescimento e momentos dramáticos no jogo.</p>
+            </div>
+            
+            <!-- Tip 5 -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">5. Comece simples e deixe o personagem evoluir</h3>
+                <p class="text-gray-300 mb-2">— Não precisa ter tudo definido no início! Deixe espaço para surpresas durante as sessões.</p>
+                <p class="text-gray-300 mb-2">— Exemplo: <em class="text-blue-300">"Não sei como ele reage a traição ainda… Vou descobrir jogando!"</em></p>
+                <p class="text-gray-300">— Aos poucos, você ajusta a personalidade com base nas interações do grupo e no enredo.</p>
+            </div>
+            
+            <!-- Bonus Tip -->
+            <div class="tip-item">
+                <h3 class="tip-header text-xl font-bold mb-3 text-tipYellow">Bônus: Use perguntas rápidas para se aprofundar</h3>
+                <p class="text-gray-300 mb-2">— Responda mentalmente:</p>
+                <ul class="text-gray-300 ml-5 space-y-1 mb-4">
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <em>"O que ele mais odeia?"</em>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <em>"Como reage sob pressão?"</em>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <em>"Qual seu maior segredo?"</em>
+                    </li>
+                </ul>
+                <p class="text-gray-300">— Isso cria camadas sem exigir horas de preparo.</p>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <button id="back-btn" class="neon-btn px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg">
+                <i class="fas fa-arrow-left mr-2"></i> Voltar
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('back-btn')?.addEventListener('click', () => {
+            window.location.href = "/character/new";
+        });
+    </script>
+</body>
+</html>

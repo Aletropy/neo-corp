@@ -1,0 +1,489 @@
+/* ========== RESET & GLOBAL STYLES ========== */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(45deg, #0a0a2e, #1a1a4f, #2d0f36);
+    font-family: 'Times New Roman', Times, serif;
+    color: #f3ffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 255, 255, 0.1) 0px,
+            rgba(0, 255, 255, 0.1) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+}
+
+/* ========== UTILITY CLASSES ========== */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.fade-out {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.full-width {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* ========== FORM ELEMENTS ========== */
+.neon-input {
+    display: block;
+    margin: 1rem auto;
+    padding: 1rem;
+    width: 300px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #0ff;
+    color: #0ff;
+    font-size: 1.2em;
+    box-shadow: 0 0 10px #0ff;
+}
+
+.neon-btn {
+    padding: 1rem 3rem;
+    background: #00ffff;
+    border: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.2em;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px #0ff;
+}
+
+.neon-btn:hover {
+    background: #0aa;
+    box-shadow: 0 0 25px #0ff;
+}
+
+/* ========== CARD COMPONENTS ========== */
+/* Base Card */
+.card {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 2rem;
+    border: 3px solid #f0f;
+    box-shadow: 0 0 30px #f0f;
+    max-width: 500px;
+    animation: fadeIn 1s ease;
+}
+
+/* Class Selection Cards */
+.class-cards-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    padding: 1rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.class-card {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid;
+    padding: 1.5rem;
+    width: 280px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px;
+}
+
+.class-card:nth-child(1) {
+    border-color: #fd5f5f;
+    box-shadow: 0 0 20px #fd5f5f;
+}
+
+.class-card:nth-child(2) {
+    border-color: #519afa;
+    box-shadow: 0 0 20px #519afa;
+}
+
+.class-card:nth-child(3) {
+    border-color: #b341ff;
+    box-shadow: 0 0 20px #b341ff;
+}
+
+.class-card h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px;
+}
+
+.class-card p {
+    line-height: 1.6;
+    margin: 0.5rem 0;
+    color: #fff;
+}
+
+.class-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.scroll-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 140px;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pericias-list {
+    padding-left: 1.5rem;
+    color: #fff;
+}
+
+.pericias-list li {
+    margin: 0.5rem 0;
+    list-style-type: '⏹️ ';
+}
+
+/* Dashboard Cards */
+.neon-card {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1.5rem;
+    border: 1px solid #0ff;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.neon-card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Player Cards */
+.player-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.player-card:hover {
+    transform: translateX(5px);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0ff;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.player-card.online .player-avatar {
+    background: #0f0;
+    box-shadow: 0 0 10px #0f0;
+}
+
+/* ========== LAYOUT COMPONENTS ========== */
+/* Main Containers */
+.container {
+    text-align: center;
+    transition: opacity 0.5s ease;
+}
+
+.dashboard-container {
+    margin-top: 70px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: calc(100vh - 70px);
+}
+
+.campaign-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
+    margin-top: 70px;
+}
+
+.campaign-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+}
+
+/* Navigation */
+.dashboard-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid #0ff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
+    font-size: 1.5em;
+    letter-spacing: 3px;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+    padding: 2rem;
+    border-right: 2px solid #0ff;
+    box-shadow: 5px 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.nav-user {
+    text-align: center;
+    margin-right: 25px;
+}
+
+/* Content Areas */
+.dashboard-content {
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.content-title {
+    border-left: 4px solid #0ff;
+    padding-left: 1rem;
+    margin-bottom: 2rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Campaign Components */
+.campaign-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.neon-title {
+    font-size: 2.5em;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 15px #f3ffff;
+}
+
+.campaign-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 2px solid #666;
+    border-radius: 20px;
+    font-size: 1.1em;
+}
+
+.campaign-status.active {
+    border-color: #0f0;
+    color: #0f0;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #666;
+    margin-right: 0.5rem;
+}
+
+.campaign-status.active .status-indicator {
+    background: #0f0;
+    box-shadow: 0 0 10px #0f0;
+    animation: pulse 1.5s infinite;
+}
+
+.campaign-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.player-list {
+    margin-bottom: 1.5rem;
+}
+
+.players-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.session-timeline {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #f0f;
+}
+
+.timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.9em;
+}
+
+/* Form Components */
+.account-form {
+    max-width: 500px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #0ff;
+}
+
+.big-textarea {
+    width: 480px;
+    max-width: 480px;
+    font-family: 'Courier New', Courier, monospace;
+    color: white;
+    border: 2px solid #0ff;
+    box-shadow: 0 0 10px #0ff;
+    outline: none;
+    background-color: #333;
+    margin-bottom: 15px;
+    overflow-y: scroll;
+}
+
+/* Tab System */
+.tab-btn {
+    width: 100%;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: none;
+    border: 1px solid #0ff;
+    color: #f3ffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 255, 255, 0.1);
+    transition: left 0.3s ease;
+}
+
+.tab-btn.active {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 15px #0ff;
+}
+
+.tab-btn.active::after {
+    left: 0;
+}
+
+.tab-btn:hover {
+    transform: translateX(10px);
+}
+
+.tab-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.tab-content.active {
+    display: block;
+    opacity: 1;
+    position: relative;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1 {
+    margin-bottom: 2rem;
+    font-size: 2.5em;
+}
+
+.hint-text {
+    color: #ffab3d;
+    font-style: italic;
+    text-shadow: 0 0 10px #ffab3d;
+    font-size: 12px;
+}
+
+.class-content .hint-text {
+    text-shadow: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.neon-pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ========== MEDIA QUERIES ========== */
+@media (max-width: 768px) {
+    .campaign-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .campaign-sidebar {
+        order: -1;
+    }
+    
+    .big-textarea {
+        width: 100%;
+        max-width: 100%;
+    }
+}

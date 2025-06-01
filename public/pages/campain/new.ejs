@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCorp - Campain Creator (Dark Theme)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        themePrimary: '#60a5fa',      // Brighter blue for primary actions (Tailwind blue-400)
+                        themeSecondary: '#3b82f6',    // Standard blue for secondary (Tailwind blue-500)
+                        themeAccent: '#2563eb',      // Darker blue for accents (Tailwind blue-600)
+                        
+                        themeBgDark: '#0f172a',      // Darkest background (Tailwind slate-900) - for body
+                        themeBgMedium: '#1e293b',    // Medium background (Tailwind slate-800) - for cards
+                        themeBgLight: '#334155',     // Lighter background (Tailwind slate-700) - for inputs, subtle elements
+                        
+                        themeTextHeader: '#f1f5f9',  // Brightest text (Tailwind slate-100) - for headers
+                        themeTextBody: '#cbd5e1',    // Main body text (Tailwind slate-300)
+                        themeTextMuted: '#94a3b8',   // Muted text (Tailwind slate-400) - for placeholders, descriptions
+                        
+                        themeBorder: '#475569',      // Default border (Tailwind slate-600)
+                        themeBorderFocus: '#60a5fa', // Border on focus (matches themePrimary)
+                        
+                        themeGreen: '#22c55e',       // Green for success/submit (Tailwind green-500)
+                        themeGreenHover: '#16a34a',  // Hover for green (Tailwind green-600)
+                        themeEmeraldAccent: '#059669', // For green gradient (Tailwind emerald-600)
+
+                        themeWhite: '#ffffff',       // Pure white (for button text etc.)
+                        themeGrayButton: '#4b5563', // Gray for previous button bg (Tailwind gray-600)
+                        themeGrayButtonHover: '#374151'  // Gray for previous button hover bg (Tailwind gray-700)
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b); /* themeBgDark to themeBgMedium */
+            color: #cbd5e1; /* themeTextBody */
+        }
+        
+        .card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Adjusted shadow for dark theme - might need to be lighter or more diffuse */
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3); 
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .animate-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .progress-container {
+            position: relative;
+            height: 6px;
+            background-color: #334155; /* themeBgLight */
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            /* themePrimary to themeSecondary */
+            background: linear-gradient(to right, #60a5fa, #3b82f6); 
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #475569; /* themeBorder */
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: #60a5fa; /* themePrimary */
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Initial Welcome Screen -->
+    <div id="welcomeScreen" class="card bg-themeBgMedium rounded-2xl p-8 max-w-md w-full text-center animate-in">
+        <div class="w-16 h-16 bg-gradient-to-br from-themeSecondary to-themeAccent rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-dragon text-themeWhite text-2xl"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-themeTextHeader mb-2">Neo<span class="text-themePrimary">Corp</span> Foundations</h1>
+        <h2 class="text-xl text-themeSecondary font-medium mb-6">Crie uma nova campanha!</h2>
+        
+        <p class="text-themeTextMuted mb-8">
+            Comece sua jornada épica com uma campanha personalizada. Crie mundos, desafie jogadores e conte histórias memoráveis.
+        </p>
+        
+        <button id="startButton" class="w-full py-3 px-4 bg-gradient-to-r from-themeSecondary to-themeAccent hover:from-themeAccent hover:to-blue-700 text-themeWhite font-medium rounded-lg shadow-md transition duration-300">
+            Começar Agora
+        </button>
+    </div>
+    
+    <!-- Form Container -->
+    <form id="campaignForm" method="post" class="w-full max-w-md hidden">
+        <!-- Progress Indicator -->
+        <div class="step-indicator">
+            <div class="step active" data-step="0"></div>
+            <div class="step" data-step="1"></div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container mb-8">
+            <div id="progressBar" class="progress-bar" style="width: 50%"></div>
+        </div>
+        
+        <!-- Step 1: Campaign Name -->
+        <div id="card-0" class="card bg-themeBgMedium rounded-2xl p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-themeBgLight flex items-center justify-center mr-3">
+                    <span class="text-themePrimary font-bold">1</span>
+                </div>
+                <h2 class="text-xl font-bold text-themeTextHeader">Nome da Campanha</h2>
+            </div>
+            
+            <p class="text-themeTextMuted mb-6">
+                Escolha um nome épico para sua campanha que inspire seus jogadores e defina o tom da aventura.
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-themeTextBody text-sm font-medium mb-2">Nome da campanha</label>
+                <input 
+                    class="w-full px-4 py-3 border border-themeBorder rounded-lg focus:ring-2 focus:ring-themeBorderFocus focus:border-themeBorderFocus transition bg-themeBgLight text-themeTextHeader placeholder-themeTextMuted" 
+                    name="name" 
+                    type="text" 
+                    placeholder="Ex: A Ascensão dos Dragões"
+                    autocomplete="off"
+                >
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="button" class="next-step-btn px-6 py-3 bg-gradient-to-r from-themeSecondary to-themeAccent text-themeWhite font-medium rounded-lg shadow hover:from-themeAccent hover:to-blue-700 transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Campaign Description -->
+        <div id="card-1" class="card bg-themeBgMedium rounded-2xl p-8 mb-6 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-themeBgLight flex items-center justify-center mr-3">
+                    <span class="text-themePrimary font-bold">2</span>
+                </div>
+                <h2 class="text-xl font-bold text-themeTextHeader">Descrição da Campanha</h2>
+            </div>
+            
+            <p class="text-themeTextMuted mb-6">
+                Descreva o mundo, o enredo principal e o tom da sua campanha. Isso ajudará os jogadores a se imergirem na história.
+            </p>
+            
+            <div class="mb-6">
+                <label class="block text-themeTextBody text-sm font-medium mb-2">Descrição</label>
+                <textarea 
+                    class="w-full h-40 px-4 py-3 border border-themeBorder rounded-lg focus:ring-2 focus:ring-themeBorderFocus focus:border-themeBorderFocus transition bg-themeBgLight text-themeTextHeader placeholder-themeTextMuted" 
+                    name="description" 
+                    placeholder="Descreva sua campanha..."
+                    autocomplete="off"
+                ></textarea>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-themeGrayButton text-themeTextHeader font-medium rounded-lg hover:bg-themeGrayButtonHover transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-themeGreen to-themeEmeraldAccent text-themeWhite font-medium rounded-lg shadow hover:from-themeGreenHover hover:to-emerald-700 transition">
+                    Criar Campanha <i class="fas fa-check ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <script>
+        let currentPage = 0;
+        const totalPages = 2;
+        
+        // Start button
+        document.getElementById('startButton')?.addEventListener('click', () => {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const form = document.getElementById('campaignForm');
+            
+            // Animate out welcome screen
+            welcomeScreen.classList.add('animate-out');
+            
+            setTimeout(() => {
+                // Hide welcome screen and show form
+                welcomeScreen.classList.add('hidden');
+                form.classList.remove('hidden');
+                form.classList.add('animate-in'); // Animate in the form
+                
+                // Show first step
+                document.getElementById('card-0').classList.remove('hidden');
+                document.getElementById('card-0').classList.add('animate-in'); // Animate in the first card
+                
+                // Update progress
+                updateProgress();
+            }, 500); // Duration of fadeOut animation
+        });
+        
+        // Next step buttons
+        document.querySelectorAll('.next-step-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (currentPage < totalPages - 1) {
+                    const currentCard = document.getElementById(`card-${currentPage}`);
+                    currentCard.classList.remove('animate-in');
+                    currentCard.classList.add('animate-out');
+
+                    setTimeout(() => {
+                        currentCard.classList.add('hidden');
+                        currentPage++;
+                        const nextCard = document.getElementById(`card-${currentPage}`);
+                        nextCard.classList.remove('hidden','animate-out'); // Ensure animate-out is removed if was applied
+                        nextCard.classList.add('animate-in');
+                        updateProgress();
+                    }, 500); // Match animation duration
+                }
+            });
+        });
+        
+        document.querySelectorAll('.prev-step-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (currentPage > 0) {
+                    const currentCard = document.getElementById(`card-${currentPage}`);
+                    currentCard.classList.remove('animate-in');
+                    currentCard.classList.add('animate-out');
+                    
+                    setTimeout(() => {
+                        currentCard.classList.add('hidden');
+                        currentPage--;
+                        const prevCard = document.getElementById(`card-${currentPage}`);
+                        prevCard.classList.remove('hidden', 'animate-out'); // Ensure animate-out is removed
+                        prevCard.classList.add('animate-in');
+                        updateProgress();
+                    }, 500); // Match animation duration
+                }
+            });
+        });
+        
+        function updateProgress() {
+            const progressPercentage = (currentPage + 1) / totalPages * 100;
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+            
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index <= currentPage) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        // Initial animation for the form if it's the first thing shown (e.g. if welcome screen is removed)
+        // and for the first card
+        // If the welcome screen is present, these will be triggered after the welcome screen is dismissed.
+        if (!document.getElementById('welcomeScreen') || document.getElementById('welcomeScreen').classList.contains('hidden')) {
+            document.getElementById('campaignForm')?.classList.add('animate-in');
+            document.getElementById('card-0')?.classList.add('animate-in');
+        }
+
+    </script>
+</body>
+</html>
