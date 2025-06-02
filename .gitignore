@@ -4,3 +4,4 @@ models/
 node_modules/
 
 livro_de_regras.pdf
+.env

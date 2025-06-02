@@ -1,5 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../Database";
+import { readFileSync } from "fs";
 
 export interface ItemAttributes {
 	id: number;
@@ -12,6 +13,25 @@ export interface ItemAttributes {
 type ItemCreationAttributes = Optional<ItemAttributes, 'id'>;
 
 class Item extends Model<ItemAttributes, ItemCreationAttributes> {
+
+	public static async SeedDefaultItens(defaultItensPath : string)
+    {
+        await this.sync({ force: true });
+
+        const json = readFileSync(defaultItensPath, 'utf-8');
+        const itensData = JSON.parse(json);
+
+        for(const item of itensData)
+        {
+            await this.create({
+                name: item.name,
+                description: item.description,
+				category: item.category,
+				storage: item.storage
+            });
+        }
+    }
+
 	static initialize() {
 		this.init({
 			id: {

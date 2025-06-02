@@ -137,7 +137,7 @@
                             %>
                             <div class="skill-item bg-cardLight p-3 rounded-md flex justify-between items-center">
                                 <label class="text-sm font-medium text-darkTextPrimary"><%= skillName %></label>
-                                <input type="number" min="0" max="20" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" step="5" class="w-20 text-right bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0">
+                                <input type="number" min="0" max="15" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" step="5" class="w-20 text-right bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0">
                             </div>
                             <% }); %>
                         </div>
@@ -222,9 +222,11 @@
                                                 <h4 class="font-semibold text-darkTextPrimary"><%= weapon.name %></h4>
                                                 <p class="text-xs text-darkTextSecondary description-text"><%= weapon.description %></p>
                                                 <p class="text-xs mt-1">
-                                                    <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= weapon.weaponType %></span>, 
-                                                    <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= weapon.grip %></span>, 
-                                                    <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= weapon.proficiency %></span><br>
+                                                    <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= humanizeWeaponType(weapon.weaponType) %></span>, 
+                                                    <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= humanizeGrip(weapon.grip) %></span>, 
+                                                    <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= humanizeProficiency(weapon.proficiency) %></span><br>
+                                                    <span class="text-infoLabel">Dano:</span> <span class="text-infoValue"><%= weapon.damageDice || '-' %></span>, 
+                                                    <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue"><%= formatCritical(weapon.criticalChance, weapon.criticalMultiplier) %></span><br>
                                                     <span class="text-infoLabel">Espaços:</span> <span class="text-infoValue"><%= weapon.storage %></span>, 
                                                     <span class="text-infoLabel">Categoria:</span> <span class="text-infoValue"><%= weapon.category %></span>
                                                 </p>
@@ -259,7 +261,7 @@
                                         <h3 class="font-semibold text-darkTextPrimary"><%= poder.name %> 
                                             <span class="text-xs text-infoValue"><%= poder.isHabilidade ? '(Habilidade)' : '(Poder)' %></span>
                                         </h3>
-                                        <p class="text-xs text-darkTextSecondary description-text"><%= poder.description %></p>
+                                        <p class="text-xs text-darkTextSecondary description-text"><%= poder.description.replace("\n", "<br>") %></p>
                                         <% if(poder.fromClasse || poder.fromTrilha || poder.elemento) { %>
                                         <p class="text-xs mt-1">
                                             <% if(poder.fromClasse) { %><span class="text-infoLabel">Classe:</span> <span class="text-infoValue"><%= poder.fromClasse %>.</span> <% } %>
@@ -295,7 +297,7 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex-grow">
                                         <h3 class="font-semibold text-darkTextPrimary"><%= ritual.name %></h3>
-                                        <p class="text-xs text-darkTextSecondary description-text"><%= ritual.description %></p>
+                                        <p class="text-xs text-darkTextSecondary description-text"><%- ritual.description %></p>
                                         <p class="text-xs mt-1">
                                             <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue"><%= ritual.circle %></span>, 
                                             <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= ritual.element %></span><br>
@@ -338,6 +340,43 @@
     </div>
 
     <script>
+        function humanizeWeaponType(type) {
+            const map = {
+                "corpo_a_corpo": "Corpo-a-Corpo",
+                "arremessavel": "Arremessável",
+                "ranged": "À Distância",
+                "fire": "Arma de Fogo"
+            };
+            return map[type] || type;
+        }
+
+        function humanizeGrip(grip) {
+            const map = {
+                "leve": "Leve",
+                "uma_mao": "Uma Mão",
+                "duas_maos": "Duas Mãos"
+            };
+            return map[grip] || grip;
+        }
+
+        function humanizeProficiency(proficiency) {
+            const map = {
+                "simples": "Simples",
+                "tatica": "Tática",
+                "pesada": "Pesada"
+            };
+            return map[proficiency] || proficiency;
+        }
+
+        function formatCritical(chance, multiplier) {
+            if (chance && multiplier) {
+                return `${chance}/${multiplier}x`;
+            } else if (multiplier) {
+                return `${multiplier}x`;
+            }
+            return "-";
+        }
+
         // EJS data available to script
         const allPoderes = <%- JSON.stringify(allPoderes || []) %>;
         const allRituais = <%- JSON.stringify(allRituais || []) %>;
@@ -416,7 +455,12 @@
                 if (currentModalType === 'poder') details = `${item.isHabilidade ? '(Hab.)' : '(Poder)'}${item.elemento ? ` - ${item.elemento}` : ''}`;
                 else if (currentModalType === 'ritual') details = `Círculo ${item.circle} - ${String(item.element).charAt(0).toUpperCase() + item.element.slice(1)}`;
                 else if (currentModalType === 'item') details = `Cat: ${item.category}, Esp: ${item.storage}`;
-                else if (currentModalType === 'arma') details = `${item.weaponType}, Emp: ${item.grip}`;
+                else if (currentModalType === 'arma') {
+                    details = `${humanizeWeaponType(item.weaponType)}, Emp: ${humanizeGrip(item.grip)}`;
+                    if (item.damageDice) details += `, Dano: ${item.damageDice}`;
+                    const critStr = formatCritical(item.criticalChance, item.criticalMultiplier);
+                    if (critStr !== '-') details += `, Crítico: ${critStr}`;
+                }
                 
                 const detailSpan = document.createElement('span');
                 detailSpan.className = 'ml-auto text-xs text-darkTextSecondary';
@@ -526,11 +570,13 @@
                         <p class="text-xs text-darkTextSecondary description-text">${itemData.description}</p>`;
                 } else if (itemType === 'arma') {
                      contentHTML = `<h4 class="font-semibold text-darkTextPrimary">${itemName}</h4>`;
-                     contentHTML += `<p class="text-xs text-darkTextSecondary description-text">${itemData.description}</p>`;
+                     contentHTML += `<p class="text-xs text-darkTextSecondary description-text">${itemData.description || '-'}</p>`;
                      contentHTML += `<p class="text-xs mt-1">
-                        <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue">${itemData.weaponType}</span>, 
-                        <span class="text-infoLabel">Emp:</span> <span class="text-infoValue">${itemData.grip}</span>, 
-                        <span class="text-infoLabel">Prof:</span> <span class="text-infoValue">${itemData.proficiency}</span><br>
+                        <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue">${humanizeWeaponType(itemData.weaponType)}</span>, 
+                        <span class="text-infoLabel">Emp:</span> <span class="text-infoValue">${humanizeGrip(itemData.grip)}</span>, 
+                        <span class="text-infoLabel">Prof:</span> <span class="text-infoValue">${humanizeProficiency(itemData.proficiency)}</span><br>
+                        <span class="text-infoLabel">Dano:</span> <span class="text-infoValue">${itemData.damageDice || '-'}</span>, 
+                        <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue">${formatCritical(itemData.criticalChance, itemData.criticalMultiplier)}</span><br>
                         <span class="text-infoLabel">Espaços:</span> <span class="text-infoValue">${itemData.storage}</span>, 
                         <span class="text-infoLabel">Categoria:</span> <span class="text-infoValue">${itemData.category}</span>
                     </p>`;

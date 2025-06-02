@@ -10,7 +10,7 @@ export interface CharacterAttributes
     classe : Classe;
     nex : number;
     poderes: number[];
-    itens: {id: number, count : number}[];
+    itens: number[];
     armas: number[];
     rituais: number[];
     info: {

@@ -1,8 +1,9 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { ItemAttributes } from "./Items";
 import sequelize from "../Database";
+import { readFileSync } from "fs";
 
-export enum WeaponType
+export enum ArmaType
 {
     Melee = "corpo_a_corpo",
     Thrown = "arremessavel",
@@ -10,31 +11,71 @@ export enum WeaponType
     Fire = "fire",
 }
 
-export enum WeaponGrip
+export enum ArmaGrip
 {
     Light = "leve",
     OneHanded = "uma_mao",
     TwoHanded = "duas_maos"
 }
 
-export enum WeaponProficiency
+export enum ArmaProficiency
 {
     Simple = "simples",
     Tatical = "tatica",
     Heavy = "pesada"
 }
 
-export interface WeaponAttributes extends ItemAttributes
+export enum ArmaCriticalChance
 {
-    weaponType: WeaponType;
-    grip : WeaponGrip;
-    proficiency : WeaponProficiency;
+    _19 = 19,
+    _18 = 18
 }
 
-type WeaponCreationAttributes = Optional<WeaponAttributes, 'id'>;
-
-class Weapon extends Model<WeaponAttributes, WeaponCreationAttributes>
+export enum ArmaCritialMultiplier
 {
+    X2 = 2,
+    X3 = 3,
+    X4 = 4
+}
+
+export interface ArmaAttributes extends ItemAttributes
+{
+    weaponType: ArmaType;
+    grip : ArmaGrip;
+    proficiency : ArmaProficiency;
+    damageDice : string;
+    criticalChance? : ArmaCriticalChance;
+    criticalMultiplier? : ArmaCritialMultiplier;
+}
+
+type ArmaCreationAttributes = Optional<ArmaAttributes, 'id' | 'criticalChance' | 'criticalMultiplier'>;
+
+class Arma extends Model<ArmaAttributes, ArmaCreationAttributes>
+{
+    public static async SeedDefaultArmas(defaultArmasPath : string)
+    {
+        await this.sync({ force: true });
+
+        const json = readFileSync(defaultArmasPath, 'utf-8');
+        const armasData = JSON.parse(json);
+
+        for(const arma of armasData)
+        {
+            await this.create({
+                name: arma.name,
+                description: arma.description,
+                category: arma.category,
+                damageDice: arma.damageDice,
+                grip: arma.grip,
+                proficiency: arma.proficiency,
+                storage: arma.storage,
+                weaponType: arma.weaponType,
+                criticalChance: arma.criticalChance,
+                criticalMultiplier: arma.criticalMultiplier
+            });
+        }
+    }
+
     static initialize()
     {
         this.init({
@@ -71,6 +112,18 @@ class Weapon extends Model<WeaponAttributes, WeaponCreationAttributes>
                 type: DataTypes.STRING,
                 allowNull: false
             },
+            damageDice: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            criticalChance: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            criticalMultiplier: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            }
         }, {
             sequelize,
             modelName: 'Weapon',
@@ -80,4 +133,4 @@ class Weapon extends Model<WeaponAttributes, WeaponCreationAttributes>
     }
 }
 
-export default Weapon;
+export default Arma;

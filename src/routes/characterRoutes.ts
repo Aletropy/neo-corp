@@ -5,7 +5,7 @@ import CharacterSkills from "../Data/Models/CharacterSkills";
 import { Poder } from "../Data/Models/Poder";
 import Ritual from "../Data/Models/Ritual";
 import Item from "../Data/Models/Items";
-import Weapon from "../Data/Models/Weapon";
+import Arma from "../Data/Models/Weapon";
 
 declare module 'express-session' {
      interface SessionData {
@@ -42,13 +42,54 @@ characterRoutes.get("/:id", AuthMiddleware, async(req, res) => {
         const ritual = await Ritual.findByPk(id);
         return ritual;
     }));
+    character["armas"] = await Promise.all(character.armas.map(async (id : string) => {
+        const arma = await Arma.findByPk(id);
+        return arma;
+    }));
+    character["itens"] = await Promise.all(character.itens.map(async (id : string) => {
+        const item = await Item.findByPk(id);
+        return item;
+    }));
 
     res.render("pages/character/character", {
         character, characterSkills: skills,
         allPoderes: await Poder.findAll(),
         allRituais: await Ritual.findAll(),
         allItems: await Item.findAll(),
-        allArmas: await Weapon.findAll()
+        allArmas: await Arma.findAll(),
+        humanizeWeaponType: (type : any) => {
+            const map = {
+                "corpo_a_corpo": "Corpo-a-Corpo",
+                "arremessavel": "Arremessável",
+                "ranged": "À Distância",
+                "fire": "Arma de Fogo"
+            } as any;
+            return map[type] || type;
+        },
+        humanizeGrip: (grip : any) => {
+            const map = {
+                "leve": "Leve",
+                "uma_mao": "Uma Mão",
+                "duas_maos": "Duas Mãos"
+            } as any;
+            return map[grip] || grip;
+        },
+        humanizeProficiency: (proficiency : any) => {
+            const map = {
+                "simples": "Simples",
+                "tatica": "Tática",
+                "pesada": "Pesada"
+            } as any;
+            return map[proficiency] || proficiency;
+        },
+        formatCritical: (chance : any, multiplier : any) => {
+            if (chance && multiplier) {
+                return `${chance}/${multiplier}x`;
+            } else if (multiplier) {
+                return `${multiplier}x`;
+            }
+            return "-";
+        }
     });
 });
 
@@ -149,6 +190,9 @@ characterRoutes.post("/:id/update", async (req, res) => {
     body["new_ritual_ids"]?.forEach((id : any) => {
         newCharacter.rituais?.push(parseInt(id))
     });
+    body["new_item_ids"]?.forEach((id : any) => {
+        newCharacter.itens?.push(parseInt(id))
+    });
 
     if(body["deleted_poder_ids"])
     {
@@ -185,6 +229,18 @@ characterRoutes.post("/:id/update", async (req, res) => {
             newRituais.push(ritual);
         }
         newCharacter.rituais = newRituais;
+    }
+    if(body["deleted_item_ids"])
+    {
+        let oldItens = newCharacter.itens!;
+        let newItens : number[] = [];
+        for(const item of oldItens)
+        {
+            if(body["deleted_item_ids"].includes(String(item)))
+                continue;
+            newItens.push(item);
+        }
+        newCharacter.itens = newItens;
     }
 
     await Character.update(newCharacter, 

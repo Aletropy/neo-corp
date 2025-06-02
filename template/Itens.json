@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Balas curtas",
+    "description": "Munição básica, usada em pistolas, revólveres e submetralhadoras. Um pacote de balas curtas dura duas cenas.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 2,
+    "name": "Balas longas",
+    "description": "Maior e mais potente, esta munição é usada em fuzis e metralhadoras. Um pacote de balas longas dura uma cena.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 3,
+    "name": "Cartuchos",
+    "description": "Usados em espingardas, esses cartuchos são carregados com esferas de chumbo. Um pacote de cartuchos dura uma cena.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 4,
+    "name": "Combustível",
+    "description": "Um tanque de combustível para lança-chamas. Dura uma cena.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 5,
+    "name": "Flechas",
+    "description": "Usadas em arcos e bestas, flechas podem ser reaproveitadas após cada combate. Por isso, um pacote de flechas dura uma missão inteira.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 6,
+    "name": "Foguete",
+    "description": "Disparado por bazucas. Ao contrário de outras munições, cada foguete dura um único disparo, não uma cena. Para fazer vários ataques, você precisará carregar vários foguetes.",
+    "category": 1,
+    "storage": 1
+  }
+]

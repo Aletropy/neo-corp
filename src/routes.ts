@@ -5,7 +5,8 @@ import Campain from "./Data/Models/Campain";
 import { Poder } from "./Data/Models/Poder";
 import Ritual from "./Data/Models/Ritual";
 import Item from "./Data/Models/Items";
-import Weapon from "./Data/Models/Weapon";
+import Arma from "./Data/Models/Weapon";
+import path from "path";
 
 declare module 'express-session' {
      interface SessionData {
@@ -28,7 +29,9 @@ export default (app : Application) =>
     });
 
     app.get("/regras", AuthMiddleware, (_, res) => {
-        res.sendFile("/home/aletropy/Projects/RpgOverview/livro_de_regras.pdf");
+        res.sendFile("livro_de_regras.pdf", {
+            root: path.join(__dirname, "../")
+        });
     });
 
     app.get("/404", (_, res) => res.render("pages/404"));
@@ -67,7 +70,7 @@ export default (app : Application) =>
         const poderes = await Poder.findAll();
         const rituais = await Ritual.findAll();
         const itens = await Item.findAll();
-        const weapons = await Weapon.findAll();
+        const weapons = await Arma.findAll();
 
         const data = {
             poderes: poderes,

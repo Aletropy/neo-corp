@@ -18,7 +18,7 @@ type RitualCreationAttributes = Optional<RitualAttributes, 'id'>;
 
 class Ritual extends Model<RitualAttributes, RitualCreationAttributes> {
 
-    public static async SeedDefaultPoderes(defaultRitualsPath : string)
+    public static async SeedDefaultRituais(defaultRitualsPath : string)
     {
         await this.sync({ force: true });
 

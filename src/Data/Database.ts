@@ -1,17 +1,19 @@
 import { Sequelize } from "sequelize";
-import User from "./Models/User";
-import Character from "./Models/Character";
-import Campain from "./Models/Campain";
-import CharacterSkills from "./Models/CharacterSkills";
-import Item from "./Models/Items";
-import Weapon from "./Models/Weapon";
-import Ritual from "./Models/Ritual";
-import { Poder } from "./Models/Poder";
+import User from "../Data/Models/User";
+import Character from "../Data/Models/Character";
+import Campain from "../Data/Models/Campain";
+import CharacterSkills from "../Data/Models/CharacterSkills";
+import Item from "../Data/Models/Items";
+import Arma from "../Data/Models/Weapon";
+import Ritual from "../Data/Models/Ritual";
+import { Poder } from "../Data/Models/Poder";
+import path from "path";
+import Config from "../Core/Config";
 
 const sequelize = new Sequelize(
-    'neocorp',
-    'admin',
-    'Admin8525', 
+    Config.DB_DATABASE,
+    Config.DB_USER,
+    Config.DB_PASSWORD, 
     {
         host: "localhost",
         dialect: 'postgres',
@@ -36,15 +38,20 @@ export async function initializeDatabase()
         Poder.initialize();
 
         Item.initialize();
-        Weapon.initialize();
+        Arma.initialize();
         Ritual.initialize();
 
         await sequelize.authenticate();
-        await sequelize.sync({ force: false });
+        await sequelize.sync({ alter: true });
+
+        const templatesPath = path.join(__dirname, "../../template/");
 
         await User.SeedAdmin();
-        await Poder.SeedDefaultPoderes("/home/aletropy/Projects/RpgOverview/template/Poderes.json");
-        await Ritual.SeedDefaultPoderes("/home/aletropy/Projects/RpgOverview/template/Rituais.json");
+        await Poder.SeedDefaultPoderes(templatesPath + "Poderes.json");
+        await Ritual.SeedDefaultRituais(templatesPath + "Rituais.json");
+        await Arma.SeedDefaultArmas(templatesPath + "Armas.json");
+        await Item.SeedDefaultItens(templatesPath + "Itens.json");
+
         console.log("Database connected and initialized.");
     } catch(error) {
         console.error("An error ocurred when connecting to database: " + error);
