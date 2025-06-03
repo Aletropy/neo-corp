@@ -36,6 +36,6 @@ app.use("/character", characterRoutes);
 app.use("/campain", campainRoutes);
 routes(app);
 
-app.listen(Config.EXPRESS_PORT, Config.EXPRESS_IP, () => {
+app.listen(Config.EXPRESS_PORT, () => {
     console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.EXPRESS_PORT}`);
 });

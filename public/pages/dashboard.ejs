@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'class', // Not strictly used in this version, but good to keep
             theme: {
                 extend: {
                     colors: {
                         primary: '#3b82f6',
                         secondary: '#2563eb',
                         accent: '#1d4ed8',
-                        dark: '#0f172a',
-                        darker: '#0a1120',
-                        card: '#1e293b',
+                        dark: '#0f172a',       // Navbar background
+                        darker: '#0a1120',     // Body background
+                        card: '#1e293b',       // Card, Sidebar background
                         light: '#f8fafc',
                         success: '#10b981',
                         warning: '#f59e0b',
@@ -32,12 +32,8 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* bg-dark */
+            background-color: #0a1120; /* bg-darker */
             color: #e2e8f0; /* Tailwind slate-200 */
-        }
-        
-        .sidebar {
-            transition: all 0.3s ease;
         }
         
         .tab-content {
@@ -71,36 +67,23 @@
             height: 6px;
             border-radius: 3px;
             overflow: hidden;
-            background-color: #334155; /* Tailwind slate-700 */
+            background-color: #334155;
         }
         
         .progress-fill {
             height: 100%;
             transition: width 0.5s ease;
-            background: linear-gradient(to right, #3b82f6, #2563eb); /* primary to secondary */
+            background: linear-gradient(to right, #3b82f6, #2563eb);
         }
-        
-        .health-bar { 
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            background-color: #334155;
-        }
-        
-        .health-fill { 
-            height: 100%;
-            width: 75%; /* Example width */
-            background: linear-gradient(to right, #10b981, #059669); /* success */
-        }
-        
+                
         .active-tab {
             background-color: rgba(59, 130, 246, 0.15);
-            border-left: 4px solid #3b82f6; /* primary color */
-            color: #3b82f6; /* primary color */
+            border-left: 4px solid #3b82f6;
+            color: #3b82f6;
         }
         
         .active-tab i {
-            color: #3b82f6; /* primary color */
+            color: #3b82f6;
         }
         
         .tab-btn:hover:not(.active-tab) {
@@ -108,35 +91,48 @@
         }
         
         input, textarea, select {
-            background-color: #1e293b; /* bg-card */
-            border-color: #334155; /* slate-700 */
-            color: #e2e8f0; /* slate-200 */
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
         }
         
         input:focus, textarea:focus, select:focus {
-            border-color: #3b82f6; /* primary */
+            border-color: #3b82f6;
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Sidebar transition */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
         }
     </style>
 </head>
 <body class="bg-darker">
     <!-- Navbar Superior -->
-    <nav class="bg-dark shadow-lg">
+    <nav class="bg-dark shadow-lg fixed w-full top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" class="md:hidden mr-3 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <a href="/" class="flex-shrink-0 flex items-center">
                         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center">
                             <i class="fas fa-cube text-white"></i>
                         </div>
                         <span class="ml-2 text-xl font-bold text-white">Neo<span class="text-blue-400">Corp</span></span>
-                    </div>
+                    </a>
                 </div>
                 <div class="flex items-center">
                     <div class="ml-3 relative">
                         <div class="flex items-center">
-                            <span class="text-gray-400 mr-2">Bem-vindo,</span>
+                            <span class="text-gray-400 mr-2 hidden sm:inline">Bem-vindo,</span>
                             <span class="font-medium text-white"><%=user.username%></span>
                             <div class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
                                 <span class="font-medium"><%=user.username.charAt(0)%></span>
@@ -148,287 +144,315 @@
         </div>
     </nav>
 
-    <div class="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex min-h-screen pt-16"> <!-- pt-16 for fixed navbar -->
         <!-- Sidebar -->
-        <aside class="w-64 min-h-screen pr-6">
-            <div class="bg-card rounded-xl shadow-sm p-4 border border-gray-800">
-                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg active-tab" data-tab="characters">
-                    <i class="fas fa-user text-gray-400 w-6 mr-3 text-center"></i>
-                    <span>Personagens</span>
-                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=characters.length%></span>
-                </button>
-                
-                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800" data-tab="campaigns">
-                    <i class="fas fa-map text-gray-400 w-6 mr-3 text-center"></i>
-                    <span>Campanhas</span>
-                    <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=campaings.length%></span>
-                </button>
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-card transform -translate-x-full md:translate-x-0 md:static md:inset-auto md:pt-0 pt-16 shadow-lg border-r border-gray-800 md:border-r-0">
+             <div class="h-full px-1 py-4 overflow-y-auto"> <!-- Reduced px for tighter fit on mobile, py-4 standard -->
+                <div class="p-3"> <!-- Inner padding for sidebar items -->
+                    <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg" data-tab="characters">
+                        <i class="fas fa-user text-gray-400 w-6 mr-3 text-center"></i>
+                        <span>Personagens</span>
+                        <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=characters.length%></span>
+                    </button>
+                    
+                    <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg" data-tab="campaigns">
+                        <i class="fas fa-map text-gray-400 w-6 mr-3 text-center"></i>
+                        <span>Campanhas</span>
+                        <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=campaings.length%></span>
+                    </button>
 
-                <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800" data-tab="suggestions">
-                    <i class="fas fa-lightbulb text-gray-400 w-6 mr-3 text-center"></i>
-                    <span>Sugestões</span>
-                    <% if(user.isAdmin && typeof suggestions !== 'undefined') { %>
-                        <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=suggestions.length%></span>
-                    <% } %>
-                </button>
-                
-                <button class="tab-btn w-full flex items-center p-3 rounded-lg hover:bg-gray-800" data-tab="account">
-                    <i class="fas fa-cog text-gray-400 w-6 mr-3 text-center"></i>
-                    <span>Conta</span>
-                </button>
+                    <button class="tab-btn w-full flex items-center p-3 mb-2 rounded-lg" data-tab="suggestions">
+                        <i class="fas fa-lightbulb text-gray-400 w-6 mr-3 text-center"></i>
+                        <span>Sugestões</span>
+                        <% if(user.isAdmin && typeof suggestions !== 'undefined') { %>
+                            <span class="ml-auto bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=suggestions.length%></span>
+                        <% } %>
+                    </button>
+                    
+                    <button class="tab-btn w-full flex items-center p-3 rounded-lg" data-tab="account">
+                        <i class="fas fa-cog text-gray-400 w-6 mr-3 text-center"></i>
+                        <span>Conta</span>
+                    </button>
+                </div>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1">
-            <!-- Characters Tab -->
-            <div id="characters" class="tab-content active">
-                <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
-                    <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Seus Personagens (<%=characters.length%>)</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <% for(let character of characters) { %>
-                            <div class="card bg-card rounded-xl overflow-hidden">
-                                <div class="p-5">
-                                    <div class="flex items-start justify-between">
-                                        <h3 class="font-bold text-white text-lg"><%=character.info.name%></h3>
-                                        <span class="bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=String(character.classe).charAt(0).toUpperCase() + character.classe.slice(1)%></span>
-                                    </div>
-                                    <p class="text-gray-400 mt-2">NEX - <span class="text-yellow-400 font-medium"><%=character.nex%>%</span></p>
-                                    <% if(character.currentCampain != null) { %>
-                                        <p class="text-gray-400 mt-1">Campanha - NeuroShock: O Ritual Da Megalópole</p>
-                                        <% } else { %>
-                                        <p class="text-gray-400 mt-1">Nenhuma campanha ativa :(</p>
-                                    <% } %>
-                                </div>
-                                <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
-                                    <a class="text-blue-400 hover:text-blue-300 text-sm font-medium" href="/character/<%=character.id%>">Ver Detalhes</a>
-                                </div>
-                            </div>
-                        <% } %>
-                        
-                        <div class="card bg-card rounded-xl overflow-hidden" style="cursor: pointer;" id="new-character-card">
-                            <div class="p-5 h-full flex flex-col items-center justify-center text-center">
-                                <div class="w-12 h-12 rounded-full bg-blue-900/30 flex items-center justify-center mb-3">
-                                    <i class="fas fa-plus text-blue-400 text-xl"></i>
-                                </div>
-                                <h3 class="font-bold text-white text-lg">Novo Personagem</h3>
-                                <p class="text-gray-400 mt-2">Crie um novo personagem para começar sua jornada</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Campaigns Tab -->
-            <div id="campaigns" class="tab-content">
-                <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
-                    <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Campanhas Ativas (<%=campaings.length%>)</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                        <% for(let campain of campaings) { %>
-                            <div class="card bg-card rounded-xl overflow-hidden">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-white text-lg mb-3"><%=campain.name%></h3>
-                                    <p class="text-gray-400">Progresso: <span class="font-medium text-blue-400"><%=campain.progress%>%</span></p>
-                                    
-                                    <div class="mt-4">
-                                        <div class="progress-bar bg-gray-800">
-                                            <div class="progress-fill" style="width: <%=campain.progress%>%;"></div>
+        <main id="main-content" class="flex-1 bg-darker overflow-y-auto">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <!-- Characters Tab -->
+                <div id="characters" class="tab-content">
+                    <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
+                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Seus Personagens (<%=characters.length%>)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <% for(let character of characters) { %>
+                                <div class="card bg-card rounded-xl overflow-hidden">
+                                    <div class="p-5">
+                                        <div class="flex items-start justify-between">
+                                            <h3 class="font-bold text-white text-lg"><%=character.info.name%></h3>
+                                            <span class="bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=String(character.classe).charAt(0).toUpperCase() + character.classe.slice(1)%></span>
                                         </div>
+                                        <p class="text-gray-400 mt-2">NEX - <span class="text-yellow-400 font-medium"><%=character.nex%>%</span></p>
+                                        <% if(character.currentCampain != null) { %>
+                                            <p class="text-gray-400 mt-1">Campanha - NeuroShock: O Ritual Da Megalópole</p>
+                                            <% } else { %>
+                                            <p class="text-gray-400 mt-1">Nenhuma campanha ativa :(</p>
+                                        <% } %>
+                                    </div>
+                                    <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
+                                        <a class="text-blue-400 hover:text-blue-300 text-sm font-medium" href="/character/<%=character.id%>">Ver Detalhes</a>
                                     </div>
                                 </div>
-                                <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
-                                    <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">Continuar</button>
-                                </div>
-                            </div>
-                        <% } %>
-                        <% if(user.isAdmin) { %>
-                            <div class="card bg-card rounded-xl overflow-hidden" id="new-campain-card" style="cursor: pointer;">
+                            <% } %>
+                            <div class="card bg-card rounded-xl overflow-hidden" style="cursor: pointer;" id="new-character-card">
                                 <div class="p-5 h-full flex flex-col items-center justify-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-blue-900/30 flex items-center justify-center mb-3">
                                         <i class="fas fa-plus text-blue-400 text-xl"></i>
                                     </div>
-                                    <h3 class="font-bold text-white text-lg">Nova Campanha</h3>
-                                    <p class="text-gray-400 mt-2">Crie uma nova campanha para seus jogadores</p>
+                                    <h3 class="font-bold text-white text-lg">Novo Personagem</h3>
+                                    <p class="text-gray-400 mt-2">Crie um novo personagem para começar sua jornada</p>
                                 </div>
                             </div>
-                        <% } %>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Suggestions Tab -->
-            <div id="suggestions" class="tab-content">
-                <% if(user.isAdmin) { %>
-                    <!-- Admin View: List Suggestions -->
+                
+                <!-- Campaigns Tab -->
+                <div id="campaigns" class="tab-content">
                     <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
-                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Sugestões Recebidas (<%=(typeof suggestions !== 'undefined' ? suggestions.length : 0)%>)</h2>
-                        <% if(suggestions.length > 0) { %>
-                            <div class="space-y-4">
-                                <% for(let suggestion of suggestions) { %>
-                                    <div class="card bg-dark p-4 rounded-lg border border-gray-700 hover:border-primary transition-all duration-200">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="bg-blue-900 text-blue-300 text-xs font-semibold px-2.5 py-1 rounded-full"><%= suggestion.type %></span>
-                                            <div class="text-xs text-gray-500">
-                                                <% if(suggestion.authorId && suggestion.authorName) { %>
-                                                    <span>Por: <span class="font-medium text-gray-400"><%= suggestion.authorId %></span></span>
-                                                <% } %>
-                                                <% if(suggestion.createdAt) { %>
-                                                    <span class="ml-2"><%= new Date(suggestion.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
-                                                <% } %>
+                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Campanhas Ativas (<%=campaings.length%>)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <% for(let campain of campaings) { %>
+                                <div class="card bg-card rounded-xl overflow-hidden">
+                                    <div class="p-5">
+                                        <h3 class="font-bold text-white text-lg mb-3"><%=campain.name%></h3>
+                                        <p class="text-gray-400">Progresso: <span class="font-medium text-blue-400"><%=campain.progress%>%</span></p>
+                                        <div class="mt-4">
+                                            <div class="progress-bar bg-gray-800">
+                                                <div class="progress-fill" style="width: <%=campain.progress%>%;"></div>
                                             </div>
                                         </div>
-                                        <p class="text-gray-300 leading-relaxed"><%= suggestion.text %></p>                                        
-                                        <div class="mt-3 flex space-x-2">
-                                            <button class="text-xs text-green-400 hover:text-green-300">Concluído</button>
-                                            <button class="text-xs text-red-400 hover:text-red-300">Negar</button>
-                                        </div>
                                     </div>
-                                <% } %>
-                            </div>
-                        <% } else { %>
-                            <p class="text-gray-400 text-center py-4">Nenhuma sugestão recebida ainda.</p>
-                        <% } %>
+                                    <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
+                                        <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">Continuar</button>
+                                    </div>
+                                </div>
+                            <% } %>
+                            <% if(user.isAdmin) { %>
+                                <div class="card bg-card rounded-xl overflow-hidden" id="new-campain-card" style="cursor: pointer;">
+                                    <div class="p-5 h-full flex flex-col items-center justify-center text-center">
+                                        <div class="w-12 h-12 rounded-full bg-blue-900/30 flex items-center justify-center mb-3">
+                                            <i class="fas fa-plus text-blue-400 text-xl"></i>
+                                        </div>
+                                        <h3 class="font-bold text-white text-lg">Nova Campanha</h3>
+                                        <p class="text-gray-400 mt-2">Crie uma nova campanha para seus jogadores</p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
                     </div>
-                <% } else { %>
-                    <!-- User View: Submit Suggestion Form -->
+                </div>
+
+                <!-- Suggestions Tab -->
+                <div id="suggestions" class="tab-content">
+                    <% if(user.isAdmin) { %>
+                        <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
+                            <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Sugestões Recebidas (<%=(typeof suggestions !== 'undefined' ? suggestions.length : 0)%>)</h2>
+                            <% if(typeof suggestions !== 'undefined' && suggestions.length > 0) { %>
+                                <div class="space-y-4">
+                                    <% for(let suggestion of suggestions) { %>
+                                        <div class="card bg-dark p-4 rounded-lg border border-gray-700">
+                                            <div class="flex justify-between items-center mb-2 flex-wrap">
+                                                <span class="bg-blue-900 text-blue-300 text-xs font-semibold px-2.5 py-1 rounded-full mb-1 sm:mb-0"><%= suggestion.type %></span>
+                                                <div class="text-xs text-gray-500">
+                                                    <% if(suggestion.user && suggestion.user.username) { %>
+                                                        <span>Por: <span class="font-medium text-gray-400"><%= suggestion.user.username %></span></span>
+                                                    <% } %>
+                                                    <% if(suggestion.createdAt) { %>
+                                                        <span class="ml-2"><%= new Date(suggestion.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-300 leading-relaxed"><%= suggestion.text %></p>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% } else { %>
+                                <p class="text-gray-400 text-center py-4">Nenhuma sugestão recebida ainda.</p>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
+                            <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Enviar Sugestão</h2>
+                            <form id="suggestion-form" class="space-y-6">
+                                <div>
+                                    <label for="suggestion-text" class="block text-gray-300 font-medium mb-2">Sua Sugestão</label>
+                                    <textarea id="suggestion-text" name="suggestionText" rows="4" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" placeholder="Descreva sua sugestão detalhadamente..." required></textarea>
+                                </div>
+                                <div>
+                                    <label for="suggestion-type" class="block text-gray-300 font-medium mb-2">Tipo de Sugestão</label>
+                                    <select id="suggestion-type" name="suggestionType" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" required>
+                                        <option value="" disabled selected>Selecione um tipo</option>
+                                        <option value="Itens">Itens</option>
+                                        <option value="Armas">Armas</option>
+                                        <option value="Site">Site</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-medium rounded-lg shadow hover:from-secondary hover:to-accent transition">Enviar Sugestão</button>
+                                </div>
+                            </form>
+                            <div id="suggestion-notification" class="mt-4 text-sm"></div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Account Tab -->
+                <div id="account" class="tab-content">
                     <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
-                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Enviar Sugestão</h2>
-                        <form id="suggestion-form" class="space-y-6">
-                            <div>
-                                <label for="suggestion-text" class="block text-gray-300 font-medium mb-2">Sua Sugestão</label>
-                                <textarea 
-                                    id="suggestion-text" 
-                                    name="suggestionText"
-                                    rows="4"
-                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" 
-                                    placeholder="Descreva sua sugestão detalhadamente..."
-                                    required
-                                ></textarea>
+                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Configurações da Conta</h2>
+                        <form class="account-form space-y-6" action="/account/changeInfo" method="post">
+                            <div class="form-group">
+                                <label class="block text-gray-300 font-medium mb-2">Nome de Usuário</label>
+                                <input type="text" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" disabled value="<%=user.username%>">
                             </div>
-                            
-                            <div>
-                                <label for="suggestion-type" class="block text-gray-300 font-medium mb-2">Tipo de Sugestão</label>
-                                <select 
-                                    id="suggestion-type" 
-                                    name="suggestionType"
-                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700"
-                                    required
-                                >
-                                    <option value="" disabled selected>Selecione um tipo</option>
-                                    <option value="Itens">Itens</option>
-                                    <option value="Armas">Armas</option>
-                                    <option value="Site">Site</option>
-                                </select>
+                            <div class="form-group">
+                                <h3 class="block text-gray-300 font-medium mb-4">Alterar Senha</h3>
+                                <div class="mb-4">
+                                    <label class="block text-gray-400 text-sm mb-2">Senha Atual</label>
+                                    <input type="password" name="currentPassword" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" placeholder="Digite sua senha atual">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-400 text-sm mb-2">Nova Senha</label>
+                                    <input type="password" name="newPassword" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" placeholder="Digite sua nova senha">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-400 text-sm mb-2">Confirmar Nova Senha</label>
+                                    <input type="password" name="newPasswordConfirm" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" placeholder="Confirme sua nova senha">
+                                </div>
                             </div>
-                            
-                            <div>
-                                <button 
-                                    type="submit" 
-                                    class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-medium rounded-lg shadow hover:from-secondary hover:to-accent transition"
-                                >
-                                    Enviar Sugestão
-                                </button>
+                            <div class="flex space-x-4 pt-4">
+                                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow hover:from-blue-700 hover:to-blue-800 transition">Atualizar Dados</button>
+                                <button type="button" id="logout-btn" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-lg shadow hover:from-red-700 hover:to-red-800 transition">Sair</button>
                             </div>
                         </form>
-                        <div id="suggestion-notification" class="mt-4 text-sm"></div>
                     </div>
-                <% } %>
-            </div>
-            <!-- End Suggestions Tab -->
-            
-            <!-- Account Tab -->
-            <div id="account" class="tab-content">
-                <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800">
-                    <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Configurações da Conta</h2>
-                    
-                    <form class="account-form space-y-6" action="/account/changeInfo" method="post">
-                        <div class="form-group">
-                            <label class="block text-gray-300 font-medium mb-2">Nome de Usuário</label>
-                            <input 
-                                type="text" 
-                                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" 
-                                disabled 
-                                value="<%=user.username%>"
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <h3 class="block text-gray-300 font-medium mb-4">Alterar Senha</h3>
-                            
-                            <div class="mb-4">
-                                <label class="block text-gray-400 text-sm mb-2">Senha Atual</label>
-                                <input 
-                                    type="password"
-                                    name="currentPassword"
-                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" 
-                                    placeholder="Digite sua senha atual"
-                                >
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="block text-gray-400 text-sm mb-2">Nova Senha</label>
-                                <input 
-                                    type="password" 
-                                    name="newPassword"
-                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" 
-                                    placeholder="Digite sua nova senha"
-                                >
-                            </div>
-                            
-                            <div>
-                                <label class="block text-gray-400 text-sm mb-2">Confirmar Nova Senha</label>
-                                <input 
-                                    type="password"
-                                    name="newPasswordConfirm"
-                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700" 
-                                    placeholder="Confirme sua nova senha"
-                                >
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-4 pt-4">
-                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow hover:from-blue-700 hover:to-blue-800 transition">
-                                Atualizar Dados
-                            </button>
-                            
-                            <button type="button" id="logout-btn" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-lg shadow hover:from-red-700 hover:to-red-800 transition">
-                                Sair
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-black/70 hidden md:hidden opacity-0"></div>
     
     <script>
-        // Tab Switching
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebarOverlay.classList.remove('hidden');
+                requestAnimationFrame(() => { // Ensure 'hidden' is removed before starting opacity transition
+                    sidebarOverlay.classList.remove('opacity-0');
+                    sidebarOverlay.classList.add('opacity-100');
+                });
+                document.body.classList.add('overflow-hidden', 'md:overflow-auto');
+            }
+        }
+
+        function closeSidebar() {
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                sidebarOverlay.classList.remove('opacity-100');
+                sidebarOverlay.classList.add('opacity-0');
+                setTimeout(() => { // Hide after transition
+                    sidebarOverlay.classList.add('hidden');
+                }, 300); // Match transition duration
+                document.body.classList.remove('overflow-hidden', 'md:overflow-auto');
+            }
+        }
+
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        function activateTabFromHash() {
+            let hash = window.location.hash.substring(1);
+            const defaultTabId = 'characters';
+
+            if (!hash) {
+                hash = defaultTabId;
+                // Silently update the hash for the default tab without triggering hashchange
+                // Or, if you prefer the URL to be clean initially, don't update it here.
+                // window.history.replaceState(null, null, '#' + defaultTabId); 
+            }
+
+            const targetButton = document.querySelector(`.tab-btn[data-tab="${hash}"]`);
+            const targetContent = document.getElementById(hash);
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('hover:bg-gray-800');
+            });
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            if (targetButton && targetContent) {
+                targetButton.classList.add('active-tab');
+                targetButton.classList.remove('hover:bg-gray-800');
+                targetContent.classList.add('active');
+            } else {
+                // Fallback to default if hash is invalid
+                const defaultButton = document.querySelector(`.tab-btn[data-tab="${defaultTabId}"]`);
+                const defaultContent = document.getElementById(defaultTabId);
+                if (defaultButton && defaultContent) {
+                    defaultButton.classList.add('active-tab');
+                    defaultButton.classList.remove('hover:bg-gray-800');
+                    defaultContent.classList.add('active');
+                    if (window.location.hash.substring(1) !== defaultTabId) {
+                        window.history.replaceState(null, null, '#' + defaultTabId);
+                    }
+                }
+            }
+        }
+        
         document.querySelectorAll('.tab-btn').forEach(button => {
             button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('active-tab');
-                    btn.classList.add('hover:bg-gray-800'); 
-                });
-                
-                button.classList.add('active-tab');
-                button.classList.remove('hover:bg-gray-800'); 
-                
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
                 const tabId = button.getAttribute('data-tab');
-                const activeTabContent = document.getElementById(tabId);
-                if (activeTabContent) {
-                    activeTabContent.classList.add('active');
+                
+                // Update URL hash, this will trigger 'hashchange' event which calls activateTabFromHash
+                if (window.location.hash !== '#' + tabId) {
+                    window.location.hash = '#' + tabId;
+                } else {
+                    // If hash is already the same, hashchange won't fire, so activate manually
+                    activateTabFromHash(); 
+                }
+                
+                if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
+                    closeSidebar();
                 }
             });
         });
         
-        // Logout button
+        window.addEventListener('DOMContentLoaded', activateTabFromHash);
+        window.addEventListener('hashchange', activateTabFromHash);
+        
         const logoutButton = document.getElementById("logout-btn");
         if (logoutButton) {
             logoutButton.addEventListener('click', (e) => {
@@ -437,7 +461,6 @@
             });
         }
         
-        // New character card
         const newCharacterCard = document.getElementById("new-character-card");
         if (newCharacterCard) {
             newCharacterCard.addEventListener('click', () => {
@@ -445,25 +468,22 @@
             });
         }
         
-        // New campaign card
         const newCampaignCard = document.getElementById("new-campain-card");
-        if (newCampaignCard) { // Check if element exists (it only does for admins)
+        if (newCampaignCard) {
             newCampaignCard.addEventListener('click', () => {
                 window.location.href = "/campain/new"
             });
         }
         
-        // Animate progress bars
         document.querySelectorAll('.progress-fill').forEach(bar => {
             const targetWidth = bar.style.width; 
             bar.style.width = '0%'; 
-            void bar.offsetWidth; // Force reflow
+            void bar.offsetWidth;
             setTimeout(() => { 
                 bar.style.width = targetWidth;
             }, 50); 
         });
 
-        // Suggestion Form Logic (only if the form exists)
         const suggestionForm = document.getElementById('suggestion-form');
         if (suggestionForm) {
             const suggestionTextEl = document.getElementById('suggestion-text');
@@ -473,6 +493,8 @@
 
             suggestionForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if(!suggestionSubmitButton || !suggestionTextEl || !suggestionTypeEl || !suggestionNotificationEl) return;
+
                 suggestionNotificationEl.textContent = '';
                 suggestionNotificationEl.className = 'mt-4 text-sm'; 
 
@@ -481,7 +503,7 @@
 
                 if (!suggestionText) {
                     suggestionNotificationEl.textContent = 'Por favor, descreva sua sugestão.';
-                    suggestionNotificationEl.classList.add('text-danger');
+                    suggestionNotificationEl.classList.add('text-danger'); // Make sure text-danger is defined in your colors
                     return;
                 }
                 if (!suggestionType) {
@@ -493,39 +515,31 @@
                 const originalButtonText = suggestionSubmitButton.textContent;
                 suggestionSubmitButton.disabled = true;
                 suggestionSubmitButton.textContent = 'Enviando...';
-                
+
                 try {
                     const response = await fetch('/suggestion/new', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: suggestionText,
-                            type: suggestionType
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: suggestionText, type: suggestionType })
                     });
 
                     if (response.ok) {
                         suggestionTextEl.value = '';
                         suggestionTypeEl.value = ''; 
                         suggestionNotificationEl.textContent = 'Sugestão enviada com sucesso!';
-                        suggestionNotificationEl.classList.add('text-success');
-                        
+                        suggestionNotificationEl.classList.add('text-success'); // Make sure text-success is defined
                         setTimeout(() => {
                             suggestionNotificationEl.textContent = '';
                             suggestionNotificationEl.className = 'mt-4 text-sm';
                         }, 5000);
-
                     } else {
                         const errorData = await response.json().catch(() => ({ message: 'Erro ao processar sua sugestão.' }));
                         suggestionNotificationEl.textContent = `Erro: ${errorData.message || 'Não foi possível enviar a sugestão.'}`;
                         suggestionNotificationEl.classList.add('text-danger');
                     }
                 } catch (error) {
-                    suggestionNotificationEl.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+                    suggestionNotificationEl.textContent = 'Erro de conexão. Tente novamente.';
                     suggestionNotificationEl.classList.add('text-danger');
-                    console.error('Fetch error:', error);
                 } finally {
                     suggestionSubmitButton.disabled = false;
                     suggestionSubmitButton.textContent = originalButtonText;
