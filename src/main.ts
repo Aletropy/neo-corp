@@ -7,18 +7,18 @@ import sequelize, { initializeDatabase } from "./Data/Database";
 import AuthRouter from "./routes/auth";
 import characterRoutes from "./routes/characterRoutes";
 import campainRoutes from "./routes/campainRoutes";
+import Config from "./Core/Config";
 
 const app = express();
 const SessionStore = SequelizeStore(session.Store);
 const viewsFolder = path.join(__dirname, "../public");
-const port = process.env.ROUTE_PORT || 8000;
 
 initializeDatabase();
 
 app.set("views", viewsFolder);
 app.set("view engine", "ejs");
 app.use(session({
-    secret: "MyLovedAndComplexSecret8525",
+    secret: Config.SECRET,
     store: new SessionStore({db: sequelize}),
     resave: false,
     saveUninitialized: false,
@@ -36,6 +36,6 @@ app.use("/character", characterRoutes);
 app.use("/campain", campainRoutes);
 routes(app);
 
-app.listen(port, () => {
-    console.log(`Initialized at http://localhost:${port}`);
+app.listen(Config.EXPRESS_PORT, Config.EXPRESS_IP, () => {
+    console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.EXPRESS_PORT}`);
 });

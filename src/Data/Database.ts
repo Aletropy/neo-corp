@@ -9,6 +9,7 @@ import Ritual from "../Data/Models/Ritual";
 import { Poder } from "../Data/Models/Poder";
 import path from "path";
 import Config from "../Core/Config";
+import { Suggestion } from "./Models/Suggestion";
 
 const sequelize = new Sequelize(
     Config.DB_DATABASE,
@@ -40,6 +41,8 @@ export async function initializeDatabase()
         Item.initialize();
         Arma.initialize();
         Ritual.initialize();
+
+        Suggestion.initialize();
 
         await sequelize.authenticate();
         await sequelize.sync({ alter: true });

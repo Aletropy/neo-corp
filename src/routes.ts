@@ -7,6 +7,7 @@ import Ritual from "./Data/Models/Ritual";
 import Item from "./Data/Models/Items";
 import Arma from "./Data/Models/Weapon";
 import path from "path";
+import { Suggestion } from "./Data/Models/Suggestion";
 
 declare module 'express-session' {
      interface SessionData {
@@ -58,10 +59,13 @@ export default (app : Application) =>
             }
         })
 
+        const suggestions = await Suggestion.findAll();
+
         res.render("pages/dashboard", {
             user: req.session.user,
             characters,
-            campaings
+            campaings,
+            suggestions: suggestions
         })
     });
 
@@ -72,6 +76,7 @@ export default (app : Application) =>
         const itens = await Item.findAll();
         const weapons = await Arma.findAll();
 
+
         const data = {
             poderes: poderes,
             rituals: rituais,
@@ -79,5 +84,22 @@ export default (app : Application) =>
             weapons: weapons
         };
         res.render('pages/data/database', data); 
+    });
+
+    app.post("/suggestion/new", AuthMiddleware, async (req, res) => {
+        const { text, type } = req.body;
+
+        if (!text || !type) {
+            res.status(400).send("Title and content are required.");
+            return;
+        }
+
+        await Suggestion.create({
+            authorId: req.session.user!.id,
+            text: text,
+            type: type
+        })
+        
+        res.status(200).send("Suggestion submitted successfully.");
     });
 }
