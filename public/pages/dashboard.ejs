@@ -192,14 +192,11 @@
                                             <h3 class="font-bold text-white text-lg"><%=character.info.name%></h3>
                                             <span class="bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=String(character.classe).charAt(0).toUpperCase() + character.classe.slice(1)%></span>
                                         </div>
-                                        <p class="text-gray-400 mt-2">NEX - <span class="text-yellow-400 font-medium"><%=character.nex%>%</span></p>
-                                        <% if(character.currentCampain != null) { %>
-                                            <p class="text-gray-400 mt-1">Campanha - NeuroShock: O Ritual Da Megalópole</p>
-                                            <% } else { %>
-                                            <p class="text-gray-400 mt-1">Nenhuma campanha ativa :(</p>
-                                        <% } %>
+                                        <p class="text-gray-400 mt-6">Vida - <span class="text-red-400 font-medium"><%=character.pv%>/<%=character.maxPv%></span></p>
+                                        <p class="text-gray-400">Sanidade - <span class="text-blue-400 font-medium"><%=character.ps%>/<%=character.maxPs%></span></p>
+                                        <p class="text-gray-400">NEX - <span class="text-yellow-400 font-medium"><%=character.nex%>%</span></p>
                                     </div>
-                                    <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
+                                    <div class="bg-gray-800 p-8 border-t border-gray-700">
                                         <a class="text-blue-400 hover:text-blue-300 text-sm font-medium" href="/character/<%=character.id%>">Ver Detalhes</a>
                                     </div>
                                 </div>
@@ -234,7 +231,7 @@
                                         </div>
                                     </div>
                                     <div class="bg-gray-800 px-5 py-3 border-t border-gray-700">
-                                        <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">Continuar</button>
+                                        <a href="/campain/<%=campain.id%>" class="text-blue-400 hover:text-blue-300 text-sm font-medium">Continuar</a>
                                     </div>
                                 </div>
                             <% } %>

@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import User from "../Data/Models/User";
 import Character from "../Data/Models/Character";
-import Campain from "../Data/Models/Campain";
+import Campaign from "../Data/Models/Campaign";
 import CharacterSkills from "../Data/Models/CharacterSkills";
 import Item from "../Data/Models/Items";
 import Arma from "../Data/Models/Weapon";
@@ -32,7 +32,7 @@ export async function initializeDatabase()
 {
     try {
         User.initialize();
-        Campain.initialize();
+        Campaign.initialize();
 
         Character.initialize();
         CharacterSkills.initialize();

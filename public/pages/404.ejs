@@ -1,14 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoCorp - Page Not Found</title>
-    <link rel="stylesheet" href="/styles/main.css">
+    <title>NeoCorp - Página Não Encontrada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configuração opcional do Tailwind (pode ser omitida para usar os padrões)
+        tailwind.config = {
+            darkMode: 'class', // Garante que o modo escuro é ativado pela classe no HTML
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-red': '#da3232', // Se quiser usar sua cor vermelha específica
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Pequeno estilo customizado para o cursor piscando, se desejar */
+        .blinking-cursor::after {
+            content: '_';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
-<body class="flex-center">
-    <div class="container" id="container">
-        <h1 style="color: #da3232; text-shadow: 0 2px 4px #da3232;">- Essa página não foi encontrada x_x -</h1>
+<body class="bg-gray-900 text-gray-100 flex flex-col items-center justify-center min-h-screen p-4 antialiased">
+    
+    <div class="container bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl text-center max-w-lg w-full">
+        
+        <div class="mb-8">
+            <span class="text-7xl md:text-9xl font-extrabold text-red-500">404</span>
+        </div>
+
+        <h1 class="text-2xl md:text-3xl font-bold text-yellow-400 mb-4">
+            <span class="blinking-cursor">Oops! Página Perdida</span>
+        </h1>
+        
+        <p class="text-lg text-gray-300 mb-2">
+           - A página que você procura não foi encontrada x_x -
+        </p>
+        <p class="text-sm text-gray-400 mb-8">
+            Parece que o link está quebrado ou a página foi removida.
+        </p>
+
+        <a href="/" 
+           class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md
+                  transition-all duration-300 ease-in-out transform hover:scale-105">
+            Voltar para o Início
+        </a>
+
+        <p class="mt-10 text-xs text-gray-500">
+            NeoCorp © 2025
+        </p>
     </div>
+
 </body>
 </html>

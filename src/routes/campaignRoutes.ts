@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { AdminMiddleware, AuthMiddleware } from "../Middlewares/auth";
-import Campain from "../Data/Models/Campain";
 import User from "../Data/Models/User";
+import Campaign from "../Data/Models/Campaign";
+import Character from "../Data/Models/Character";
 
 declare module 'express-session' {
      interface SessionData {
@@ -10,10 +11,38 @@ declare module 'express-session' {
             username : string;
             isAdmin : boolean;
          };
+         characterId : number;
     }
 }
 
 const campainRoutes = Router();
+
+campainRoutes.get("/session/:id", AuthMiddleware, async (req, res) => {
+
+    const campain = await Campaign.findByPk(parseInt(req.params.id));
+
+    if(campain == null)
+    {
+        res.redirect("/404");
+        return;
+    }
+
+    const character = await Character.findByPk(req.session.characterId);
+
+    if(character == null || character.get("owner") != req.session.user?.id && !req.session.user?.isAdmin)
+    {
+        res.redirect("/dashboard");
+        return;
+    }
+
+    res.render("pages/campain/session", {
+        campaignName: campain.get("name"),
+        campaignId: campain.get("id"),
+        system: "Ordem Paranormal 1.1",
+        user: req.session.user,
+        character: character.get()
+    });
+});
 
 campainRoutes.get("/new", AdminMiddleware, (_, res) => {
     res.render("pages/campain/new");
@@ -28,7 +57,7 @@ campainRoutes.post("/new", AdminMiddleware, async (req, res) => {
 
     const user = req.session.user!;
 
-    await Campain.create({
+    await Campaign.create({
         name: name,
         gameMaster: user.id,
         description: description,
@@ -41,7 +70,7 @@ campainRoutes.post("/new", AdminMiddleware, async (req, res) => {
 });
 
 campainRoutes.get("/:id", AuthMiddleware, async (req, res) => {
-    const campain = await Campain.findOne({
+    const campain = await Campaign.findOne({
         where: {id: parseInt(req.params.id)}
     });
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoCorp - Ficha de Personagem: <%= character.info.name %></title>
+    <title>NeoCorp - Ficha: <%= character.info.name %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -22,8 +22,12 @@
                         darkBorder: '#334155',
                         darkTextPrimary: '#e2e8f0',
                         darkTextSecondary: '#94a3b8',
-                        infoValue: '#60a5fa', // Light blue for values
-                        infoLabel: '#94a3b8',  // Same as darkTextSecondary for labels
+                        infoValue: '#60a5fa',
+                        infoLabel: '#94a3b8',
+                        health: '#ef4444',
+                        healthMax: '#f87171',
+                        sanity: '#3b82f6',
+                        sanityMax: '#60a5fa',
                         success: '#10b981',
                         warning: '#f59e0b',
                         danger: '#ef4444'
@@ -34,335 +38,386 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a1120; color: #e2e8f0; }
+        html, body { height: 100%; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #0a1120; color: #e2e8f0; display: flex; flex-direction: column; overflow: hidden; }
+        main { flex-grow: 1; overflow: hidden; }
         .tab-content-char { display: none; animation: fadeIn 0.3s ease forwards; }
         .tab-content-char.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .active-char-tab { background-color: #3b82f6; color: white; }
         .char-tab-btn:hover:not(.active-char-tab) { background-color: #334155; }
-        .attribute-box { background-color: #334155; border: 1px solid #475569; }
+        .attribute-box { background-color: #1e293b; /* card color for attribute boxes too */ border: 1px solid #334155; /* darkBorder */ }
         .skill-item { border-left: 3px solid #3b82f6; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        input[type="number"], input[type="text"], textarea, select { background-color: #334155; border-color: #475569; color: #e2e8f0; padding: 0.5rem 0.75rem; border-radius: 0.375rem; }
+        input[type="number"], input[type="text"], textarea, select { background-color: #334155; border-color: #475569; color: #e2e8f0; padding: 0.4rem 0.6rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
         input:focus, textarea:focus, select:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
-        .description-text { overflow-y: auto; padding-right: 5px; font-size: 0.8rem; /* Adjusted max-height with responsive classes */ }
-        
-        /* Modal Styles */
+        .description-text { overflow-y: auto; padding-right: 4px; font-size: 0.75rem; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); }
-        .modal-content { background-color: #1e293b; /* card */ margin: 10% auto; padding: 20px sm:padding: 25px; border: 1px solid #334155; /* darkBorder */ border-radius: 0.75rem; /* rounded-xl */ position: relative; /* Responsive width in Tailwind classes */ }
-        .modal-close-btn { color: #94a3b8; /* darkTextSecondary */ float: right; font-size: 24px sm:font-size:28px; font-weight: bold; line-height: 1; cursor: pointer; }
-        .modal-close-btn:hover, .modal-close-btn:focus { color: #e2e8f0; /* darkTextPrimary */ text-decoration: none; }
-        .modal-item-list label:hover { background-color: #475569; } /* slightly lighter for hover */
+        .modal-content { background-color: #1e293b; margin: 8% auto; padding: 18px sm:padding:22px; border: 1px solid #334155; border-radius: 0.5rem; position: relative; }
+        .modal-close-btn { color: #94a3b8; float: right; font-size: 22px sm:font-size:26px; font-weight: bold; line-height: 1; cursor: pointer; }
+        .modal-close-btn:hover, .modal-close-btn:focus { color: #e2e8f0; text-decoration: none; }
+        .modal-item-list label:hover { background-color: #475569; }
+        .form-checkbox { appearance: none; -webkit-appearance: none; height: 1.25em; width: 1.25em; background-color: #334155; border: 1px solid #475569; border-radius: 0.25em; display: inline-block; position: relative; cursor: pointer; }
+        .form-checkbox:checked { background-color: #3b82f6; border-color: #3b82f6; }
+        .form-checkbox:checked::after { content: ''; position: absolute; left: 0.375em; top: 0.125em; width: 0.375em; height: 0.75em; border: solid white; border-width: 0 0.125em 0.125em 0; transform: rotate(45deg); }
+        .scrollable-column { height: 100%; overflow-y: auto; padding-bottom: 1rem; /* Ensure some space at the bottom for scroll */ }
     </style>
 </head>
-<body class="bg-darker text-darkTextPrimary">
-    <!-- Navbar -->
-    <nav class="bg-dark shadow-lg sticky top-0 z-50">
-        <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-8">
-            <div class="flex justify-between h-16">
+<body>
+    <nav class="bg-dark shadow-md sticky top-0 z-50 h-14 flex-shrink-0">
+        <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 h-full">
+            <div class="flex justify-between items-center h-full">
                 <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="/dashboard" class="flex items-center">
-                            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-cube text-white"></i>
-                            </div>
-                            <span class="ml-2 text-lg sm:text-xl font-bold text-white">Neo<span class="text-blue-400">Corp</span></span>
-                        </a>
-                    </div>
-                    <span class="ml-3 sm:ml-6 text-gray-400">/</span>
-                    <span class="ml-1 sm:ml-2 text-base sm:text-lg font-semibold text-white truncate max-w-[100px] xs:max-w-[150px] sm:max-w-xs"><%= character.info.name %></span>
+                    <a href="/dashboard" class="flex items-center">
+                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-7 h-7 rounded-md flex items-center justify-center">
+                            <i class="fas fa-cube text-white text-sm"></i>
+                        </div>
+                        <span class="ml-2 text-base sm:text-lg font-bold text-white">Neo<span class="text-blue-400">Corp</span></span>
+                    </a>
+                    <span class="ml-2 sm:ml-4 text-gray-400">/</span>
+                    <span class="ml-1 sm:ml-2 text-sm sm:text-base font-semibold text-white truncate max-w-[90px] xs:max-w-[140px] sm:max-w-xs"><%= character.info.name %></span>
                 </div>
                 <div class="flex items-center">
-                     <button type="submit" form="characterSheetForm" class="px-3 py-2 sm:px-4 text-xs sm:text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg shadow hover:from-green-600 hover:to-emerald-700 transition flex items-center">
-                        <i class="fas fa-save sm:mr-2"></i> <span class="hidden sm:inline">Salvar Alterações</span>
+                     <button type="submit" form="characterSheetForm" class="px-2.5 py-1.5 sm:px-3.5 text-xs sm:text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-md shadow hover:from-green-600 hover:to-emerald-700 transition flex items-center">
+                        <i class="fas fa-save sm:mr-1.5"></i> <span class="hidden sm:inline">Salvar</span>
                     </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <form id="characterSheetForm" action="/character/<%= character.id %>/update" method="post">
-        <div id="newly-added-items-container"></div> <!-- Holds new_..._ids[] and deleted_..._ids[] -->
+<form id="characterSheetForm" action="/character/<%= character.id %>/update" method="post" class="flex-grow overflow-hidden">
+    <div id="newly-added-items-container" class="hidden"></div>
 
-        <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
-            <!-- Character Header & Core Stats -->
-            <div class="bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder mb-4 sm:mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-                    <div>
-                        <input type="text" name="info_name" value="<%= character.info.name %>" class="text-2xl sm:text-3xl font-bold bg-transparent border-0 focus:ring-0 focus:border-primary p-0 mb-1 sm:mb-2 w-full md:w-auto inline-block">
-                        <p class="text-sm sm:text-base text-darkTextSecondary">
-                            <select name="classe" class="bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block appearance-none text-sm sm:text-base">
-                                <% const classes = ["Combatente", "Especialista", "Ocultista", "Mundano"]; %>
-                                <% classes.forEach(cls => { %>
-                                    <option value="<%= cls.toLowerCase() %>" <%= character.classe.toLowerCase() === cls.toLowerCase() ? 'selected' : '' %>><%= cls %></option>
-                                <% }); %>
-                            </select>
-                            - NEX 
-                            <input type="number" name="nex" value="<%= character.nex %>" min="0" max="99" class="w-12 sm:w-16 text-center bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block text-sm sm:text-base">%
-                        </p>
+    <main class="h-full p-2 sm:p-3 md:p-4 grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4">
+        
+        <div class="md:col-span-3 bg-card p-3 sm:p-4 rounded-lg shadow-lg border border-darkBorder scrollable-column">
+            <div class="flex flex-col items-center mb-4">
+                <div class="w-24 h-24 sm:w-32 sm:h-32 bg-cardLight rounded-full flex items-center justify-center mb-3 border-2 border-primary">
+                    <% if (character.info.portraitUrl) { %>
+                        <img src="<%= character.info.portraitUrl %>" alt="Retrato de <%= character.info.name %>" class="w-full h-full rounded-full object-cover">
+                    <% } else { %>
+                        <i class="fas fa-user fa-3x text-primary"></i>
+                    <% } %>
+                </div>
+                <input type="text" name="info_name" value="<%= character.info.name %>" class="text-lg sm:text-xl font-bold bg-transparent border-0 focus:ring-0 focus:border-primary p-0 text-center w-full mb-0.5">
+                <div class="text-xs sm:text-sm text-darkTextSecondary text-center w-full">
+                    <select name="classe" id="character-classe" class="bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block appearance-none text-xs sm:text-sm text-center">
+                        <% const classes = ["Combatente", "Especialista", "Ocultista", "Mundano"]; %>
+                        <% classes.forEach(cls => { %>
+                            <option value="<%= cls.toLowerCase() %>" <%= character.classe.toLowerCase() === cls.toLowerCase() ? 'selected' : '' %>><%= cls %></option>
+                        <% }); %>
+                    </select>
+                    - NEX 
+                    <input type="number"  name="nex" id="character-nex" value="<%= character.nex %>" min="0" max="99" class="w-10 text-center bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block text-xs sm:text-sm">%
+                </div>
+                 <div class="text-[10px] text-darkTextSecondary mt-1">ID: <%= character.id %></div>
+            </div>
+            
+            <!-- Attributes -->
+            <h3 class="text-sm font-semibold mb-2 text-center text-primary">Atributos</h3>
+            <% const attributesData = { pre: "PRE", agi: "AGI", for: "FOR", vig: "VIG", int: "INT" }; %>
+            <% const attrLayout = [
+                ['pre'], // Top
+                ['agi', 'for'], // Middle
+                ['vig', 'int'] // Bottom
+            ]; %>
+            <div class="space-y-1.5 mb-4">
+                <% attrLayout.forEach(row => { %>
+                    <div class="flex <%= row.length === 1 ? 'justify-center' : 'justify-around' %> gap-1.5">
+                        <% row.forEach(key => { %>
+                            <div class="attribute-box p-1.5 rounded-md <%= row.length === 1 ? 'w-2/5 sm:w-1/3' : 'w-2/5 sm:w-2/5' %> text-center">
+                                <label class="block text-[10px] text-darkTextSecondary uppercase tracking-wider"><%= attributesData[key] %></label>
+                                <input type="number" min="0" name="attributes_<%= key %>" id="attr-<%= key %>" value="<%= character.attributes[key] %>" class="text-base sm:text-lg font-bold w-full text-center bg-transparent border-0 focus:ring-0 p-0 m-0">
+                            </div>
+                        <% }); %>
                     </div>
-                    <div class="text-xs sm:text-sm text-darkTextSecondary mt-2 md:mt-0 text-left md:text-right">
-                        ID do Personagem: <%= character.id %> <br>
-                        Campanha Atual: <%= character.currentCampain ? `ID ${character.currentCampain}` : "Nenhuma" %>
+                <% }); %>
+            </div>
+            
+            <!-- HP and Sanity -->
+            <div class="space-y-2">
+                <div class="attribute-box p-2 rounded-md">
+                    <label class="text-xs text-healthMax uppercase tracking-wider font-semibold block text-center mb-1">Vida (PV)</label>
+                    <div class="flex items-center space-x-1.5">
+                        <input type="number" name="pv" id="character-pv" value="<%= character.pv %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-health p-0.5">
+                        <span class="text-darkTextSecondary text-base">/</span>
+                        <input type="number" name="maxPv" id="character-maxPv" value="<%= character.maxPv %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-health p-0.5">
                     </div>
                 </div>
-                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 text-center">
-                    <% const attributes = { for: "FOR", vig: "VIG", agi: "AGI", pre: "PRE", int: "INT" }; %>
-                    <% Object.entries(attributes).forEach(([key, label]) => { %>
-                    <div class="attribute-box p-2 sm:p-3 rounded-lg">
-                        <label class="block text-xs text-darkTextSecondary uppercase tracking-wider"><%= label %></label>
-                        <input type="number" min="0" name="attributes_<%= key %>" value="<%= character.attributes[key] %>" class="text-xl sm:text-2xl font-bold w-full text-center bg-transparent border-0 focus:ring-0 p-0 m-0">
+                <div class="attribute-box p-2 rounded-md">
+                    <label class="text-xs text-sanityMax uppercase tracking-wider font-semibold block text-center mb-1">Sanidade (PS)</label>
+                    <div class="flex items-center space-x-1.5">
+                        <input type="number" name="ps" id="character-ps" value="<%= character.ps %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
+                        <span class="text-darkTextSecondary text-base">/</span>
+                        <input type="number" name="maxPs" id="character-maxPs" value="<%= character.maxPs %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
                     </div>
-                    <% }); %>
                 </div>
             </div>
+            <div class="flex items-center justify-center space-x-2 mt-3">
+                <input type="checkbox" id="autoCalcStats" name="autoCalcStats" class="form-checkbox text-primary" checked>
+                <label for="autoCalcStats" class="text-xs text-darkTextSecondary cursor-pointer">Calcular Max Auto</label>
+            </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                <!-- Left Column: Skills -->
-                <div class="lg:col-span-1 space-y-4 sm:space-y-6">
-                    <div class="bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder">
-                        <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 pb-2 border-b border-darkBorder">Perícias</h2>
-                        <div class="space-y-2 sm:space-y-3 max-h-[45vh] md:max-h-[55vh] lg:max-h-[calc(100vh-260px)] overflow-y-auto pr-1 sm:pr-2">
-                            <% const skillOrder = [
-                                "acrobacia", "adestramento", "artes", "atletismo", "atualidades", "ciencias", "crime", 
-                                "diplomacia", "enganacao", "fortitude", "furtividade", "iniciativa", "intimidacao", 
-                                "intuicao", "investigacao", "luta", "medicina", "ocultismo", "percepcao", "pilotagem", 
-                                "pontaria", "profissao", "reflexos", "religiao", "sobrevivencia", "tatica", "tecnologia", "vontade"
-                            ]; %>
-                            <% skillOrder.forEach(skillKey => { 
-                                const skillName = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
-                            %>
-                            <div class="skill-item bg-cardLight p-2 sm:p-3 rounded-md flex justify-between items-center">
-                                <label class="text-xs sm:text-sm font-medium text-darkTextPrimary"><%= skillName %></label>
-                                <input type="number" min="0" max="15" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" class="w-14 sm:w-16 text-right bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 text-xs sm:text-sm">
-                            </div>
-                            <% }); %>
-                        </div>
+        <!-- Center Column: Skills -->
+        <div class="md:col-span-4 bg-card p-3 sm:p-4 rounded-lg shadow-lg border border-darkBorder scrollable-column">
+            <h2 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3 pb-1.5 border-b border-darkBorder text-center">Perícias</h2>
+            <div class="space-y-1.5 sm:space-y-2 pr-1 sm:pr-1.5">
+                <% const skillOrder = [
+                    "acrobacia", "adestramento", "artes", "atletismo", "atualidades", "ciencias", "crime", 
+                    "diplomacia", "enganacao", "fortitude", "furtividade", "iniciativa", "intimidacao", 
+                    "intuicao", "investigacao", "luta", "medicina", "ocultismo", "percepcao", "pilotagem", 
+                    "pontaria", "profissao", "reflexos", "religiao", "sobrevivencia", "tatica", "tecnologia", "vontade"
+                ]; %>
+                <% skillOrder.forEach(skillKey => { 
+                    const skillName = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+                %>
+                <div class="skill-item bg-cardLight p-1.5 sm:p-2 rounded-sm flex justify-between items-center">
+                    <label class="text-[11px] sm:text-xs font-medium text-darkTextPrimary"><%= skillName %></label>
+                    <input type="number" min="0" max="15" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" class="w-12 sm:w-14 text-right bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 text-[11px] sm:text-xs">
+                </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <!-- Right Column: Tabs -->
+        <div class="md:col-span-5 bg-card rounded-lg shadow-lg border border-darkBorder flex flex-col overflow-hidden">
+            <div class="flex-shrink-0 flex flex-wrap border-b border-darkBorder">
+                <button type="button" class="char-tab-btn flex-grow px-2 py-1.5 sm:px-3 sm:py-2.5 text-[10px] sm:text-xs font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none active-char-tab" data-tab="char-info"><i class="fas fa-user-circle sm:mr-1"></i> <span class="hidden sm:inline">Info</span><span class="sm:hidden xs:inline">Info</span></button>
+                <button type="button" class="char-tab-btn flex-grow px-2 py-1.5 sm:px-3 sm:py-2.5 text-[10px] sm:text-xs font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-inventory"><i class="fas fa-briefcase sm:mr-1"></i> <span class="hidden sm:inline">Inventário</span><span class="sm:hidden xs:inline">Inv.</span></button>
+                <button type="button" class="char-tab-btn flex-grow px-2 py-1.5 sm:px-3 sm:py-2.5 text-[10px] sm:text-xs font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-powers"><i class="fas fa-bolt sm:mr-1"></i> <span class="hidden sm:inline">Poderes</span><span class="sm:hidden xs:inline">Poder</span></button>
+                <button type="button" class="char-tab-btn flex-grow px-2 py-1.5 sm:px-3 sm:py-2.5 text-[10px] sm:text-xs font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-rituals"><i class="fas fa-book-dead sm:mr-1"></i> <span class="hidden sm:inline">Rituais</span><span class="sm:hidden xs:inline">Rit.</span></button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto p-3 sm:p-4">
+                <div id="char-info" class="tab-content-char active">
+                    <h2 class="text-base sm:text-lg font-semibold mb-3">Detalhes do Personagem</h2>
+                    <div class="space-y-2.5 sm:space-y-3">
+                        <div><label for="char-age" class="block text-xs font-medium text-darkTextSecondary mb-0.5">Idade</label><input type="text" id="char-age" name="info_age" value="<%= character.info.age %>" class="w-full text-sm"></div>
+                        <div><label for="char-appearance" class="block text-xs font-medium text-darkTextSecondary mb-0.5">Aparência</label><textarea id="char-appearance" name="info_appearanceDescription" rows="3" sm:rows-4" class="w-full text-sm"><%= character.info.appearanceDescription %></textarea></div>
+                        <div><label for="char-description" class="block text-xs font-medium text-darkTextSecondary mb-0.5">História / Personalidade</label><textarea id="char-description" name="info_description" rows="4" sm:rows-6" class="w-full text-sm"><%= character.info.description %></textarea></div>
                     </div>
-                    <!-- Equipped Items section was hidden, leaving it as is unless requested -->
                 </div>
 
-                <!-- Right Column: Tabs (Info, Inventory, Powers, Rituals) -->
-                <div class="lg:col-span-2">
-                    <div class="mb-4 sm:mb-6 flex flex-wrap border-b border-darkBorder">
-                        <button type="button" class="char-tab-btn px-3 py-2 sm:px-4 md:px-6 sm:py-3 text-xs sm:text-sm font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none active-char-tab" data-tab="char-info"><i class="fas fa-user-circle sm:mr-2"></i> <span class="hidden sm:inline">Informações</span></button>
-                        <button type="button" class="char-tab-btn px-3 py-2 sm:px-4 md:px-6 sm:py-3 text-xs sm:text-sm font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-inventory"><i class="fas fa-briefcase sm:mr-2"></i> <span class="hidden sm:inline">Inventário</span></button>
-                        <button type="button" class="char-tab-btn px-3 py-2 sm:px-4 md:px-6 sm:py-3 text-xs sm:text-sm font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-powers"><i class="fas fa-bolt sm:mr-2"></i> <span class="hidden sm:inline">Poderes</span></button>
-                        <button type="button" class="char-tab-btn px-3 py-2 sm:px-4 md:px-6 sm:py-3 text-xs sm:text-sm font-medium text-darkTextPrimary hover:text-darkTextSecondary focus:outline-none" data-tab="char-rituals"><i class="fas fa-book-dead sm:mr-2"></i> <span class="hidden sm:inline">Rituais</span></button>
+                <div id="char-inventory" class="tab-content-char">
+                    <div class="flex justify-between items-center mb-2 sm:mb-3">
+                        <h2 class="text-base sm:text-lg font-semibold">Inventário</h2>
+                        <button type="button" class="open-modal-btn text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 sm:py-1.5 sm:px-3 rounded-md flex items-center" data-type="item">
+                            <i class="fas fa-plus sm:mr-1.5 text-[10px] sm:text-xs"></i> <span class="hidden sm:inline">Item</span><span class="sm:hidden">Item</span>
+                        </button>
                     </div>
-
-                    <!-- Info Tab -->
-                    <div id="char-info" class="tab-content-char active bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder lg:max-h-[calc(100vh-320px)] lg:overflow-y-auto">
-                        <h2 class="text-lg sm:text-xl font-semibold mb-4">Detalhes do Personagem</h2>
-                        <div class="space-y-3 sm:space-y-4">
-                            <div><label for="char-age" class="block text-xs sm:text-sm font-medium text-darkTextSecondary mb-1">Idade</label><input type="text" id="char-age" name="info_age" value="<%= character.info.age %>" class="w-full text-sm sm:text-base"></div>
-                            <div><label for="char-appearance" class="block text-xs sm:text-sm font-medium text-darkTextSecondary mb-1">Aparência</label><textarea id="char-appearance" name="info_appearanceDescription" rows="3" sm:rows="4" class="w-full text-sm sm:text-base"><%= character.info.appearanceDescription %></textarea></div>
-                            <div><label for="char-description" class="block text-xs sm:text-sm font-medium text-darkTextSecondary mb-1">História / Personalidade</label><textarea id="char-description" name="info_description" rows="4" sm:rows="6" class="w-full text-sm sm:text-base"><%= character.info.description %></textarea></div>
+                    <div class="space-y-2.5 sm:space-y-3">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-medium text-primary mb-1.5">Itens (<span class="item-count"><%= character.itens.length %></span>)</h3>
+                            <div id="character-items-list" class="grid grid-cols-1 xl:grid-cols-2 gap-1.5 sm:gap-2">
+                            <% if (character.itens.length > 0) { %>
+                                <% character.itens.forEach(item => { %>
+                                <div class="p-2 sm:p-2.5 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= item.id %>">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-grow mr-1.5">
+                                            <h4 class="font-semibold text-xs sm:text-sm text-darkTextPrimary"><%= item.name %> 
+                                                <span class="text-[10px] text-infoValue">(<span class="text-infoLabel">Cat:</span> <%= item.category %>, <span class="text-infoLabel">Esp:</span> <%= item.storage %>)</span>
+                                            </h4>
+                                            <p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20"><%= item.description %></p>
+                                        </div>
+                                        <button type="button" class="delete-item-btn p-0.5 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= item.id %>" data-item-type="item">
+                                            <i class="fas fa-trash-alt text-[10px] sm:fa-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="no-items-text text-xs text-darkTextSecondary italic col-span-full">Nenhum item.</p>
+                            <% } %>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- Inventory Tab -->
-                    <div id="char-inventory" class="tab-content-char bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder lg:max-h-[calc(100vh-320px)] lg:overflow-y-auto">
-                        <div class="flex justify-between items-center mb-3 sm:mb-4">
-                            <h2 class="text-lg sm:text-xl font-semibold">Inventário</h2>
-                            <button type="button" class="open-modal-btn text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-lg flex items-center" data-type="item">
-                                <i class="fas fa-plus sm:mr-2"></i> <span class="hidden sm:inline">Adicionar Item</span>
+                        <hr class="border-darkBorder my-3 sm:my-4">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <h3 class="text-sm sm:text-base font-medium text-primary">Armas (<span class="weapon-count"><%= character.armas.length %></span>)</h3>
+                             <button type="button" class="open-modal-btn text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 sm:py-1.5 sm:px-3 rounded-md flex items-center" data-type="arma">
+                                <i class="fas fa-plus sm:mr-1.5 text-[10px] sm:text-xs"></i> <span class="hidden sm:inline">Arma</span><span class="sm:hidden">Arma</span>
                             </button>
                         </div>
-                        <div class="space-y-3 sm:space-y-4">
-                            <div>
-                                <h3 class="text-base sm:text-lg font-medium text-primary mb-2">Itens (<span class="item-count"><%= character.itens.length %></span>)</h3>
-                                <div id="character-items-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                                <% if (character.itens.length > 0) { %>
-                                    <% character.itens.forEach(item => { %>
-                                    <div class="p-2.5 sm:p-3 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= item.id %>">
-                                        <div class="flex justify-between items-start">
-                                            <div class="flex-grow mr-2">
-                                                <h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= item.name %> 
-                                                    <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> <%= item.category %>, <span class="text-infoLabel">Esp:</span> <%= item.storage %>)</span>
-                                                </h4>
-                                                <p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%= item.description %></p>
-                                            </div>
-                                            <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= item.id %>" data-item-type="item">
-                                                <i class="fas fa-trash-alt fa-xs sm:fa-sm"></i>
-                                            </button>
+                         <div id="character-weapons-list" class="grid grid-cols-1 xl:grid-cols-2 gap-1.5 sm:gap-2">
+                            <% if (character.armas.length > 0) { %>
+                                <% character.armas.forEach(weapon => { %>
+                                <div class="p-2 sm:p-2.5 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= weapon.id %>">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-grow mr-1.5">
+                                            <h4 class="font-semibold text-xs sm:text-sm text-darkTextPrimary"><%= weapon.name %></h4>
+                                            <p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20"><%= weapon.description %></p>
+                                            <p class="text-[10px] mt-0.5">
+                                                <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= humanizeWeaponType(weapon.weaponType) %></span>, 
+                                                <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= humanizeGrip(weapon.grip) %></span>, 
+                                                <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= humanizeProficiency(weapon.proficiency) %></span><br>
+                                                <span class="text-infoLabel">Dano:</span> <span class="text-infoValue"><%= weapon.damageDice || '-' %></span>, 
+                                                <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue"><%= formatCritical(weapon.criticalChance, weapon.criticalMultiplier) %></span>, 
+                                                <span class="text-infoLabel">Esp:</span> <span class="text-infoValue"><%= weapon.storage %></span>, 
+                                                <span class="text-infoLabel">Cat:</span> <span class="text-infoValue"><%= weapon.category %></span>
+                                            </p>
                                         </div>
+                                        <button type="button" class="delete-item-btn p-0.5 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= weapon.id %>" data-item-type="arma">
+                                            <i class="fas fa-trash-alt text-[10px] sm:fa-xs"></i>
+                                        </button>
                                     </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <p class="no-items-text text-sm text-darkTextSecondary italic col-span-full">Nenhum item.</p>
-                                <% } %>
                                 </div>
-                            </div>
-                            <hr class="border-darkBorder my-4 sm:my-6">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-base sm:text-lg font-medium text-primary">Armas (<span class="weapon-count"><%= character.armas.length %></span>)</h3>
-                                <button type="button" class="open-modal-btn text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-lg flex items-center" data-type="arma">
-                                    <i class="fas fa-plus sm:mr-2"></i> <span class="hidden sm:inline">Adicionar Arma</span>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="no-weapons-text text-xs text-darkTextSecondary italic col-span-full">Nenhuma arma.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="char-powers" class="tab-content-char">
+                    <div class="flex justify-between items-center mb-2 sm:mb-3">
+                        <h2 class="text-base sm:text-lg font-semibold">Poderes & Habilidades (<span class="power-count"><%= character.poderes.length %></span>)</h2>
+                        <button type="button" class="open-modal-btn text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 sm:py-1.5 sm:px-3 rounded-md flex items-center" data-type="poder">
+                            <i class="fas fa-plus sm:mr-1.5 text-[10px] sm:text-xs"></i><span class="hidden sm:inline"> Poder</span><span class="sm:hidden">Poder</span>
+                        </button>
+                    </div>
+                    <div id="character-poderes-list" class="space-y-1.5 sm:space-y-2">
+                    <% if (character.poderes.length > 0) { %>
+                        <% character.poderes.forEach(poder => { %>
+                        <div class="p-2 sm:p-2.5 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= poder.id %>">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-grow mr-1.5">
+                                    <h3 class="font-semibold text-xs sm:text-sm text-darkTextPrimary"><%= poder.name %> 
+                                        <span class="text-[10px] text-infoValue"><%= poder.isHabilidade ? '(Habilidade)' : '(Poder)' %></span>
+                                    </h3>
+                                    <p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20"><%- poder.description.replace(/\n/g, "<br>") %></p>
+                                    <% if(poder.fromClasse || poder.fromTrilha || poder.elemento) { %>
+                                    <p class="text-[10px] mt-0.5">
+                                        <% if(poder.fromClasse) { %><span class="text-infoLabel">Classe:</span> <span class="text-infoValue"><%= poder.fromClasse %>.</span> <% } %>
+                                        <% if(poder.fromTrilha) { %><span class="text-infoLabel">Trilha:</span> <span class="text-infoValue"><%= poder.fromTrilha %>.</span> <% } %>
+                                        <% if(poder.elemento) { %><span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= poder.elemento %>.</span> <% } %>
+                                    </p>
+                                    <% } %>
+                                </div>
+                                <button type="button" class="delete-item-btn p-0.5 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= poder.id %>" data-item-type="poder">
+                                    <i class="fas fa-trash-alt text-[10px] sm:fa-xs"></i>
                                 </button>
                             </div>
-                             <div id="character-weapons-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                                <% if (character.armas.length > 0) { %>
-                                    <% character.armas.forEach(weapon => { %>
-                                    <div class="p-2.5 sm:p-3 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= weapon.id %>">
-                                        <div class="flex justify-between items-start">
-                                            <div class="flex-grow mr-2">
-                                                <h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= weapon.name %></h4>
-                                                <p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%= weapon.description %></p>
-                                                <p class="text-xs mt-1">
-                                                    <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= humanizeWeaponType(weapon.weaponType) %></span>, 
-                                                    <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= humanizeGrip(weapon.grip) %></span>, 
-                                                    <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= humanizeProficiency(weapon.proficiency) %></span><br>
-                                                    <span class="text-infoLabel">Dano:</span> <span class="text-infoValue"><%= weapon.damageDice || '-' %></span>, 
-                                                    <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue"><%= formatCritical(weapon.criticalChance, weapon.criticalMultiplier) %></span><br>
-                                                    <span class="text-infoLabel">Espaços:</span> <span class="text-infoValue"><%= weapon.storage %></span>, 
-                                                    <span class="text-infoLabel">Categoria:</span> <span class="text-infoValue"><%= weapon.category %></span>
-                                                </p>
-                                            </div>
-                                            <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= weapon.id %>" data-item-type="arma">
-                                                <i class="fas fa-trash-alt fa-xs sm:fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <p class="no-weapons-text text-sm text-darkTextSecondary italic col-span-full">Nenhuma arma.</p>
-                                <% } %>
-                            </div>
                         </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="no-poderes-text text-xs text-darkTextSecondary italic">Nenhum poder ou habilidade.</p>
+                    <% } %>
                     </div>
+                </div>
 
-                    <!-- Powers Tab -->
-                    <div id="char-powers" class="tab-content-char bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder lg:max-h-[calc(100vh-320px)] lg:overflow-y-auto">
-                        <div class="flex justify-between items-center mb-3 sm:mb-4">
-                            <h2 class="text-lg sm:text-xl font-semibold">Poderes & Habilidades (<span class="power-count"><%= character.poderes.length %></span>)</h2>
-                            <button type="button" class="open-modal-btn text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-lg flex items-center" data-type="poder">
-                                <i class="fas fa-plus sm:mr-2"></i><span class="hidden sm:inline"> Adicionar Poder</span>
-                            </button>
-                        </div>
-                        <div id="character-poderes-list" class="space-y-2 sm:space-y-3">
-                        <% if (character.poderes.length > 0) { %>
-                            <% character.poderes.forEach(poder => { %>
-                            <div class="p-2.5 sm:p-3 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= poder.id %>">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-grow mr-2">
-                                        <h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= poder.name %> 
-                                            <span class="text-xs text-infoValue"><%= poder.isHabilidade ? '(Habilidade)' : '(Poder)' %></span>
-                                        </h3>
-                                        <p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%- poder.description.replace(/\n/g, "<br>") %></p>
-                                        <% if(poder.fromClasse || poder.fromTrilha || poder.elemento) { %>
-                                        <p class="text-xs mt-1">
-                                            <% if(poder.fromClasse) { %><span class="text-infoLabel">Classe:</span> <span class="text-infoValue"><%= poder.fromClasse %>.</span> <% } %>
-                                            <% if(poder.fromTrilha) { %><span class="text-infoLabel">Trilha:</span> <span class="text-infoValue"><%= poder.fromTrilha %>.</span> <% } %>
-                                            <% if(poder.elemento) { %><span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= poder.elemento %>.</span> <% } %>
-                                        </p>
-                                        <% } %>
-                                    </div>
-                                    <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= poder.id %>" data-item-type="poder">
-                                        <i class="fas fa-trash-alt fa-xs sm:fa-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <% }); %>
-                        <% } else { %>
-                            <p class="no-poderes-text text-sm text-darkTextSecondary italic">Nenhum poder ou habilidade.</p>
-                        <% } %>
-                        </div>
+                <div id="char-rituals" class="tab-content-char">
+                     <div class="flex justify-between items-center mb-2 sm:mb-3">
+                        <h2 class="text-base sm:text-lg font-semibold">Rituais (<span class="ritual-count"><%= character.rituais.length %></span>)</h2>
+                        <button type="button" class="open-modal-btn text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 sm:py-1.5 sm:px-3 rounded-md flex items-center" data-type="ritual">
+                            <i class="fas fa-plus sm:mr-1.5 text-[10px] sm:text-xs"></i><span class="hidden sm:inline"> Ritual</span><span class="sm:hidden">Ritual</span>
+                        </button>
                     </div>
-
-                    <!-- Rituals Tab -->
-                    <div id="char-rituals" class="tab-content-char bg-card p-4 sm:p-6 rounded-xl shadow-lg border border-darkBorder lg:max-h-[calc(100vh-320px)] lg:overflow-y-auto">
-                         <div class="flex justify-between items-center mb-3 sm:mb-4">
-                            <h2 class="text-lg sm:text-xl font-semibold">Rituais (<span class="ritual-count"><%= character.rituais.length %></span>)</h2>
-                            <button type="button" class="open-modal-btn text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-lg flex items-center" data-type="ritual">
-                                <i class="fas fa-plus sm:mr-2"></i><span class="hidden sm:inline"> Adicionar Ritual</span>
-                            </button>
-                        </div>
-                        <div id="character-rituais-list" class="space-y-2 sm:space-y-3">
-                         <% if (character.rituais.length > 0) { %>
-                            <% character.rituais.forEach(ritual => { %>
-                            <div class="p-2.5 sm:p-3 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= ritual.id %>">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-grow mr-2">
-                                        <h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= ritual.name %></h3>
-                                        <p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%- ritual.description.replace(/\n/g, "<br>") %></p>
-                                        <p class="text-xs mt-1">
-                                            <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue"><%= ritual.circle %></span>, 
-                                            <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= ritual.element %></span><br>
-                                            <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue"><%= ritual.range %></span>, 
-                                            <span class="text-infoLabel">Duração:</span> <span class="text-infoValue"><%= ritual.duration %></span>
-                                        </p>
-                                    </div>
-                                    <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= ritual.id %>" data-item-type="ritual">
-                                        <i class="fas fa-trash-alt fa-xs sm:fa-sm"></i>
-                                    </button>
+                    <div id="character-rituais-list" class="space-y-1.5 sm:space-y-2">
+                     <% if (character.rituais.length > 0) { %>
+                        <% character.rituais.forEach(ritual => { %>
+                        <div class="p-2 sm:p-2.5 bg-cardLight rounded-md border border-darkBorder" data-item-id="<%= ritual.id %>">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-grow mr-1.5">
+                                    <h3 class="font-semibold text-xs sm:text-sm text-darkTextPrimary"><%= ritual.name %></h3>
+                                    <p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20"><%- ritual.description.replace(/\n/g, "<br>") %></p>
+                                    <p class="text-[10px] mt-0.5">
+                                        <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue"><%= ritual.circle %></span>, 
+                                        <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= ritual.element %></span>, 
+                                        <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue"><%= ritual.range %></span>, 
+                                        <span class="text-infoLabel">Duração:</span> <span class="text-infoValue"><%= ritual.duration %></span>
+                                    </p>
                                 </div>
+                                <button type="button" class="delete-item-btn p-0.5 text-danger hover:text-red-400 transition-colors flex-shrink-0" data-item-id="<%= ritual.id %>" data-item-type="ritual">
+                                    <i class="fas fa-trash-alt text-[10px] sm:fa-xs"></i>
+                                </button>
                             </div>
-                            <% }); %>
-                        <% } else { %>
-                            <p class="no-rituais-text text-sm text-darkTextSecondary italic">Nenhum ritual conhecido.</p>
-                        <% } %>
                         </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="no-rituais-text text-xs text-darkTextSecondary italic">Nenhum ritual conhecido.</p>
+                    <% } %>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+    </main>
+</form>
 
-    <!-- Generic Modal -->
-    <div id="addItemModal" class="modal">
-        <div class="modal-content w-11/12 sm:w-5/6 md:w-3/4 lg:max-w-xl xl:max-w-2xl"> {/* Responsive width */}
-            <span class="modal-close-btn">×</span>
-            <h2 id="modal-title" class="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-darkTextPrimary">Adicionar</h2>
-            <div id="modal-search-bar" class="mb-3 sm:mb-4">
-                <input type="text" id="modal-search-input" placeholder="Buscar por nome..." class="w-full text-sm sm:text-base">
-            </div>
-            <div id="modal-item-list" class="space-y-2 max-h-60 sm:max-h-72 md:max-h-80 overflow-y-auto p-1 pr-2 text-sm sm:text-base">
-                {/* Items will be populated by JavaScript */}
-            </div>
-            <div class="mt-4 sm:mt-6 flex justify-end space-x-2 sm:space-x-3">
-                <button type="button" id="modal-cancel-btn" class="px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">Cancelar</button>
-                <button type="button" id="modal-add-selected-btn" class="px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">Adicionar Selecionados</button>
-            </div>
+<div id="addItemModal" class="modal">
+    <div class="modal-content w-11/12 sm:w-5/6 md:w-2/3 lg:max-w-lg xl:max-w-xl p-8">
+        <span class="modal-close-btn">×</span>
+        <h2 id="modal-title" class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-darkTextPrimary">Adicionar</h2>
+        <div id="modal-search-bar" class="mb-2 sm:mb-3">
+            <input type="text" id="modal-search-input" placeholder="Buscar por nome..." class="w-full text-sm">
+        </div>
+        <div id="modal-item-list" class="space-y-1.5 max-h-52 sm:max-h-60 md:max-h-72 overflow-y-auto p-0.5 pr-1 text-xs sm:text-sm">
+        </div>
+        <div class="mt-3 sm:mt-4 flex justify-end space-x-1.5 sm:space-x-2">
+            <button type="button" id="modal-cancel-btn" class="px-2.5 py-1 sm:px-4 sm:py-1.5 text-xs bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition">Cancelar</button>
+            <button type="button" id="modal-add-selected-btn" class="px-2.5 py-1 sm:px-4 sm:py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition">Adicionar</button>
         </div>
     </div>
+</div>
 
-    <script>
-        function humanizeWeaponType(type) {
-            const map = { "corpo_a_corpo": "Corpo-a-Corpo", "arremessavel": "Arremessável", "ranged": "À Distância", "fire": "Arma de Fogo" };
-            return map[type] || type;
-        }
-        function humanizeGrip(grip) {
-            const map = { "leve": "Leve", "uma_mao": "Uma Mão", "duas_maos": "Duas Mãos" };
-            return map[grip] || grip;
-        }
-        function humanizeProficiency(proficiency) {
-            const map = { "simples": "Simples", "tatica": "Tática", "pesada": "Pesada" };
-            return map[proficiency] || proficiency;
-        }
-        function formatCritical(chance, multiplier) {
-            if (chance && multiplier) return `${chance}/${multiplier}x`;
-            if (multiplier) return `${multiplier}x`;
-            return "-";
-        }
+<script>
+    // All helper functions (humanize, formatCritical) remain the same
+    function humanizeWeaponType(type) {
+        const map = { "corpo_a_corpo": "Corpo-a-Corpo", "arremessavel": "Arremessável", "ranged": "À Distância", "fire": "Arma de Fogo" };
+        return map[type] || type;
+    }
+    function humanizeGrip(grip) {
+        const map = { "leve": "Leve", "uma_mao": "Uma Mão", "duas_maos": "Duas Mãos" };
+        return map[grip] || grip;
+    }
+    function humanizeProficiency(proficiency) {
+        const map = { "simples": "Simples", "tatica": "Tática", "pesada": "Pesada" };
+        return map[proficiency] || proficiency;
+    }
+    function formatCritical(chance, multiplier) {
+        if (chance && multiplier) return `${chance}/${multiplier}x`;
+        if (multiplier) return `${multiplier}x`;
+        return "-";
+    }
 
-        const allPoderes = <%- JSON.stringify(allPoderes || []) %>;
-        const allRituais = <%- JSON.stringify(allRituais || []) %>;
-        const allItems = <%- JSON.stringify(allItems || []) %>;
-        const allArmas = <%- JSON.stringify(allArmas || []) %>;
-        const characterId = <%= character.id %>;
+    const allPoderes = <%- JSON.stringify(allPoderes || []) %>;
+    const allRituais = <%- JSON.stringify(allRituais || []) %>;
+    const allItems = <%- JSON.stringify(allItems || []) %>;
+    const allArmas = <%- JSON.stringify(allArmas || []) %>;
+    const characterId = <%= character.id %>;
 
-        document.querySelectorAll('.char-tab-btn').forEach(button => {
+    document.addEventListener('DOMContentLoaded', () => {
+        const charTabButtons = document.querySelectorAll('.char-tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content-char');
+        
+        charTabButtons.forEach(button => {
             button.addEventListener('click', () => {
-                document.querySelectorAll('.char-tab-btn').forEach(btn => btn.classList.remove('active-char-tab'));
+                charTabButtons.forEach(btn => btn.classList.remove('active-char-tab'));
                 button.classList.add('active-char-tab');
-                document.querySelectorAll('.tab-content-char').forEach(tab => tab.classList.remove('active'));
-                document.getElementById(button.getAttribute('data-tab')).classList.add('active');
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                // The tab content's parent div is now the scrollable one
+                const tabContentElement = document.getElementById(button.getAttribute('data-tab'));
+                if (tabContentElement) {
+                    tabContentElement.classList.add('active');
+                }
             });
         });
+
+        // Modal JS (openModal, populateModalList, getCurrentOwnedIds, search, add, delete) remains largely the same
+        // Ensure selectors for list containers and count spans are still correct for the new HTML structure if they were moved.
+        // The core logic for adding/deleting items to the DOM and hidden inputs doesn't change.
 
         const modal = document.getElementById('addItemModal');
         const modalTitle = document.getElementById('modal-title');
@@ -399,38 +454,36 @@
             const filteredItems = items.filter(item => !characterOwnedIds.has(String(item.id)));
 
             if (filteredItems.length === 0) {
-                 modalItemList.innerHTML = `<p class="text-darkTextSecondary italic text-center py-4 text-sm">Nenhum ${currentModalType} novo disponível ou todos já foram adicionados.</p>`;
+                 modalItemList.innerHTML = `<p class="text-darkTextSecondary italic text-center py-3 text-xs">Nenhum ${currentModalType} novo disponível ou todos já foram adicionados.</p>`;
                  return;
             }
 
             filteredItems.forEach(item => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center p-2 sm:p-3 bg-cardLight hover:bg-darkBorder rounded-md cursor-pointer transition-colors duration-150';
+                label.className = 'flex items-center p-1.5 sm:p-2 bg-cardLight hover:bg-darkBorder rounded-sm cursor-pointer transition-colors duration-150';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.className = 'form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-primary rounded mr-3 sm:mr-4 focus:ring-primary focus:ring-offset-0 focus:ring-offset-cardLight';
+                checkbox.className = 'form-checkbox h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary rounded mr-2 sm:mr-2.5 focus:ring-primary focus:ring-offset-0 focus:ring-offset-cardLight';
                 checkbox.dataset.itemId = item.id;
                 checkbox.dataset.itemName = item.name;
                 checkbox.dataset.itemData = JSON.stringify(item);
 
                 const nameSpan = document.createElement('span');
-                nameSpan.className = 'text-darkTextPrimary font-medium text-sm sm:text-base';
+                nameSpan.className = 'text-darkTextPrimary font-medium text-xs sm:text-sm flex-grow';
                 nameSpan.textContent = item.name;
 
                 let details = '';
-                if (currentModalType === 'poder') details = `${item.isHabilidade ? '(Hab.)' : '(Poder)'}${item.elemento ? ` - ${item.elemento}` : ''}`;
-                else if (currentModalType === 'ritual') details = `Círculo ${item.circle} - ${String(item.element).charAt(0).toUpperCase() + item.element.slice(1)}`;
-                else if (currentModalType === 'item') details = `Cat: ${item.category}, Esp: ${item.storage}`;
+                if (currentModalType === 'poder') details = `${item.isHabilidade ? '(Hab.)' : '(Poder)'}${item.elemento ? ` - ${item.elemento.substring(0,3)}.` : ''}`;
+                else if (currentModalType === 'ritual') details = `Círculo. ${item.circle} - ${String(item.element).charAt(0).toUpperCase() + item.element.slice(1)}.`;
+                else if (currentModalType === 'item') details = `Categoria: ${item.category}., Esp: ${item.storage}`;
                 else if (currentModalType === 'arma') {
-                    details = `${humanizeWeaponType(item.weaponType)}, Emp: ${humanizeGrip(item.grip)}`;
-                    if (item.damageDice) details += `, Dano: ${item.damageDice}`;
-                    const critStr = formatCritical(item.criticalChance, item.criticalMultiplier);
-                    if (critStr !== '-') details += `, Crítico: ${critStr}`;
+                    details = `${humanizeWeaponType(item.weaponType)}.`;
+                    if (item.damageDice) details += `, ${item.damageDice}`;
                 }
                 
                 const detailSpan = document.createElement('span');
-                detailSpan.className = 'ml-auto text-xs text-darkTextSecondary';
+                detailSpan.className = 'ml-auto text-[10px] text-darkTextSecondary whitespace-nowrap';
                 detailSpan.textContent = details;
 
                 label.appendChild(checkbox);
@@ -449,12 +502,16 @@
             else if (type === 'arma') listElementId = 'character-weapons-list';
             
             if (listElementId) {
-                document.querySelectorAll(`#${listElementId} > div[data-item-id]`).forEach(el => {
-                    ids.add(el.dataset.itemId);
-                });
+                const listContainer = document.getElementById(listElementId);
+                if (listContainer) { // Check if container exists
+                    listContainer.querySelectorAll(':scope > div[data-item-id]').forEach(el => {
+                        ids.add(el.dataset.itemId);
+                    });
+                }
             }
             return ids;
         }
+
 
         modalSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -483,8 +540,15 @@
                 case 'arma': listContainerId = 'character-weapons-list'; noItemsTextClass = 'no-weapons-text'; countClass = 'weapon-count'; break;
             }
             const listContainer = document.getElementById(listContainerId);
+            // The count span might be outside the scrollable area now, ensure selector is global if needed
+            const countSpan = document.querySelector(`.${countClass}`); 
+
+            if(!listContainer) {
+                console.error("List container not found for type: ", itemType, "with ID:", listContainerId);
+                return;
+            }
             const noItemsText = listContainer.querySelector(`.${noItemsTextClass}`);
-            const countSpan = document.querySelector(`.${countClass}`);
+
 
             selectedCheckboxes.forEach(checkbox => {
                 const itemId = checkbox.dataset.itemId;
@@ -500,8 +564,7 @@
                 if (noItemsText) noItemsText.remove();
 
                 const newItemDiv = document.createElement('div');
-                // Adjusted padding and added responsive max-height to description here
-                newItemDiv.className = 'p-2.5 sm:p-3 bg-cardLight rounded-md border border-darkBorder';
+                newItemDiv.className = 'p-2 sm:p-2.5 bg-cardLight rounded-md border border-darkBorder';
                 newItemDiv.dataset.itemId = itemId;
                 newItemDiv.dataset.isNew = "true"; 
 
@@ -509,54 +572,55 @@
                 flexContainer.className = 'flex justify-between items-start';
 
                 const contentWrapper = document.createElement('div');
-                contentWrapper.className = 'flex-grow mr-2'; // Added mr-2 for spacing from delete button
+                contentWrapper.className = 'flex-grow mr-1.5';
 
                 let contentHTML = '';
+                // HTML generation for items remains the same as before
                 if (itemType === 'poder') {
-                    contentHTML = `<h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName} <span class="text-xs text-infoValue">${itemData.isHabilidade ? '(Habilidade)' : '(Poder)'}</span></h3>`;
-                    contentHTML += `<p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description.replace(/\n/g, "<br>")}</p>`;
+                    contentHTML = `<h3 class="font-semibold text-xs sm:text-sm text-darkTextPrimary">${itemName} <span class="text-[10px] text-infoValue">${itemData.isHabilidade ? '(Habilidade)' : '(Poder)'}</span></h3>`;
+                    contentHTML += `<p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20">${itemData.description.replace(/\n/g, "<br>")}</p>`;
                     if(itemData.fromClasse || itemData.fromTrilha || itemData.elemento) {
-                         contentHTML += `<p class="text-xs mt-1">`;
+                         contentHTML += `<p class="text-[10px] mt-0.5">`;
                          if(itemData.fromClasse) contentHTML += `<span class="text-infoLabel">Classe:</span> <span class="text-infoValue">${itemData.fromClasse}.</span> `;
                          if(itemData.fromTrilha) contentHTML += `<span class="text-infoLabel">Trilha:</span> <span class="text-infoValue">${itemData.fromTrilha}.</span> `;
                          if(itemData.elemento) contentHTML += `<span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.elemento}.</span> `;
                          contentHTML += `</p>`;
                     }
                 } else if (itemType === 'ritual') {
-                    contentHTML = `<h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName}</h3>`;
-                    contentHTML += `<p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description.replace(/\n/g, "<br>")}</p>`;
-                    contentHTML += `<p class="text-xs mt-1">
+                    contentHTML = `<h3 class="font-semibold text-xs sm:text-sm text-darkTextPrimary">${itemName}</h3>`;
+                    contentHTML += `<p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20">${itemData.description.replace(/\n/g, "<br>")}</p>`;
+                    contentHTML += `<p class="text-[10px] mt-0.5">
                         <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue">${itemData.circle}</span>, 
-                        <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.element}</span><br>
+                        <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.element}</span>, 
                         <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue">${itemData.range}</span>, 
                         <span class="text-infoLabel">Duração:</span> <span class="text-infoValue">${itemData.duration}</span>
                     </p>`;
                 } else if (itemType === 'item') {
-                    contentHTML = `<h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName} 
-                        <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> ${itemData.category}, <span class="text-infoLabel">Esp:</span> ${itemData.storage})</span>
+                    contentHTML = `<h4 class="font-semibold text-xs sm:text-sm text-darkTextPrimary">${itemName} 
+                        <span class="text-[10px] text-infoValue">(<span class="text-infoLabel">Cat:</span> ${itemData.category}, <span class="text-infoLabel">Esp:</span> ${itemData.storage})</span>
                         </h4>
-                        <p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description}</p>`;
+                        <p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20">${itemData.description}</p>`;
                 } else if (itemType === 'arma') {
-                     contentHTML = `<h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName}</h4>`;
-                     contentHTML += `<p class="text-xs text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description || '-'}</p>`;
-                     contentHTML += `<p class="text-xs mt-1">
+                     contentHTML = `<h4 class="font-semibold text-xs sm:text-sm text-darkTextPrimary">${itemName}</h4>`;
+                     contentHTML += `<p class="text-[10px] sm:text-xs text-darkTextSecondary description-text max-h-12 sm:max-h-16 md:max-h-20">${itemData.description || '-'}</p>`;
+                     contentHTML += `<p class="text-[10px] mt-0.5">
                         <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue">${humanizeWeaponType(itemData.weaponType)}</span>, 
                         <span class="text-infoLabel">Emp:</span> <span class="text-infoValue">${humanizeGrip(itemData.grip)}</span>, 
                         <span class="text-infoLabel">Prof:</span> <span class="text-infoValue">${humanizeProficiency(itemData.proficiency)}</span><br>
                         <span class="text-infoLabel">Dano:</span> <span class="text-infoValue">${itemData.damageDice || '-'}</span>, 
-                        <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue">${formatCritical(itemData.criticalChance, itemData.criticalMultiplier)}</span><br>
-                        <span class="text-infoLabel">Espaços:</span> <span class="text-infoValue">${itemData.storage}</span>, 
-                        <span class="text-infoLabel">Categoria:</span> <span class="text-infoValue">${itemData.category}</span>
+                        <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue">${formatCritical(itemData.criticalChance, itemData.criticalMultiplier)}</span>, 
+                        <span class="text-infoLabel">Esp:</span> <span class="text-infoValue">${itemData.storage}</span>, 
+                        <span class="text-infoLabel">Cat:</span> <span class="text-infoValue">${itemData.category}</span>
                     </p>`;
                 }
                 contentWrapper.innerHTML = contentHTML;
 
                 const deleteButton = document.createElement('button');
                 deleteButton.type = 'button';
-                deleteButton.className = 'delete-item-btn p-1 text-danger hover:text-red-400 transition-colors flex-shrink-0';
+                deleteButton.className = 'delete-item-btn p-0.5 text-danger hover:text-red-400 transition-colors flex-shrink-0';
                 deleteButton.dataset.itemId = itemId;
                 deleteButton.dataset.itemType = itemType;
-                deleteButton.innerHTML = '<i class="fas fa-trash-alt fa-xs sm:fa-sm"></i>'; // Responsive icon size
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt text-[10px] sm:fa-xs"></i>';
 
                 flexContainer.appendChild(contentWrapper);
                 flexContainer.appendChild(deleteButton);
@@ -577,6 +641,7 @@
             const itemId = deleteButton.dataset.itemId;
             const itemType = deleteButton.dataset.itemType;
             const isNew = itemDiv.dataset.isNew === "true";
+            const listContainer = itemDiv.parentElement; // Get the list container
             itemDiv.remove(); 
 
             if (isNew) {
@@ -590,37 +655,120 @@
                 newlyAddedItemsContainer.appendChild(hiddenInput);
             }
 
-            let countClass, listContainerId, noItemsTextClass, noItemsMessage;
+            let countClass, noItemsTextClass, noItemsMessage;
             switch (itemType) {
-                case 'poder': countClass = 'power-count'; listContainerId = 'character-poderes-list'; noItemsTextClass = 'no-poderes-text'; noItemsMessage = 'Nenhum poder ou habilidade.'; break;
-                case 'ritual': countClass = 'ritual-count'; listContainerId = 'character-rituais-list'; noItemsTextClass = 'no-rituais-text'; noItemsMessage = 'Nenhum ritual conhecido.'; break;
-                case 'item': countClass = 'item-count'; listContainerId = 'character-items-list'; noItemsTextClass = 'no-items-text'; noItemsMessage = 'Nenhum item.'; break;
-                case 'arma': countClass = 'weapon-count'; listContainerId = 'character-weapons-list'; noItemsTextClass = 'no-weapons-text'; noItemsMessage = 'Nenhuma arma.'; break;
+                case 'poder': countClass = 'power-count'; noItemsTextClass = 'no-poderes-text'; noItemsMessage = 'Nenhum poder ou habilidade.'; break;
+                case 'ritual': countClass = 'ritual-count'; noItemsTextClass = 'no-rituais-text'; noItemsMessage = 'Nenhum ritual conhecido.'; break;
+                case 'item': countClass = 'item-count'; noItemsTextClass = 'no-items-text'; noItemsMessage = 'Nenhum item.'; break;
+                case 'arma': countClass = 'weapon-count'; noItemsTextClass = 'no-weapons-text'; noItemsMessage = 'Nenhuma arma.'; break;
             }
 
-            const countSpan = document.querySelector(`.${countClass}`);
+            const countSpan = document.querySelector(`.${countClass}`); // Global selector for count
             if (countSpan) {
                 const currentCount = parseInt(countSpan.textContent);
                 if (currentCount > 0) countSpan.textContent = currentCount - 1;
             }
             
-            const listContainer = document.getElementById(listContainerId);
             if (listContainer && listContainer.children.length === 0 && noItemsTextClass && noItemsMessage) {
                 const p = document.createElement('p');
-                p.className = `${noItemsTextClass} text-sm text-darkTextSecondary italic`; // Ensure text-sm for consistency
-                if (listContainerId === 'character-items-list' || listContainerId === 'character-weapons-list') {
-                     p.classList.add('col-span-full'); 
+                p.className = `${noItemsTextClass} text-xs text-darkTextSecondary italic`;
+                if (listContainer.id === 'character-items-list' || listContainer.id === 'character-weapons-list') {
+                     p.classList.add('col-span-full'); // This might need to be removed if items/weapons are not in a grid anymore in the new layout
                 }
                 p.textContent = noItemsMessage;
                 listContainer.appendChild(p);
             }
         }
+        
+        // Add event listeners to dynamically added list containers if necessary, 
+        // or ensure the parent container (e.g., specific tab content div) catches these events.
+        // The current setup uses event delegation on the list containers themselves, which should still work if the IDs are maintained.
+        // Check if list container IDs are still present within the new tab structure.
+        // For example, if character-poderes-list is inside a tab that's dynamically shown/hidden:
+        const rightColumnTabContent = document.querySelector('.md\\:col-span-5 .flex-grow.overflow-y-auto');
+        if (rightColumnTabContent) {
+            rightColumnTabContent.addEventListener('click', handleDeleteItem);
+        }
 
-        document.getElementById('character-poderes-list').addEventListener('click', handleDeleteItem);
-        document.getElementById('character-rituais-list').addEventListener('click', handleDeleteItem);
-        document.getElementById('character-items-list').addEventListener('click', handleDeleteItem);
-        document.getElementById('character-weapons-list').addEventListener('click', handleDeleteItem);
 
-    </script>
+        // HP and Sanity Auto-Calculation (no changes needed to this logic block)
+        const autoCalcCheckbox = document.getElementById('autoCalcStats');
+        const maxPvInput = document.getElementById('character-maxPv');
+        const maxPsInput = document.getElementById('character-maxPs');
+        const classeSelect = document.getElementById('character-classe');
+        const nexInput = document.getElementById('character-nex');
+        const vigInput = document.getElementById('attr-vig');
+        const preInput = document.getElementById('attr-pre');
+        const intInput = document.getElementById('attr-int'); // Ensure this ID exists if INT is used
+
+        document.getElementById('characterSheetForm').addEventListener('submit', function(event) {
+            if (autoCalcCheckbox.checked) {
+                maxPvInput.disabled = false;
+                maxPsInput.disabled = false;
+            }
+        });
+
+        function calculateMaxStats() {
+            if (!autoCalcCheckbox.checked) return;
+
+            const classe = classeSelect.value;
+            const nex = parseInt(nexInput.value) || 0;
+            const vig = parseInt(vigInput.value) || 0;
+            const pre = parseInt(preInput.value) || 0;
+            const int = intInput ? (parseInt(intInput.value) || 0) : 0; // Handle if intInput might not exist
+
+            let calculatedMaxPv = 0;
+            let calculatedMaxPs = 0;
+
+            switch (classe) {
+                case 'combatente':
+                    calculatedMaxPv = (20 + vig) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (4 + vig)) : 0);
+                    calculatedMaxPs = 12 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 3) : 0);
+                    break;
+                case 'especialista':
+                    calculatedMaxPv = (16 + vig) +  (nex > 5 ? ((Math.floor(nex / 5) - 1) * (3 + vig)) : 0);
+                    calculatedMaxPs = 16 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 4) : 0);
+                    break;
+                case 'ocultista':
+                    calculatedMaxPv = (12 + vig) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (2 + vig)) : 0);
+                    calculatedMaxPs = 20 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 5) : 0);
+                    break; 
+                default: 
+                    calculatedMaxPv = (10 + vig);
+                    calculatedMaxPs = (10 + pre);
+            }
+            
+            // Ensure values are positive
+            maxPvInput.value = Math.max(1, calculatedMaxPv);
+            maxPsInput.value = Math.max(1, calculatedMaxPs);
+        }
+
+        function toggleAutoCalc() {
+            if (autoCalcCheckbox.checked) {
+                maxPvInput.disabled = true;
+                maxPsInput.disabled = true;
+                calculateMaxStats();
+            } else {
+                maxPvInput.disabled = false;
+                maxPsInput.disabled = false;
+            }
+        }
+
+        autoCalcCheckbox.addEventListener('change', toggleAutoCalc);
+        const statInputsToWatch = [classeSelect, nexInput, vigInput, preInput];
+        if (intInput) statInputsToWatch.push(intInput); // Add INT only if element exists
+
+        statInputsToWatch.forEach(input => {
+            if (input) { // Check if input element exists
+                input.addEventListener('input', calculateMaxStats);
+                if (input.tagName === 'SELECT') { // 'change' for select is better
+                    input.addEventListener('change', calculateMaxStats);
+                }
+            }
+        });
+        
+        toggleAutoCalc(); // Initial state
+    });
+</script>
 </body>
 </html>

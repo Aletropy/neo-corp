@@ -24,13 +24,13 @@ function initTabs() {
     const campainIdRaw = element.dataset.campain;
     if(!campainIdRaw)
     {
-        console.warn("Campain id for campain card not set. What fuck happend?"); 
+        console.warn("Campaign id for campain card not set. What fuck happend?"); 
         return;
     }
     const campainId = parseInt(campainIdRaw);
     if(isNaN(campainId))
     {
-        console.warn("Campaing id is not an id? What fuck happend²");
+        console.warn("Campaigng id is not an id? What fuck happend²");
         return;
     }
 

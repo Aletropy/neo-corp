@@ -6,13 +6,16 @@ export interface CharacterAttributes
 {
     id : number;
     owner : number;
-    currentCampain? : number;
     classe : Classe;
     nex : number;
     poderes: number[];
     itens: number[];
     armas: number[];
     rituais: number[];
+    maxPv : number;
+    maxPs : number;
+    pv : number;
+    ps : number;
     info: {
       name : string;
       age : string;
@@ -42,10 +45,6 @@ class Character extends Model<CharacterAttributes, CharacterCreationAttributes>
       owner: {
         type: DataTypes.INTEGER,
         allowNull: false
-      },
-      currentCampain: {
-        type: DataTypes.INTEGER,
-        allowNull: true
       },
       nex: {
         type: DataTypes.INTEGER,
@@ -78,6 +77,26 @@ class Character extends Model<CharacterAttributes, CharacterCreationAttributes>
       info: {
         type: DataTypes.JSON,
         allowNull: false
+      },
+      maxPv: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      maxPs: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      pv: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      ps: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
       },
       attributes: {
         type: DataTypes.JSON,

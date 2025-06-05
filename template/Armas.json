@@ -453,5 +453,83 @@
     "damageDice": "2d12",
     "criticalChance": 19,
     "criticalMultiplier": 3
+  },
+  {
+    "id": 36,
+    "name": "Executor Oculto",
+    "description": "No coldre, uma empunhadura discreta. Ao ser sacado, nanites reconfiguram sua estrutura, formando um revólver high-tech com mira laser integrada e supressor sônico adaptativo.",
+    "category": 2,
+    "storage": 1,
+    "weaponType": "fire",
+    "grip": "uma_mao",
+    "proficiency": "tatica",
+    "damageDice": "2d8",
+    "criticalChance": 19,
+    "criticalMultiplier": 3
+  },
+  {
+    "id": 37,
+    "name": "Quimera de Combate",
+    "description": "Um rifle de assalto pesado cuja estrutura pode ser reconfigurada com uma ação de movimento, transformando seu cano reforçado e coronha em uma brutal machadinha energética. Dano (Fuzil/Machado).",
+    "category": 3,
+    "storage": 2,
+    "weaponType": "fire",
+    "grip": "duas_maos",
+    "proficiency": "tatica",
+    "damageDice": "2d10/1d10",
+    "criticalChance": 19,
+    "criticalMultiplier": 3
+  },
+  {
+    "id": 38,
+    "name": "Lâmina Neural",
+    "description": "Uma espada longa com filamentos condutores. Um botão no cabo, quando ativado (ação livre no turno do acerto após fincar a lâmina + 2 PE), libera uma descarga psiônica (+2d6 de dano elétrico). Alvos com implantes cibernéticos devem passar em um teste de Vontade (DT 20) ou ficam Atordoados por 1 rodada pela sobrecarga neural.",
+    "category": 2,
+    "storage": 1,
+    "weaponType": "corpo_a_corpo",
+    "grip": "uma_mao",
+    "proficiency": "tatica",
+    "damageDice": "1d10/1d12",
+    "criticalChance": 19,
+    "criticalMultiplier": 2
+  },
+  {
+    "id": 39,
+    "name": "Punho de Cometa",
+    "description": "Um martelo de guerra com um propulsor de impacto em uma de suas faces. Ao ativar o botão no cabo (ação livre ao atacar + 3 PE), o propulsor dispara no momento do impacto, adicionando +1d8 de dano de impacto e forçando o alvo a um teste de Fortitude (DT 15) para não ser Derrubado.",
+    "category": 2,
+    "storage": 1,
+    "weaponType": "corpo_a_corpo",
+    "grip": "uma_mao",
+    "proficiency": "tatica",
+    "damageDice": "2d6",
+    "criticalChance": null,
+    "criticalMultiplier": 2
+  },
+  {
+    "id": 40,
+    "name": "Enxame Perseguidor",
+    "description": "Granada que, ao explodir, libera micro-drones explosivos que buscam ativamente alvos em um raio de 6m, ignorando cobertura leve. Alvos na área sofrem o dano; um teste de Reflexos (DT 20) reduz o dano à metade.",
+    "category": 2,
+    "storage": 1,
+    "weaponType": "ranged",
+    "grip": "leve",
+    "proficiency": "tatica",
+    "damageDice": "6d6",
+    "criticalChance": null, 
+    "criticalMultiplier": 2
+  },
+  {
+    "id": 41,
+    "name": "Neutralizadora Paralisante",
+    "description": "Espingarda tática que dispara cartuchos calibre .12 carregados com uma rede de nanofilamentos energizados. Além do dano balístico, a descarga elétrica secundária força o alvo a um teste de Fortitude (DT 15) ou fica Paralisado por 1 rodada. O dano elétrico é considerado 2d6 dos dados de dano total para fins de resistências. Metade do dano balístico em alcance médio ou maior.",
+    "category": 2,
+    "storage": 2,
+    "weaponType": "fire",
+    "grip": "duas_maos",
+    "proficiency": "tatica",
+    "damageDice": "2d6+2d6",
+    "criticalChance": 19,
+    "criticalMultiplier": 3
   }
 ]

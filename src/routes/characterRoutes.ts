@@ -9,11 +9,12 @@ import Arma from "../Data/Models/Weapon";
 
 declare module 'express-session' {
      interface SessionData {
-         user : {
+        user : {
             id : number;
             username : string;
             isAdmin : boolean;
-         };
+        };
+        characterId : number;
     }
 }
 
@@ -102,7 +103,8 @@ characterRoutes.post("/new", AuthMiddleware, async (req, res) => {
     };
 
     const characterInfo = req.body;
-    
+
+    const initialPoints = getInitialPoints(characterInfo.classe, characterInfo);
 
     const character = await Character.create({
         owner: user.id,
@@ -113,13 +115,17 @@ characterRoutes.post("/new", AuthMiddleware, async (req, res) => {
             description: characterInfo.description
         },
         nex: 5,
-        poderes: [1],
+        maxPs: initialPoints.ps,
+        maxPv: initialPoints.pv,
+        pv: initialPoints.pv,
+        ps: initialPoints.ps,
+        poderes: [],
         attributes: {
-            agi: 1,
-            for: 1,
-            int: 1,
-            pre: 1,
-            vig: 1,
+            agi: characterInfo.agilidade,
+            for: characterInfo.forca,
+            int: characterInfo.intelecto,
+            pre: characterInfo.presenca,
+            vig: characterInfo.vigor
         },
         classe: characterInfo.classe
     });
@@ -145,6 +151,8 @@ characterRoutes.post("/:id/update", async (req, res) => {
         return;
     };
 
+    req.session.characterId = id;
+
     let newCharacter : {
         attributes? : any;
         info? : any;
@@ -154,13 +162,21 @@ characterRoutes.post("/:id/update", async (req, res) => {
         rituais? : any[];
         itens? : any[];
         armas? : any[];
+        pv : number;
+        ps : number;
+        maxPv : number;
+        maxPs : number;
     } = {
         attributes: {},
         info: {},
         poderes: character.get("poderes") as number[],
         rituais: character.get("rituais") as number[],
         itens: character.get("itens") as number[],
-        armas: character.get("armas") as number[]
+        armas: character.get("armas") as number[],
+        pv: character.get("pv") as number,
+        ps: character.get("ps") as number,
+        maxPv: character.get("maxPv") as number,
+        maxPs: character.get("maxPs") as number
     };
 
     let skills : any = {}
@@ -168,6 +184,10 @@ characterRoutes.post("/:id/update", async (req, res) => {
     const body = req.body;
     newCharacter.nex = body.nex;
     newCharacter.classe = body.classe;
+    newCharacter.pv = parseInt(body.pv);
+    newCharacter.maxPv = parseInt(body.maxPv);
+    newCharacter.ps = parseInt(body.ps);
+    newCharacter.maxPs = parseInt(body.maxPs);
     Object.keys(body).filter((key) => key.startsWith("attributes_")).map(key => {
         const realKey = key.replace("attributes_", "");
         newCharacter.attributes[realKey] = body[key];
@@ -243,9 +263,15 @@ characterRoutes.post("/:id/update", async (req, res) => {
         newCharacter.itens = newItens;
     }
 
-    await Character.update(newCharacter, 
-        { where: { id }}
-    );
+    try {
+        await Character.update(newCharacter, 
+            { where: { id }}
+        );
+    } catch (error) {
+        console.error("Error updating character:", error);
+        res.status(500).send("Error updating character");
+        return;
+    }
     
     await CharacterSkills.update(skills, {
         where: { characterId: id }
@@ -258,5 +284,16 @@ characterRoutes.get("/tips", AuthMiddleware, (_, res) => {
     res.render("pages/character/tips");
 });
 
+function getInitialPoints(classe : string, attributes : any) : { ps : number, pv : number } {
+    if(classe == "combatente") {
+        return { ps: 12, pv: 20 + parseInt(attributes.vigor) };
+    } else if(classe == "especialista") {
+        return { ps: 16, pv: 16 + parseInt(attributes.vigor) };
+    } else if(classe == "ocultista") {
+        return { ps: 20, pv: 12 + parseInt(attributes.vigor) };
+    }
+
+    return { ps: 0, pv: 0 };
+}
 
 export default characterRoutes;

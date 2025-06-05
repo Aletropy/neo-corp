@@ -1,7 +1,7 @@
 import { Application } from "express";
 import { AdminMiddleware, AuthMiddleware } from "./Middlewares/auth";
 import Character from "./Data/Models/Character";
-import Campain from "./Data/Models/Campain";
+import Campaign from "./Data/Models/Campaign";
 import { Poder } from "./Data/Models/Poder";
 import Ritual from "./Data/Models/Ritual";
 import Item from "./Data/Models/Items";
@@ -47,11 +47,14 @@ export default (app : Application) =>
                 nex: v.get("nex"),
                 info: v.get("info"),
                 classe: v.get("classe"),
-                currentCampain: v.get("currentCampain")
+                pv: v.get("pv"),
+                maxPv: v.get("maxPv"),
+                ps: v.get("ps"),
+                maxPs: v.get("maxPs"),
             }
         });
         
-        const campaings = (await Campain.findAll()).flatMap(v => {
+        const campaings = (await Campaign.findAll()).flatMap(v => {
             return {
                 id: v.get("id"),
                 name: v.get("name"),

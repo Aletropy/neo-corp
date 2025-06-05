@@ -149,6 +149,31 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .attr-btn {
+            background-color: #374151; /* gray-700 */
+            color: #d1d5db; /* gray-300 */
+            border: 1px solid #4b5563; /* gray-600 */
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .attr-btn:hover {
+            background-color: #4b5563; /* gray-600 */
+        }
+        .attr-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .attr-value {
+            width: 3rem;
+            text-align: center;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: bold;
+            color: #f3f4f6; /* gray-100 */
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -191,11 +216,12 @@
             <div class="step" data-step="3"></div>
             <div class="step" data-step="4"></div>
             <div class="step" data-step="5"></div>
+            <div class="step" data-step="6"></div> <!-- New step indicator -->
         </div>
         
         <!-- Progress Bar -->
         <div class="progress-container mb-8 bg-gray-700 rounded-full">
-            <div id="progressBar" class="progress-fill bg-gradient-to-r from-accent to-amber-500 rounded-full" style="width: 16.66%"></div>
+            <div id="progressBar" class="progress-fill bg-gradient-to-r from-accent to-amber-500 rounded-full" style="width: 14.28%"></div>
         </div>
         
         <!-- Step 1: Character Name -->
@@ -229,6 +255,7 @@
             </div>
         </div>
         
+        <!-- Step 2: Age -->
         <div id="card-1" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
@@ -238,7 +265,7 @@
             </div>
             
             <p class="text-gray-400 mb-6">
-                A idade <span class="font-bold text-red">NÃO</span> afeta a experiência, sabedoria e habilidades do seu personagem. Escolha uma idade entre 18 e 70 anos que se encaixe na história que você imagina.
+                A idade <span class="font-bold text-red-500">NÃO</span> afeta a experiência, sabedoria e habilidades do seu personagem. Escolha uma idade entre 18 e 70 anos que se encaixe na história que você imagina.
             </p>
             
             <div class="mb-6">
@@ -264,6 +291,7 @@
             </div>
         </div>
         
+        <!-- Step 3: Appearence -->
         <div id="card-2" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
@@ -334,12 +362,48 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Step 5: Class Selection -->
+
+        <!-- Step 5: Attributes -->
         <div id="card-4" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
                     <span class="text-gray-900 font-bold">5</span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Atributos do Personagem</h2>
+            </div>
+            
+            <p class="text-gray-400 mb-4">
+                Distribua seus pontos de atributo. Todos os atributos começam em 1. Você tem <strong class="text-accent">4 pontos</strong> para gastar.
+                O valor máximo inicial para qualquer atributo é 3.
+            </p>
+            <p class="text-gray-400 mb-6">
+                Opcional: Você pode reduzir <strong class="text-amber-400">UM</strong> atributo para 0 para ganhar 1 ponto adicional (totalizando 5 pontos para gastar).
+            </p>
+
+            <div class="mb-6 p-4 bg-gray-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-accent mb-3 text-center">Pontos para distribuir: <span id="pointsToSpendDisplay">4</span></h3>
+                <div id="attributeInputsContainer" class="space-y-3">
+                    <!-- Attributes will be dynamically inserted here by JS -->
+                </div>
+            </div>
+            
+            <div id="attributeError" class="text-red-500 text-sm mb-4 text-center hidden"></div>
+
+            <div class="flex justify-between">
+                <button type="button" class="prev-step-btn px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </button>
+                <button type="button" id="attributesNextBtn" class="next-step-btn px-6 py-3 bg-gradient-to-r from-accent to-amber-500 text-gray-900 font-bold rounded-lg shadow hover:from-amber-500 hover:to-accent transition">
+                    Continuar <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 6: Class Selection -->
+        <div id="card-5" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
+                    <span class="text-gray-900 font-bold">6</span>
                 </div>
                 <h2 class="text-xl font-bold text-white">Escolha sua Classe</h2>
             </div>
@@ -471,11 +535,11 @@
             </div>
         </div>
         
-        <!-- Step 6: Origin Selection -->
-        <div id="card-5" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
+        <!-- Step 7: Origin Selection -->
+        <div id="card-6" class="card bg-gray-800 rounded-2xl p-8 mb-6 hidden border border-gray-700">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-r from-accent to-amber-500 flex items-center justify-center mr-3">
-                    <span class="text-gray-900 font-bold">6</span>
+                    <span class="text-gray-900 font-bold">7</span>
                 </div>
                 <h2 class="text-xl font-bold text-white">Escolha sua Origem</h2>
             </div>
@@ -487,7 +551,6 @@
             <div class="origin-slider-viewport overflow-hidden mb-6 p-8">
                 <div class="origin-slider-container flex transition-transform duration-500" id="originSlider">
                     <!-- Origin Cards will be populated by originPopulator.js -->
-                    
                 </div>
             </div>
             
@@ -513,15 +576,182 @@
     
     <script defer>
         let currentPage = 0;
-        const totalPages = 6;
+        const totalPages = 7; // Updated total pages
         let selectedClass = null;
+
+        // Attribute system variables
+        const attributeNames = ["Força", "Agilidade", "Vigor", "Presença", "Intelecto"];
+        const attributeKeys = ["forca", "agilidade", "vigor", "presenca", "intelecto"];
+        let attributes = {
+            forca: 1,
+            agilidade: 1,
+            vigor: 1,
+            presenca: 1,
+            intelecto: 1
+        };
+        let pointsToSpend = 4;
+        let canReduceToZero = true; // Tracks if the "reduce to 0" bonus has been used
+        let reducedAttributeKey = null; // Tracks which attribute was reduced to 0
+
+        // DOM Elements
+        const pointsToSpendDisplay = document.getElementById('pointsToSpendDisplay');
+        const attributeInputsContainer = document.getElementById('attributeInputsContainer');
+        const attributeError = document.getElementById('attributeError');
+        const form = document.getElementById('characterForm');
+
+        function createAttributeControls() {
+            attributeInputsContainer.innerHTML = ''; // Clear previous
+            attributeKeys.forEach((key, index) => {
+                const name = attributeNames[index];
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center justify-between p-3 bg-gray-800 rounded-md';
+
+                const label = document.createElement('span');
+                label.className = 'text-gray-300 font-medium';
+                label.textContent = name;
+
+                const controls = document.createElement('div');
+                controls.className = 'flex items-center space-x-2';
+
+                const decrementBtn = document.createElement('button');
+                decrementBtn.type = 'button';
+                decrementBtn.className = 'attr-btn';
+                decrementBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                decrementBtn.addEventListener('click', () => handleAttributeChange(key, -1));
+
+                const valueDisplay = document.createElement('span');
+                valueDisplay.id = `attr-${key}-value`;
+                valueDisplay.className = 'attr-value';
+                valueDisplay.textContent = attributes[key];
+
+                const incrementBtn = document.createElement('button');
+                incrementBtn.type = 'button';
+                incrementBtn.className = 'attr-btn';
+                incrementBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                incrementBtn.addEventListener('click', () => handleAttributeChange(key, 1));
+
+                controls.appendChild(decrementBtn);
+                controls.appendChild(valueDisplay);
+                controls.appendChild(incrementBtn);
+                wrapper.appendChild(label);
+                wrapper.appendChild(controls);
+                attributeInputsContainer.appendChild(wrapper);
+
+                // Create/update hidden input for form submission
+                let hiddenInput = document.getElementById(`hidden-attr-${key}`);
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = key;
+                    hiddenInput.id = `hidden-attr-${key}`;
+                    form.appendChild(hiddenInput);
+                }
+                hiddenInput.value = attributes[key];
+            });
+            updateAttributeUIDisplay();
+        }
+
+        function handleAttributeChange(key, delta) {
+            const currentValue = attributes[key];
+            
+            if (delta > 0) { // Incrementing
+                if (pointsToSpend > 0 && currentValue < 3) {
+                    attributes[key]++;
+                    pointsToSpend--;
+                    if (currentValue === 0 && key === reducedAttributeKey) { // If increasing from 0 the one that was reduced
+                        canReduceToZero = true;
+                        reducedAttributeKey = null;
+                        // The point gained from reducing to 0 is now "spent" on this increase,
+                        // effectively meaning the point pool goes down by one more than usual.
+                        // This is simpler than managing a separate state for the "bonus point".
+                        // However, the original logic was: gain a point to the pool.
+                        // So, if we are at 0, and we increment, we "give back" the bonus point.
+                        // And pointsToSpend effectively goes up by 1 (for the current increment)
+                        // and down by 1 (for the bonus point being used).
+                        // Let's stick to: if it was reduced, and now it's not 0, the bonus is gone.
+                    }
+                }
+            } else if (delta < 0) { // Decrementing
+                if (currentValue > 1) {
+                    attributes[key]--;
+                    pointsToSpend++;
+                } else if (currentValue === 1 && canReduceToZero) { // Reducing from 1 to 0
+                    attributes[key]--;
+                    pointsToSpend++; // Gain a point for reducing
+                    canReduceToZero = false; // Used the bonus
+                    reducedAttributeKey = key;
+                } else if (currentValue === 0 && key === reducedAttributeKey) {
+                    // This case should not happen with current button disabling logic,
+                    // but as a safeguard: cannot go below 0.
+                    return;
+                } else if (currentValue > 0) { // Normal decrement if not 1 and not eligible for 0
+                    attributes[key]--;
+                    pointsToSpend++;
+                     if (currentValue === 1 && key === reducedAttributeKey) { // If it was the one reduced to 0, and now it's back to 1
+                        canReduceToZero = true;
+                        reducedAttributeKey = null;
+                        // The "bonus" point is returned to the pool, which happened with pointsToSpend++
+                    }
+                }
+            }
+            updateAttributeUIDisplay();
+        }
+
+        function updateAttributeUIDisplay() {
+            pointsToSpendDisplay.textContent = pointsToSpend;
+            attributeKeys.forEach(key => {
+                const valueDisplay = document.getElementById(`attr-${key}-value`);
+                if (valueDisplay) valueDisplay.textContent = attributes[key];
+                
+                const hiddenInput = document.getElementById(`hidden-attr-${key}`);
+                if (hiddenInput) hiddenInput.value = attributes[key];
+
+                // Update button states
+                const decrementBtn = document.querySelector(`#attr-${key}-value`).previousElementSibling;
+                const incrementBtn = document.querySelector(`#attr-${key}-value`).nextElementSibling;
+
+                if (decrementBtn) {
+                    if (attributes[key] === 1 && !canReduceToZero && key !== reducedAttributeKey) { // Cannot reduce another to 0 if bonus used
+                        decrementBtn.disabled = true;
+                    } else if (attributes[key] === 0) { // Cannot go below 0
+                        decrementBtn.disabled = true;
+                    }
+                    else {
+                        decrementBtn.disabled = false;
+                    }
+                }
+                if (incrementBtn) {
+                    incrementBtn.disabled = attributes[key] >= 3 || pointsToSpend <= 0;
+                }
+            });
+            validateAttributeStep();
+        }
         
+        function validateAttributeStep() {
+            const nextBtn = document.getElementById('attributesNextBtn');
+            if (pointsToSpend === 0) {
+                attributeError.classList.add('hidden');
+                attributeError.textContent = '';
+                if(nextBtn) nextBtn.disabled = false;
+                return true;
+            } else {
+                attributeError.classList.remove('hidden');
+                attributeError.textContent = `Você ainda precisa distribuir ${pointsToSpend} ponto(s).`;
+                if(nextBtn) nextBtn.disabled = true;
+                return false;
+            }
+        }
+
+
         // Initialize the character creator
         document.addEventListener('DOMContentLoaded', () => {
+            createAttributeControls(); // Initialize attribute controls
+
             // Start button
             document.getElementById('startButton')?.addEventListener('click', () => {
                 const welcomeScreen = document.getElementById('welcomeScreen');
-                const form = document.getElementById('characterForm');
+                // const form = document.getElementById('characterForm'); // already defined globally
                 welcomeScreen.classList.add('hidden');
                 form.classList.remove('hidden');
                 document.getElementById('card-0').classList.remove('hidden');                
@@ -530,7 +760,13 @@
             
             // Next step buttons
             document.querySelectorAll('.next-step-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (event) => {
+                    if (currentPage === 4) { // Attribute step (card-4)
+                        if (!validateAttributeStep()) {
+                            event.stopImmediatePropagation(); // Prevent moving to next step
+                            return;
+                        }
+                    }
                     if (currentPage < totalPages - 1) {
                         document.getElementById(`card-${currentPage}`).classList.add('hidden');
                         currentPage++;
@@ -555,49 +791,53 @@
             // Class selection
             document.querySelectorAll('.select-class-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // Remove selection from all buttons
                     document.querySelectorAll('.select-class-btn').forEach(b => {
-                        b.classList.remove('ring-2', 'ring-offset-2', 'ring-white');
+                        b.classList.remove('ring-2', 'ring-offset-2', 'ring-white', 'selected');
+                        b.closest('.class-card').classList.remove('selected');
                     });
                     
-                    btn.classList.add('ring-2', 'ring-offset-2', 'ring-white');
+                    btn.classList.add('ring-2', 'ring-offset-2', 'ring-white', 'selected');
+                    btn.closest('.class-card').classList.add('selected');
                     selectedClass = btn.getAttribute('data-class').toLowerCase();
 
-                    document.getElementById("classe-input")?.remove();
-
-                    const input = document.createElement("input");
-                    input.id = "classe-input"
-                    input.type = "hidden"
-                    input.value = selectedClass
-                    input.name = "classe"
-
-                    document.getElementById("characterForm").appendChild(input);
+                    let classInput = document.getElementById("classe-input");
+                    if(!classInput) {
+                        classInput = document.createElement("input");
+                        classInput.id = "classe-input";
+                        classInput.type = "hidden";
+                        classInput.name = "classe";
+                        document.getElementById("characterForm").appendChild(classInput);
+                    }
+                    classInput.value = selectedClass;
                 });
             });
 
             let translation = 0;
-            
-            // Origin navigation
+            const originSlider = document.getElementById('originSlider');
+            const cardWidth = 320; // Approximate width of an origin card + gap, adjust if needed
+
             document.getElementById('nextOrigin')?.addEventListener('click', () => {
-                const slider = document.getElementById('originSlider');
-                translation -= 320;
-                slider.style.transform = `translateX(${translation}px)`;
+                const maxTranslation = -(originSlider.scrollWidth - originSlider.parentElement.clientWidth);
+                if (translation > maxTranslation) {
+                    translation -= cardWidth;
+                    if (translation < maxTranslation) translation = maxTranslation; // Clamp
+                    originSlider.style.transform = `translateX(${translation}px)`;
+                }
             });
             
             document.getElementById('prevOrigin')?.addEventListener('click', () => {
-                const slider = document.getElementById('originSlider');
-                translation += 320;
-                slider.style.transform = `translateX(${translation}px)`;
+                if (translation < 0) {
+                    translation += cardWidth;
+                    if (translation > 0) translation = 0; // Clamp
+                    originSlider.style.transform = `translateX(${translation}px)`;
+                }
             });
         });
         
-        // Update progress bar and step indicators
         function updateProgress() {
-            // Update progress bar
             const progressPercentage = (currentPage + 1) / totalPages * 100;
             document.getElementById('progressBar').style.width = `${progressPercentage}%`;
             
-            // Update step indicators
             document.querySelectorAll('.step').forEach((step, index) => {
                 if (index <= currentPage) {
                     step.classList.add('active');

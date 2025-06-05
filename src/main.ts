@@ -6,10 +6,15 @@ import session from "express-session";
 import sequelize, { initializeDatabase } from "./Data/Database";
 import AuthRouter from "./routes/auth";
 import characterRoutes from "./routes/characterRoutes";
-import campainRoutes from "./routes/campainRoutes";
+import campainRoutes from "./routes/campaignRoutes";
 import Config from "./Core/Config";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import SessionHandler from "./Session/SessionHandler";
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 const SessionStore = SequelizeStore(session.Store);
 const viewsFolder = path.join(__dirname, "../public");
 
@@ -36,6 +41,8 @@ app.use("/character", characterRoutes);
 app.use("/campain", campainRoutes);
 routes(app);
 
-app.listen(Config.EXPRESS_PORT, () => {
+SessionHandler(io);
+
+server.listen(Config.EXPRESS_PORT, () => {
     console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.EXPRESS_PORT}`);
 });

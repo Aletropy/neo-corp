@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../Database";
 
-export interface CampainAttributes
+export interface CampaignAttributes
 {
     id : number;
     name : string;
@@ -12,9 +12,9 @@ export interface CampainAttributes
     progress: number;
 }
 
-type CampainCreationAttributes = Optional<CampainAttributes, 'id'>;
+type CampaignCreationAttributes = Optional<CampaignAttributes, 'id'>;
 
-class Campain extends Model<CampainAttributes, CampainCreationAttributes>
+class Campaign extends Model<CampaignAttributes, CampaignCreationAttributes>
 {
     static initialize() {
     this.init({
@@ -49,11 +49,11 @@ class Campain extends Model<CampainAttributes, CampainCreationAttributes>
       }
     }, {
       sequelize,
-      modelName: 'Campain',
+      modelName: 'Campaign',
       tableName: 'campaings',
       timestamps: true
     });
   }
 }
 
-export default Campain;
+export default Campaign;
