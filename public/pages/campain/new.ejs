@@ -209,28 +209,29 @@
     <script>
         let currentPage = 0;
         const totalPages = 2;
+        const campaignForm = document.getElementById('campaignForm'); // Guardar referência ao formulário
         
         // Start button
         document.getElementById('startButton')?.addEventListener('click', () => {
             const welcomeScreen = document.getElementById('welcomeScreen');
-            const form = document.getElementById('campaignForm');
             
-            // Animate out welcome screen
             welcomeScreen.classList.add('animate-out');
             
             setTimeout(() => {
-                // Hide welcome screen and show form
                 welcomeScreen.classList.add('hidden');
-                form.classList.remove('hidden');
-                form.classList.add('animate-in'); // Animate in the form
+                if (campaignForm) {
+                    campaignForm.classList.remove('hidden');
+                    campaignForm.classList.add('animate-in');
+                }
                 
-                // Show first step
-                document.getElementById('card-0').classList.remove('hidden');
-                document.getElementById('card-0').classList.add('animate-in'); // Animate in the first card
+                const firstCard = document.getElementById('card-0');
+                if (firstCard) {
+                    firstCard.classList.remove('hidden');
+                    firstCard.classList.add('animate-in');
+                }
                 
-                // Update progress
                 updateProgress();
-            }, 500); // Duration of fadeOut animation
+            }, 500); 
         });
         
         // Next step buttons
@@ -238,17 +239,21 @@
             btn.addEventListener('click', () => {
                 if (currentPage < totalPages - 1) {
                     const currentCard = document.getElementById(`card-${currentPage}`);
-                    currentCard.classList.remove('animate-in');
-                    currentCard.classList.add('animate-out');
+                    if (currentCard) {
+                        currentCard.classList.remove('animate-in');
+                        currentCard.classList.add('animate-out');
 
-                    setTimeout(() => {
-                        currentCard.classList.add('hidden');
-                        currentPage++;
-                        const nextCard = document.getElementById(`card-${currentPage}`);
-                        nextCard.classList.remove('hidden','animate-out'); // Ensure animate-out is removed if was applied
-                        nextCard.classList.add('animate-in');
-                        updateProgress();
-                    }, 500); // Match animation duration
+                        setTimeout(() => {
+                            currentCard.classList.add('hidden');
+                            currentPage++;
+                            const nextCard = document.getElementById(`card-${currentPage}`);
+                            if (nextCard) {
+                                nextCard.classList.remove('hidden','animate-out'); 
+                                nextCard.classList.add('animate-in');
+                            }
+                            updateProgress();
+                        }, 500); 
+                    }
                 }
             });
         });
@@ -257,24 +262,47 @@
             btn.addEventListener('click', () => {
                 if (currentPage > 0) {
                     const currentCard = document.getElementById(`card-${currentPage}`);
-                    currentCard.classList.remove('animate-in');
-                    currentCard.classList.add('animate-out');
-                    
-                    setTimeout(() => {
-                        currentCard.classList.add('hidden');
-                        currentPage--;
-                        const prevCard = document.getElementById(`card-${currentPage}`);
-                        prevCard.classList.remove('hidden', 'animate-out'); // Ensure animate-out is removed
-                        prevCard.classList.add('animate-in');
-                        updateProgress();
-                    }, 500); // Match animation duration
+                    if (currentCard) {
+                        currentCard.classList.remove('animate-in');
+                        currentCard.classList.add('animate-out');
+                        
+                        setTimeout(() => {
+                            currentCard.classList.add('hidden');
+                            currentPage--;
+                            const prevCard = document.getElementById(`card-${currentPage}`);
+                            if (prevCard) {
+                                prevCard.classList.remove('hidden', 'animate-out'); 
+                                prevCard.classList.add('animate-in');
+                            }
+                            updateProgress();
+                        }, 500); 
+                    }
                 }
             });
         });
+
+        campaignForm.addEventListener("keydown", (e) => e.preventDefault())
+
+        document.querySelectorAll('input').forEach(input => {
+
+            if(input.type != "textarea") {
+                input.addEventListener('keypress', (event) => {
+                    console.log(event.key);
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Prevent form submission on Enter key
+                        const nextButton = input.closest('.card').querySelector('.next-step-btn');
+                        if (nextButton) nextButton.click(); // Trigger next step
+                    }
+                });
+            }
+        });
         
         function updateProgress() {
-            const progressPercentage = (currentPage + 1) / totalPages * 100;
-            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                const progressPercentage = (currentPage + 1) / totalPages * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
             
             document.querySelectorAll('.step').forEach((step, index) => {
                 if (index <= currentPage) {
@@ -285,14 +313,13 @@
             });
         }
 
-        // Initial animation for the form if it's the first thing shown (e.g. if welcome screen is removed)
-        // and for the first card
-        // If the welcome screen is present, these will be triggered after the welcome screen is dismissed.
-        if (!document.getElementById('welcomeScreen') || document.getElementById('welcomeScreen').classList.contains('hidden')) {
-            document.getElementById('campaignForm')?.classList.add('animate-in');
-            document.getElementById('card-0')?.classList.add('animate-in');
+        // Initial animation for the form if it's the first thing shown
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        if (!welcomeScreen || welcomeScreen.classList.contains('hidden')) {
+            if (campaignForm) campaignForm.classList.add('animate-in');
+            const firstCard = document.getElementById('card-0');
+            if (firstCard) firstCard.classList.add('animate-in');
         }
-
     </script>
 </body>
 </html>
