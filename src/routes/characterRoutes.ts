@@ -112,7 +112,8 @@ characterRoutes.post("/new", AuthMiddleware, async (req, res) => {
             age: characterInfo.age,
             name: characterInfo.name,
             appearenceDescription: characterInfo.appearenceDescription,
-            description: characterInfo.description
+            description: characterInfo.description,
+            pessoalItems: characterInfo.pessoalItems
         },
         nex: 5,
         maxPs: initialPoints.ps,
