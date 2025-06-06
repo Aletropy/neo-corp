@@ -92,7 +92,7 @@
                     <div class="ml-3 relative">
                         <div class="flex items-center">
                             <div class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
-                                <span class="font-medium">JD</span>
+                                <span class="font-medium"><%=(user.username.charAt(0) + user.username.charAt(1))%></span>
                             </div>
                         </div>
                     </div>
@@ -161,8 +161,6 @@
                     </div>
                 </div>
 
-                <!-- Session Timeline -->
-                <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
                 <div class="card bg-darkCard rounded-xl p-6 mt-8">
                     <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Histórico de Sessões</h2>
                     
@@ -213,11 +211,14 @@
                     <button id="joinButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                         <i class="fas fa-play mr-2"></i> Entrar na Sessão
                     </button>
-                <% } else { %>
+                <% } else if(!campain.active && user.id == campain.gameMasterId) { %>
+                    <button id="openButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <i class="fas fa-play mr-2"></i> Abrir Sessão
+                    </button>
+                <% } %>
                     <button id="backButton" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                         <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
                     </button>
-                <% } %>
             </div>
         </div>
     </div>
@@ -235,7 +236,7 @@
             btn.disabled = true;
             
             // Logic to join session
-            fetch(`/campains/<%= campain.id %>/join`, {
+            fetch(`/campain/<%= campain.id %>/join`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -243,21 +244,44 @@
             })
             .then(response => {
                 if(response.ok) {
-                    window.location.href = `/session/<%= campain.id %>`;
+                    window.location.href = `/campain/session/<%= campain.id %>`;
                 } else {
-                    // Revert button state on error
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    // Consider a more user-friendly dark mode alert/toast here in a real app
-                    alert('Erro ao entrar na sessão. Tente novamente.');
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                // Revert button state on error
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                alert('Erro ao conectar. Verifique sua conexão.');
+            });
+        });
+
+        document.getElementById('openButton')?.addEventListener('click', () => {
+            // Show loading state
+            const btn = document.getElementById('openButton');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Conectando...';
+            btn.disabled = true;
+            
+            fetch(`/campain/<%= campain.id %>/open`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })  
+            .then(response => {
+                if(response.ok) {
+                    window.location.href = `/campain/session/<%= campain.id %>`;
+                } else {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             });
         });
     </script>

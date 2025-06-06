@@ -21,6 +21,7 @@ export interface CharacterAttributes
       age : string;
       appearenceDescription : string;
       description : string;
+      pessoalItems : string;
     },
     attributes: {
       for : number;

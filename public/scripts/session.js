@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = '#e2e8f0'; // darkTextPrimary
         ctx.font = '16px Inter';
         ctx.textAlign = 'center';
-        ctx.fillText('Mapa da Sessão (MVP)', rpgMapCanvas.width / 2, rpgMapCanvas.height / 2);
+        ctx.fillText('Carregando assets...', rpgMapCanvas.width / 2, rpgMapCanvas.height / 2);
     }
 
     // Event listeners

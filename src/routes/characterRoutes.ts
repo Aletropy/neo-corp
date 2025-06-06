@@ -129,10 +129,16 @@ characterRoutes.post("/new", AuthMiddleware, async (req, res) => {
         },
         classe: characterInfo.classe
     });
+    try {
 
-    await CharacterSkills.create({
-        characterId: (character.get("id") as number)
-    });
+        await CharacterSkills.create({
+            characterId: (character.get("id") as number)
+        });
+    } catch (error) {
+        console.error("Error creating character skills:", error);
+        res.status(500).send("Error creating character skills");
+        return;
+    }
 
     res.redirect("/dashboard");
 });

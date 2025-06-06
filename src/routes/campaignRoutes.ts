@@ -15,6 +15,8 @@ declare module 'express-session' {
     }
 }
 
+const activeCampaigns: { [key: number]: boolean } = {}; // Temporary storage for active campaings, forward change to an handler.
+
 const campainRoutes = Router();
 
 campainRoutes.get("/session/:id", AuthMiddleware, async (req, res) => {
@@ -69,6 +71,64 @@ campainRoutes.post("/new", AdminMiddleware, async (req, res) => {
     res.redirect("/dashboard");
 });
 
+campainRoutes.post("/:id/open", async (req, res) => {
+
+    const campaign = await Campaign.findByPk(parseInt(req.params.id));
+    const user = req.session.user;
+
+    if(campaign == null || user == null)
+    {
+        res.redirect("/404");
+        return;
+    }
+
+    const gameMaster = campaign.get("gameMaster") as number;
+
+    if(gameMaster != user.id && !user.isAdmin)
+    {
+        res.sendStatus(403);
+        return;
+    }
+
+    if(activeCampaigns[campaign.get("id") as number])
+    {
+        res.sendStatus(400);
+        return;
+    }
+
+    activeCampaigns[campaign.get("id") as number] = true;
+
+    res.sendStatus(200);
+});
+
+campainRoutes.post("/:id/join", async (req, res) => {
+
+    const campaign = await Campaign.findByPk(parseInt(req.params.id));
+    const user = req.session.user;
+
+    if(campaign == null || user == null)
+    {
+        res.redirect("/404");
+        return;
+    }
+
+    const players = campaign.get("players") as number[];
+
+    if(!players.includes(user.id) && !user.isAdmin)
+    {
+        res.sendStatus(403);
+        return;
+    }
+
+    if(!activeCampaigns[campaign.get("id") as number])
+    {
+        res.sendStatus(400);
+        return;
+    }
+
+    res.sendStatus(200);
+});
+
 campainRoutes.get("/:id", AuthMiddleware, async (req, res) => {
     const campain = await Campaign.findOne({
         where: {id: parseInt(req.params.id)}
@@ -94,12 +154,13 @@ campainRoutes.get("/:id", AuthMiddleware, async (req, res) => {
         id: req.params.id,
         name: campain.get("name"),
         description: campain.get("description"),
-        active: false,
+        active: activeCampaigns[campain.get("id") as number] || false,
         progress: campain.get("progress") as number,
         gameMaster: gameMaster.get("username"),
+        gameMasterId: gameMaster.get("id"),
         system: "Ordem Paranormal 1.1",
         players: campain.get("characters")
-    }});
+    }, user: req.session.user });
 });
 
 export default campainRoutes;
