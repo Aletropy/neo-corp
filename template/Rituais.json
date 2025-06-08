@@ -754,5 +754,14 @@
     "element": "morte",
     "range": "curto",
     "duration": "cena"
-  }
+  },
+  {
+  "id": 85,
+  "name": "Sintonia Metálica",
+  "description": "Execução: Padrão\nAlcance: Pessoal\nAlvo: Você\nDuração: Cena\nResistência: Nenhuma\nVocê abre seus sentidos para a cacofonia do Medo que ressoa na tecnologia, buscando os sussurros nas entrelinhas do código e o ranger das engrenagens da realidade se distorcendo ao redor de máquinas. Ao conjurar este ritual, o ar ao seu redor parece carregar o leve e perturbador odor de metal superaquecido com um toque adocicado, e você pode ouvir sons sutis de maquinaria fantasma – cliques, zumbidos e o ranger metálico que só você percebe plenamente. Ao longo da cena, você se torna mais apto a entender a linguagem secreta da tecnologia influenciada ou corrompida pelo paranormal: você recebe +2 em testes de Investigação e Percepção feitos para analisar dispositivos tecnológicos, encontrar informações neles, ou perceber anomalias em seu funcionamento. Adicionalmente, uma vez durante a duração do ritual, você pode gastar uma ação de movimento para focar em um dispositivo tecnológico em alcance curto (ou que esteja tocando). Você automaticamente sabe se este dispositivo está atualmente sob influência de alguma anomalia paranormal (seja de Medo ou outro elemento) ou se foi recentemente afetado por um ritual ou evento paranormal significativo. Você não sabe a natureza exata, apenas a confirmação de sua presença ou ausência.\nDiscente (+2 PE): O bônus em testes de Investigação e Percepção aumenta para +5. Além disso, ao focar em um dispositivo tecnológico para detectar influência paranormal, você também recebe uma impressão sensorial breve e perturbadora relacionada à natureza dessa influência ou ao último evento paranormal. Pode ser um fragmento de som distorcido (como um eco de voz ou um grito digital), uma imagem mental fugaz (um símbolo, um vulto), ou uma forte emoção residual (pânico, obsessão, dor). O Mestre descreve essa impressão. Isso pode lhe dar uma pista sobre o que aconteceu ali ou qual tipo de entidade está envolvida. O cheiro metálico adocicado e os sons de metalurgia fantasma se tornam mais intensos e perceptíveis para você.",
+  "circle": 1,
+  "element": "medo",
+  "range": "pessoal",
+  "duration": "cena"
+}
 ]
