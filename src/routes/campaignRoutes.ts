@@ -150,7 +150,7 @@ campainRoutes.get("/:id", AuthMiddleware, async (req, res) => {
         return;
     }
 
-    res.render("pages/campain", { campain: {
+    res.render("pages/campain/campaign", { campain: {
         id: req.params.id,
         name: campain.get("name"),
         description: campain.get("description"),

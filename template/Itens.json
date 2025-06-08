@@ -40,5 +40,194 @@
     "description": "Disparado por bazucas. Ao contrário de outras munições, cada foguete dura um único disparo, não uma cena. Para fazer vários ataques, você precisará carregar vários foguetes.",
     "category": 1,
     "storage": 1
+  },
+  {
+    "id": 7,
+    "name": "Kit de perícia",
+    "description": "Um kit contendo ferramentas especializadas para investigações e análises forenses.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 8,
+    "name": "Utensílio",
+    "description": "Um item multifuncional ou ferramenta específica para diversas tarefas.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 9,
+    "name": "Vestimenta",
+    "description": "Peça de roupa ou traje com propriedades protetoras ou funcionais.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 10,
+    "name": "Granada de atordoamento",
+    "description": "Explosivo não letal que emite um flash de luz e som intensos para desorientar alvos.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 11,
+    "name": "Granada de fragmentação",
+    "description": "Explosivo letal que, ao detonar, espalha estilhaços em alta velocidade.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 12,
+    "name": "Granada de fumaça",
+    "description": "Dispositivo que libera uma densa cortina de fumaça para obstrução visual ou sinalização.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 13,
+    "name": "Granada incendiária",
+    "description": "Explosivo que gera calor intenso e chamas, ideal para negar acesso a áreas ou destruir material.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 14,
+    "name": "Mina antipessoal",
+    "description": "Dispositivo explosivo oculto, acionado pela proximidade ou contato de uma pessoa.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 15,
+    "name": "Algemas",
+    "description": "Dispositivo de contenção utilizado para imobilizar os pulsos de um indivíduo.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 16,
+    "name": "Arpéu",
+    "description": "Gancho com corda, utilizado para escalada ou para alcançar locais de difícil acesso.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 17,
+    "name": "Bandoleira",
+    "description": "Correia ajustável para carregar uma arma longa ou outros equipamentos junto ao corpo.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 18,
+    "name": "Binóculos",
+    "description": "Instrumento óptico que amplia a visão de objetos distantes, útil para reconhecimento.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 19,
+    "name": "Bloqueador de sinal",
+    "description": "Dispositivo eletrônico que interfere e impede comunicações sem fio (celular, rádio, Wi-Fi).",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 20,
+    "name": "Cicatrizante",
+    "description": "Agente medicinal que promove a rápida cicatrização de ferimentos.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 21,
+    "name": "Corda",
+    "description": "Corda resistente e flexível para diversas aplicações, como escalada, rapel ou amarração.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 22,
+    "name": "Equipamento de sobrevivência",
+    "description": "Conjunto de ferramentas e suprimentos essenciais para sobreviver em ambientes hostis.",
+    "category": 0,
+    "storage": 2
+  },
+  {
+    "id": 23,
+    "name": "Lanterna tática",
+    "description": "Lanterna de alta potência, durável e com recursos adicionais para uso em operações táticas.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 24,
+    "name": "Máscara de gás",
+    "description": "Equipamento de proteção individual que filtra agentes tóxicos do ar, protegendo o sistema respiratório.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 25,
+    "name": "Mochila militar",
+    "description": "Mochila robusta e com grande capacidade, projetada para carregar equipamentos em missões. O '*' indica uma capacidade de armazenamento especial ou adicional.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 26,
+    "name": "Óculos de visão térmica",
+    "description": "Dispositivo que permite visualizar assinaturas de calor, útil em condições de baixa visibilidade.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 27,
+    "name": "Pé de cabra",
+    "description": "Ferramenta de metal robusta usada como alavanca para forçar, arrombar ou erguer objetos.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 28,
+    "name": "Pistola de dardos",
+    "description": "Arma que dispara dardos, podendo ser carregados com tranquilizantes ou outras substâncias.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 29,
+    "name": "Pistola sinalizadora",
+    "description": "Arma utilizada para disparar cartuchos sinalizadores luminosos para comunicação ou emergência.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 30,
+    "name": "Soqueira",
+    "description": "Arma de combate corpo a corpo que se encaixa nos dedos para aumentar o impacto dos socos.",
+    "category": 0,
+    "storage": 1
+  },
+  {
+    "id": 31,
+    "name": "Spray de pimenta",
+    "description": "Agente incapacitante em spray, causa irritação severa nos olhos e vias respiratórias.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 32,
+    "name": "Taser",
+    "description": "Arma de eletrochoque não letal que incapacita temporariamente um alvo através de descarga elétrica.",
+    "category": 1,
+    "storage": 1
+  },
+  {
+    "id": 33,
+    "name": "Traje hazmat",
+    "description": "Vestimenta de proteção completa contra materiais perigosos (Hazardous Materials).",
+    "category": 1,
+    "storage": 2
   }
 ]
