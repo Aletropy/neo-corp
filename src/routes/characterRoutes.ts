@@ -118,8 +118,10 @@ characterRoutes.post("/new", AuthMiddleware, async (req, res) => {
         nex: 5,
         maxPs: initialPoints.ps,
         maxPv: initialPoints.pv,
+        maxPe: initialPoints.pe,
         pv: initialPoints.pv,
         ps: initialPoints.ps,
+        pe: initialPoints.pe,
         poderes: [],
         attributes: {
             agi: characterInfo.agilidade,
@@ -171,8 +173,10 @@ characterRoutes.post("/:id/update", async (req, res) => {
         armas? : any[];
         pv : number;
         ps : number;
+        pe : number;
         maxPv : number;
         maxPs : number;
+        maxPe : number;
     } = {
         attributes: {},
         info: {},
@@ -182,8 +186,10 @@ characterRoutes.post("/:id/update", async (req, res) => {
         armas: character.get("armas") as number[],
         pv: character.get("pv") as number,
         ps: character.get("ps") as number,
+        pe: character.get("pe") as number,
         maxPv: character.get("maxPv") as number,
-        maxPs: character.get("maxPs") as number
+        maxPs: character.get("maxPs") as number,
+        maxPe: character.get("maxPe") as number
     };
 
     let skills : any = {}
@@ -195,6 +201,8 @@ characterRoutes.post("/:id/update", async (req, res) => {
     newCharacter.maxPv = parseInt(body.maxPv);
     newCharacter.ps = parseInt(body.ps);
     newCharacter.maxPs = parseInt(body.maxPs);
+    newCharacter.pe = parseInt(body.pe);
+    newCharacter.maxPe = parseInt(body.maxPe);
     Object.keys(body).filter((key) => key.startsWith("attributes_")).map(key => {
         const realKey = key.replace("attributes_", "");
         newCharacter.attributes[realKey] = body[key];
@@ -291,16 +299,16 @@ characterRoutes.get("/tips", AuthMiddleware, (_, res) => {
     res.render("pages/character/tips");
 });
 
-function getInitialPoints(classe : string, attributes : any) : { ps : number, pv : number } {
+function getInitialPoints(classe : string, attributes : any) : { ps : number, pv : number, pe : number } {
     if(classe == "combatente") {
-        return { ps: 12, pv: 20 + parseInt(attributes.vigor) };
+        return { ps: 12, pv: 20 + parseInt(attributes.vigor), pe: 2 + parseInt(attributes.presenca) };
     } else if(classe == "especialista") {
-        return { ps: 16, pv: 16 + parseInt(attributes.vigor) };
+        return { ps: 16, pv: 16 + parseInt(attributes.vigor), pe: 3 + parseInt(attributes.presenca) };
     } else if(classe == "ocultista") {
-        return { ps: 20, pv: 12 + parseInt(attributes.vigor) };
+        return { ps: 20, pv: 12 + parseInt(attributes.vigor), pe: 4 + parseInt(attributes.presenca) };
     }
 
-    return { ps: 0, pv: 0 };
+    return { ps: 0, pv: 0, pe: 0 };
 }
 
 export default characterRoutes;

@@ -14,8 +14,10 @@ export interface CharacterAttributes
     rituais: number[];
     maxPv : number;
     maxPs : number;
+    maxPe : number;
     pv : number;
     ps : number;
+    pe : number;
     info: {
       name : string;
       age : string;
@@ -89,12 +91,22 @@ class Character extends Model<CharacterAttributes, CharacterCreationAttributes>
         allowNull: false,
         defaultValue: 0
       },
+      maxPe: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       pv: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
       },
       ps: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      pe: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0

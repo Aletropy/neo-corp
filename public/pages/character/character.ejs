@@ -28,6 +28,7 @@
                         healthMax: '#f87171',
                         sanity: '#3b82f6',
                         sanityMax: '#60a5fa',
+                        peMax: '#f6a53b',
                         success: '#10b981',
                         warning: '#f59e0b',
                         danger: '#ef4444'
@@ -162,6 +163,14 @@
                         <input type="number" name="ps" id="character-ps" value="<%= character.ps %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
                         <span class="text-darkTextSecondary text-base">/</span>
                         <input type="number" name="maxPs" id="character-maxPs" value="<%= character.maxPs %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
+                    </div>
+                </div>
+                <div class="attribute-box p-2 rounded-md">
+                    <label class="text-xs text-peMax uppercase tracking-wider font-semibold block text-center mb-1">Pontos de Esforço (PE)</label>
+                    <div class="flex items-center space-x-1.5">
+                        <input type="number" name="pe" id="character-pe" value="<%= character.pe %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
+                        <span class="text-darkTextSecondary text-base">/</span>
+                        <input type="number" name="maxPe" id="character-maxPe" value="<%= character.maxPe %>" class="w-1/2 text-base sm:text-lg font-bold text-center bg-darker border-darkBorder focus:ring-sanity p-0.5">
                     </div>
                 </div>
             </div>
@@ -696,6 +705,7 @@
         const autoCalcCheckbox = document.getElementById('autoCalcStats');
         const maxPvInput = document.getElementById('character-maxPv');
         const maxPsInput = document.getElementById('character-maxPs');
+        const maxPeInput = document.getElementById('character-maxPe');
         const classeSelect = document.getElementById('character-classe');
         const nexInput = document.getElementById('character-nex');
         const vigInput = document.getElementById('attr-vig');
@@ -720,19 +730,23 @@
 
             let calculatedMaxPv = 0;
             let calculatedMaxPs = 0;
+            let calculatedMaxPe = 0;
 
             switch (classe) {
                 case 'combatente':
                     calculatedMaxPv = (20 + vig) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (4 + vig)) : 0);
                     calculatedMaxPs = 12 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 3) : 0);
+                    calculatedMaxPe = (2 + pre) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (2 + pre)) : 0);
                     break;
                 case 'especialista':
                     calculatedMaxPv = (16 + vig) +  (nex > 5 ? ((Math.floor(nex / 5) - 1) * (3 + vig)) : 0);
                     calculatedMaxPs = 16 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 4) : 0);
+                    calculatedMaxPe = (3 + pre) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (3 + pre)) : 0);
                     break;
                 case 'ocultista':
                     calculatedMaxPv = (12 + vig) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (2 + vig)) : 0);
                     calculatedMaxPs = 20 + (nex > 5 ? ((Math.floor(nex / 5) - 1) * 5) : 0);
+                    calculatedMaxPe = (4 + pre) + (nex > 5 ? ((Math.floor(nex / 5) - 1) * (4 + pre)) : 0);
                     break; 
                 default: 
                     calculatedMaxPv = (10 + vig);
@@ -742,6 +756,7 @@
             // Ensure values are positive
             maxPvInput.value = Math.max(1, calculatedMaxPv);
             maxPsInput.value = Math.max(1, calculatedMaxPs);
+            maxPeInput.value = Math.max(1, calculatedMaxPe);
         }
 
         function toggleAutoCalc() {
