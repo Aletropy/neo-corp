@@ -3,5 +3,8 @@ dist/
 models/
 node_modules/
 
+selfsigned.crt
+selfsigned.key
+
 livro_de_regras.pdf
 .env

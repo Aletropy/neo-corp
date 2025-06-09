@@ -783,7 +783,16 @@
             }
         });
         
-        toggleAutoCalc(); // Initial state
+        toggleAutoCalc();
+
+        for(let input of document.querySelectorAll("input"))
+        {
+            if(input.type === "textarea") continue;
+            input.addEventListener("keydown", (e) => {
+                if(e.key === "Enter") 
+                    e.preventDefault();
+            })
+        }
     });
 </script>
 </body>

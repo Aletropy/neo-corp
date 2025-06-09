@@ -51,6 +51,8 @@ export default (app : Application) =>
                 maxPv: v.get("maxPv"),
                 ps: v.get("ps"),
                 maxPs: v.get("maxPs"),
+                pe: v.get("pe"),
+                maxPe: v.get("maxPe")
             }
         });
         

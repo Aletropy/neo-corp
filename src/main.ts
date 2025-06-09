@@ -8,12 +8,19 @@ import AuthRouter from "./routes/auth";
 import characterRoutes from "./routes/characterRoutes";
 import campainRoutes from "./routes/campaignRoutes";
 import Config from "./Core/Config";
-import { createServer } from "http";
+import * as http from "http";
+import * as https from "https";
 import { Server } from "socket.io";
 import SessionHandler from "./Session/SessionHandler";
+import { readFileSync } from "fs";
+
+const options = {
+    key: readFileSync(Config.SSL_KEY),
+    cert: readFileSync(Config.SSL_CERT),
+}
 
 const app = express();
-const server = createServer(app);
+const server = https.createServer(options, app);
 const io = new Server(server);
 const SessionStore = SequelizeStore(session.Store);
 const viewsFolder = path.join(__dirname, "../public");
@@ -43,6 +50,11 @@ routes(app);
 
 SessionHandler(io);
 
-server.listen(Config.EXPRESS_PORT, () => {
-    console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.EXPRESS_PORT}`);
+http.createServer(function (req, res) {
+    res.writeHead(301, {Location: `https://${req.headers["host"]}${req.url}`});
+    res.end();
+}).listen(Config.HTTP_PORT);
+
+server.listen(Config.HTTPS_PORT, () => {
+    console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.HTTPS_PORT}`);
 });

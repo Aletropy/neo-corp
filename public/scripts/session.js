@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const diceRollLogEl = document.getElementById('dice-roll-log');
     const rpgMapCanvas = document.getElementById('rpg-map-canvas');
     const leaveSessionBtn = document.getElementById('leave-session-btn');
+    /**
+     * @type {CanvasRenderingContext2D}
+     */
     const ctx = rpgMapCanvas.getContext('2d');
 
     socket.on('connect', () => {
