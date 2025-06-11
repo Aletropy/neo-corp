@@ -17,6 +17,12 @@ declare module 'express-session' {
 const AuthRouter = Router();
 
 AuthRouter.post('/login', async (req, res) => {
+
+    if(!req.body.username || !req.body.password) {
+        res.redirect("/logout");
+        return;
+    }
+
     const { username, password } = req.body;
 
     try {

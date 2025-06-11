@@ -35,9 +35,43 @@ export interface CharacterSkillsAttributes {
   vontade?: number;
 }
 
+export type SkillName = keyof Omit<CharacterSkillsAttributes, 'characterId'>;
+
 type CharacterSkillsCreationAttributes = Optional<CharacterSkillsAttributes, 'characterId' | 'tatica' | 'vontade' | 'tecnologia' | 'sobrevivencia' | 'religiao' | 'reflexos' | 'profissao' | 'pontaria' | 'pilotagem' | 'percepcao' | 'ocultismo' | 'medicina' | 'luta' | 'investigacao' | 'intuicao' | 'intimidacao' | 'iniciativa' | 'furtividade' | 'fortitude' | 'enganacao' | 'diplomacia' | 'crime' | 'ciencias' | 'atualidades' | 'atletismo' | 'artes' | 'adestramento' | 'acrobacia'>;
 
 class CharacterSkills extends Model<CharacterSkillsAttributes, CharacterSkillsCreationAttributes> {
+  
+  public static readonly skillToAttributeMap: Record<SkillName, string> = {
+    acrobacia: 'agi',
+    adestramento: 'pre',
+    artes: 'pre',
+    atletismo: 'for',
+    atualidades: 'int',
+    ciencias: 'int',
+    crime: 'agi',
+    diplomacia: 'pre',
+    enganacao: 'pre',
+    fortitude: 'vig',
+    furtividade: 'agi',
+    iniciativa: 'agi',
+    intimidacao: 'pre',
+    intuicao: 'int',
+    investigacao: 'int',
+    luta: 'for',
+    medicina: 'int',
+    ocultismo: 'int',
+    percepcao: 'pre',
+    pilotagem: 'agi',
+    pontaria: 'agi',
+    profissao: 'int',
+    reflexos: 'agi',
+    religiao: 'pre',
+    sobrevivencia: 'int',
+    tatica: 'int',
+    tecnologia: 'int',
+    vontade: 'pre'
+  };
+
   static initialize() {
     this.init({
       characterId: {

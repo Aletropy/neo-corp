@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { AuthMiddleware } from "../Middlewares/auth";
 import Character from "../Data/Models/Character";
-import CharacterSkills from "../Data/Models/CharacterSkills";
+import CharacterSkills, { SkillName } from "../Data/Models/CharacterSkills";
 import { Poder } from "../Data/Models/Poder";
 import Ritual from "../Data/Models/Ritual";
 import Item from "../Data/Models/Items";
 import Arma from "../Data/Models/Weapon";
+import DiceInterpreter, { EvaluationResult } from "../Dice/DiceInterpreter";
 
 declare module 'express-session' {
      interface SessionData {
@@ -22,6 +23,40 @@ const characterRoutes = Router();
 
 characterRoutes.get("/new", AuthMiddleware, (_, res) => {
     res.render("pages/character/new");
+});
+
+characterRoutes.get("/:id/roll/:pericia", AuthMiddleware, async (req, res) => {
+
+    const characterId = parseInt(req.params.id);
+    const pericia = req.params.pericia;
+
+    const character = await Character.findByPk(characterId);
+
+    if(character == null || character.get("owner") != req.session.user?.id && !req.session.user?.isAdmin)
+    {
+        res.redirect("/dashboard");
+        return;
+    }
+
+    const skills = await CharacterSkills.findOne({ where: {characterId: characterId }});
+    if(skills == null)
+    {
+        res.status(404).send("Character skills not found");
+        return;
+    }
+    const skillValue = skills.get(pericia) as number;
+    const diceCount = (character.get("attributes") as any)[CharacterSkills.skillToAttributeMap[pericia as SkillName]] as number;
+
+    let roll : EvaluationResult;
+
+    if(skillValue == undefined || skillValue <= 0)
+        roll = new DiceInterpreter().Interpret(`>[${diceCount}d20]`);
+    else
+        roll = new DiceInterpreter().Interpret(`>[${diceCount}d20] + ${skillValue}`);
+
+    console.log(`Rolled for character ${(character.get("info") as any).name}: ${roll.stringValue}`)
+
+    res.status(200).json(roll);
 });
 
 characterRoutes.get("/:id", AuthMiddleware, async(req, res) => {
@@ -195,6 +230,7 @@ characterRoutes.post("/:id/update", async (req, res) => {
     let skills : any = {}
 
     const body = req.body;
+
     newCharacter.nex = body.nex;
     newCharacter.classe = body.classe;
     newCharacter.pv = parseInt(body.pv);

@@ -56,5 +56,5 @@ http.createServer(function (req, res) {
 }).listen(Config.HTTP_PORT);
 
 server.listen(Config.HTTPS_PORT, () => {
-    console.log(`Initialized at http://${Config.EXPRESS_IP}:${Config.HTTPS_PORT}`);
+    console.log(`Initialized at https://${Config.EXPRESS_IP}:${Config.HTTPS_PORT}`);
 });

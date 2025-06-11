@@ -213,6 +213,30 @@
                             </div>
                         </div>
                     </div>
+                    <% if(user.isAdmin) { %>
+                    <div class="bg-card rounded-xl shadow-sm p-6 border border-gray-800 mt-2">
+                        <h2 class="text-xl font-bold text-white mb-6 pb-3 border-b border-gray-800">Outros Personagens (<%=otherCharacters.length%>)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <% for(let character of otherCharacters) { %>
+                                <div class="card bg-card rounded-xl overflow-hidden">
+                                    <div class="p-5">
+                                        <div class="flex items-start justify-between">
+                                            <h3 class="font-bold text-white text-lg"><%=character.info.name%></h3>
+                                            <span class="bg-blue-900 text-blue-300 text-xs font-medium px-2 py-1 rounded-full"><%=String(character.classe).charAt(0).toUpperCase() + character.classe.slice(1)%></span>
+                                        </div>
+                                        <p class="text-gray-400 mt-6">Vida - <span class="text-red-400 font-medium"><%=character.pv%>/<%=character.maxPv%></span></p>
+                                        <p class="text-gray-400">Sanidade - <span class="text-blue-400 font-medium"><%=character.ps%>/<%=character.maxPs%></span></p>
+                                        <p class="text-gray-400">Pontos de Esforço - <span class="text-yellow-400 font-medium"><%=character.pe%>/<%=character.maxPe%></span></p>
+                                        <p class="text-gray-400">NEX - <span class="text-purple-400 font-medium"><%=character.nex%>%</span></p>
+                                    </div>
+                                    <div class="bg-gray-800 p-8 border-t border-gray-700">
+                                        <a class="text-blue-400 hover:text-blue-300 text-sm font-medium" href="/character/<%=character.id%>">Ver Detalhes</a>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% } %>
                 </div>
                 
                 <!-- Campaigns Tab -->
@@ -523,7 +547,6 @@
 
                     if (response.ok) {
                         suggestionTextEl.value = '';
-                        suggestionTypeEl.value = ''; 
                         suggestionNotificationEl.textContent = 'Sugestão enviada com sucesso!';
                         suggestionNotificationEl.classList.add('text-success'); // Make sure text-success is defined
                         setTimeout(() => {

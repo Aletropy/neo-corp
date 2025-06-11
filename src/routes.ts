@@ -8,6 +8,7 @@ import Item from "./Data/Models/Items";
 import Arma from "./Data/Models/Weapon";
 import path from "path";
 import { Suggestion } from "./Data/Models/Suggestion";
+import { Op } from "sequelize";
 
 declare module 'express-session' {
      interface SessionData {
@@ -41,20 +42,18 @@ export default (app : Application) =>
 
         const characters = (await Character.findAll({
             where: {owner: req.session.user?.id}
-        })).flatMap((v) => {
-            return {
-                id: v.get("id"),
-                nex: v.get("nex"),
-                info: v.get("info"),
-                classe: v.get("classe"),
-                pv: v.get("pv"),
-                maxPv: v.get("maxPv"),
-                ps: v.get("ps"),
-                maxPs: v.get("maxPs"),
-                pe: v.get("pe"),
-                maxPe: v.get("maxPe")
-            }
-        });
+        }));
+
+        let otherCharacters : { [key: string]: any }[] = [];
+        if (req.session.user?.isAdmin) {
+            otherCharacters = (await Character.findAll({
+                where: {
+                    owner: {
+                        [Op.ne]: req.session.user.id
+                    }
+                }
+            }));
+        }
         
         const campaings = (await Campaign.findAll()).flatMap(v => {
             return {
@@ -69,6 +68,7 @@ export default (app : Application) =>
         res.render("pages/dashboard", {
             user: req.session.user,
             characters,
+            otherCharacters,
             campaings,
             suggestions: suggestions
         })
