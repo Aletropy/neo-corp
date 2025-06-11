@@ -3,478 +3,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoCorp - Ficha: <%= character.info.name %></title>
+    <title>NeoCorp Ficha: <%= character.info.name %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Notyf CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'class', // Can be 'media' or 'class'
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6',
-                        secondary: '#2563eb',
-                        accent: '#1d4ed8',
-                        dark: '#0f172a',
-                        darker: '#0a1120',
-                        card: '#1e293b',
-                        cardLight: '#334155',
-                        darkBorder: '#475569',
-                        darkTextPrimary: '#e2e8f0',
-                        darkTextSecondary: '#94a3b8',
-                        infoValue: '#60a5fa',
-                        infoLabel: '#94a3b8',
-                        health: '#ef4444',
-                        healthMax: '#f87171',
-                        sanity: '#3b82f6',
-                        sanityMax: '#60a5fa',
-                        peColor: '#f59e0b',
-                        peMax: '#f6a53b',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        danger: '#ef4444'
+                        primary: '#007bff', 
+                        primaryHover: '#0056b3',
+                        accent: '#6f42c1', 
+                        bgBase: '#121212',
+                        bgSurface: '#1e1e1e',
+                        bgElement: '#2a2a2a',
+                        bgHover: '#343434',
+                        borderLight: '#3a3a3a',
+                        borderFocus: '#007bff',
+                        textDisplay: '#ffffff',
+                        textBody: '#e0e0e0',
+                        textMuted: '#a0a0a0',
+                        textOnPrimary: '#ffffff',
+                        health: '#e74c3c',
+                        healthMax: '#c0392b',
+                        sanity: '#3498db',
+                        sanityMax: '#2980b9',
+                        peColor: '#f39c12',
+                        peMax: '#e67e22',
+                        success: '#28a745',
+                        warning: '#ffc107',
+                        danger: '#dc3545',
+                        infoValue: '#007bff',
+                        infoLabel: '#a0a0a0',
                     }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        html, body { height: 100%; margin: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        /* Ensure base styles are applied correctly */
+        html {
+            height: 100%;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0a1120;
-            color: #e2e8f0;
+            background-color: #121212; /* Fallback: tailwind.theme.colors.bgBase */
+            color: #e0e0e0; /* Fallback: tailwind.theme.colors.textBody */
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            min-height: 100vh; /* Use min-height for body */
+            overflow-x: hidden; /* Prevent horizontal scroll on body */
         }
-        main { flex-grow: 1; overflow: hidden; }
-        .tab-content-char { display: none; animation: fadeIn 0.3s ease forwards; }
-        .tab-content-char.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .active-char-tab {
-            background-color: #3b82f6 !important;
-            color: white !important;
+        main { 
+            flex-grow: 1; 
+            /* overflow: hidden; Removed to allow main to grow with content on mobile if needed */
         }
-        .char-tab-btn:hover:not(.active-char-tab) {
-            background-color: #334155;
+        
+        .panel {
+            background-color: #1e1e1e; /* tailwind.theme.colors.bgSurface */
+            border: 1px solid #3a3a3a; /* tailwind.theme.colors.borderLight */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        .attribute-box {
-            background-color: #334155;
-            border: 1px solid #475569;
+
+        /* Adjusted scrollable column for better responsiveness */
+        .scrollable-column {
+            /* Desktop: fixed height with internal scroll */
+            /* Mobile: height auto, scroll handled by panel or page */
+            height: auto; /* Default for mobile */
+            overflow-y: auto; /* Allow scroll if content exceeds panel height */
+            padding-bottom: 1rem;
         }
-        .skill-item {
-            border-left: 4px solid #3b82f6;
+        @media (min-width: 768px) { /* md breakpoint */
+            .scrollable-column {
+                 /* Approx Navbar height + main padding */
+                height: calc(100vh - 4.5rem - (2 * 1rem) - 1px); /* -1px for potential border issues */
+                overflow-y: auto;
+            }
+            /* Specific height for tab content area scroll on desktop */
+            .tab-content-scroll-area {
+                 /* Navbar + main padding + tab bar height */
+                height: calc(100vh - 4.5rem - (2 * 1rem) - 3.75rem - 1px);
+                overflow-y: auto;
+            }
         }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3b82f6;
-        }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; } /* Slimmer scrollbar */
+        ::-webkit-scrollbar-track { background: #2a2a2a; /* tailwind.theme.colors.bgElement */ border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #3a3a3a; /* tailwind.theme.colors.borderLight */ border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #007bff; /* tailwind.theme.colors.primary */ }
+
         input[type="number"], input[type="text"], textarea, select {
-            background-color: #334155;
-            border: 1px solid #475569;
-            color: #e2e8f0;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
+            background-color: #2a2a2a; /* tailwind.theme.colors.bgElement */
+            border: 1px solid #3a3a3a; /* tailwind.theme.colors.borderLight */
+            color: #e0e0e0; /* tailwind.theme.colors.textBody */
+            padding: 0.65rem 0.9rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 0.9rem;
             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            width: 100%; /* Default to full width for responsiveness */
         }
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
         input:focus, textarea:focus, select:focus {
-            border-color: #3b82f6;
+            border-color: #007bff; /* tailwind.theme.colors.borderFocus */
             outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
         }
-        .description-text { overflow-y: auto; padding-right: 6px; font-size: 0.8rem; line-height: 1.4; }
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(2px); }
-        .modal-content {
-            background-color: #1e293b;
-            margin: 8% auto;
-            padding: 20px sm:padding:24px;
-            border: 1px solid #475569;
-            border-radius: 0.5rem;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .modal-close-btn {
-            color: #94a3b8;
-            float: right;
-            font-size: 24px sm:font-size:28px;
-            font-weight: bold;
-            line-height: 1;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        .modal-close-btn:hover, .modal-close-btn:focus {
-            color: #e2e8f0;
-            text-decoration: none;
-        }
-        .modal-item-list label:hover {
-            background-color: #475569;
-        }
-        .form-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            height: 1.25em;
-            width: 1.25em;
-            background-color: #334155;
-            border: 1px solid #475569;
-            border-radius: 0.25em;
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-        .form-checkbox:checked {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-        }
-        .form-checkbox:checked::after { content: ''; position: absolute; left: 0.375em; top: 0.125em; width: 0.375em; height: 0.75em; border: solid white; border-width: 0 0.125em 0.125em 0; transform: rotate(45deg); }
-        .scrollable-column { height: calc(100vh - 3.5rem - (2 * 1rem)); overflow-y: auto; padding-bottom: 1rem; }
-        .compact-input { padding: 0.25rem 0.5rem !important; font-size: 0.8rem !important; }
+        /* Specific widths for certain inputs */
+        .compact-input { padding: 0.35rem 0.6rem !important; font-size: 0.8rem !important; width: auto !important; }
         .stat-input {
-            background-color: #0f172a !important;
-            border: 1px solid #475569 !important;
+            background-color: #121212 !important; /* tailwind.theme.colors.bgBase */
+            border: 1px solid #3a3a3a !important; /* tailwind.theme.colors.borderLight */
             text-align: center;
-            font-weight: bold;
-            padding: 0.3rem !important;
-            font-size: 1rem !important;
+            font-weight: 700; /* bold */
+            padding: 0.5rem !important;
+            font-size: 1.1rem !important;
+            border-radius: 0.375rem; /* rounded-md */
+            width: 5rem !important; /* w-20 */
         }
-        .stat-input:focus {
-            border-color: #3b82f6 !important;
+        .stat-input:focus { border-color: #007bff !important; /* tailwind.theme.colors.borderFocus */ }
+        
+        .tab-content-char { display: none; animation: fadeIn 0.3s ease-out forwards; }
+        .tab-content-char.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .char-tab-btn {
+            color: #a0a0a0; /* tailwind.theme.colors.textMuted */
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+            padding: 0.875rem 0.75rem; /* py-3.5 px-3 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* semibold */
         }
-        .section-title {
+        .char-tab-btn:hover:not(.active-char-tab) {
+            color: #ffffff; /* tailwind.theme.colors.textDisplay */
+            border-bottom-color: #2a2a2a; /* tailwind.theme.colors.bgElement */
+        }
+        .active-char-tab {
+            color: #007bff !important; /* tailwind.theme.colors.primary */
+            border-bottom-color: #007bff !important; /* tailwind.theme.colors.primary */
+        }
+
+        .section-title-lg {
+            font-size: 1.125rem; /* text-lg, slightly smaller for mobile friendliness */
+            font-weight: 700; /* bold */
+            color: #ffffff; /* tailwind.theme.colors.textDisplay */
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #3a3a3a; /* tailwind.theme.colors.borderLight */
+            display: flex;
+            align-items: center;
+        }
+        .section-title-lg i { margin-right: 0.6rem; color: #007bff; /* tailwind.theme.colors.primary */ }
+
+        .list-item-card {
+            background-color: #2a2a2a; /* tailwind.theme.colors.bgElement */
+            border: 1px solid #3a3a3a; /* tailwind.theme.colors.borderLight */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .list-item-card:hover:not(.expanded-item) {
+           border-color: #007bff; /* tailwind.theme.colors.borderFocus */
+           box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+        }
+        
+        .collapsible-trigger { cursor: pointer; padding: 0.75rem; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s ease; border-radius: 0.5rem; }
+        .collapsible-trigger:hover { background-color: #343434; /* tailwind.theme.colors.bgHover */ }
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-in-out, padding 0.35s ease-in-out, margin 0.35s ease-in-out; padding-left: 0.75rem; padding-right: 0.75rem; }
+        .collapsible-content.expanded { padding-bottom: 0.75rem; margin-top: 0.25rem; }
+        .description-block { background-color: #121212; /* tailwind.theme.colors.bgBase */ color: #e0e0e0; /* tailwind.theme.colors.textBody */ padding: 0.75rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.6; border: 1px solid #3a3a3a; margin-bottom: 0.5rem; /* space before delete button */ }
+        .chevron-icon { transition: transform 0.3s ease-in-out; }
+        .expanded .chevron-icon { transform: rotate(180deg); }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #1e1e1e; margin: 5% auto; padding: 1.5rem; border: 1px solid #3a3a3a; border-radius: 0.75rem; position: relative; box-shadow: 0 15px 30px rgba(0,0,0,0.4); width: 90%; max-width: 600px; /* Responsive modal width */ }
+        @media (min-width: 640px) { .modal-content { padding: 2rem; } }
+        .modal-close-btn { color: #a0a0a0; position: absolute; top: 0.75rem; right: 1rem; font-size: 1.75rem; font-weight: bold; line-height: 1; cursor: pointer; transition: color 0.2s ease; }
+        .modal-close-btn:hover, .modal-close-btn:focus { color: #ffffff; }
+        .modal-item-list label:hover { background-color: #343434; }
+        
+        .form-checkbox { appearance: none; -webkit-appearance: none; height: 1.25em; width: 1.25em; background-color: #2a2a2a; border: 2px solid #3a3a3a; border-radius: 0.3em; display: inline-block; position: relative; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; vertical-align: middle; }
+        .form-checkbox:checked { background-color: #007bff; border-color: #007bff; }
+        .form-checkbox:checked::after { content: ''; position: absolute; left: 0.35em; top: 0.1em; width: 0.35em; height: 0.7em; border: solid white; border-width: 0 0.15em 0.15em 0; transform: rotate(45deg); }
+        
+        .notyf__toast { border-radius: 0.5rem !important; box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important; background-color: #1e1e1e !important; border: 1px solid #3a3a3a !important; }
+        .notyf__message { color: #e0e0e0 !important; }
+        .notyf__icon--success i, .notyf__icon--error i, .notyf__icon--info i { font-size: 1.3em; }
+        .notyf__toast--success { border-left: 4px solid #28a745 !important; }
+        .notyf__toast--error { border-left: 4px solid #dc3545 !important; }
+        .notyf__toast--info { border-left: 4px solid #007bff !important; }
+
+        /* Ensure portrait images are contained */
+        .portrait-image-container {
+            width: 8rem; /* w-32 */
+            height: 8rem; /* h-32 */
+            background-color: #2a2a2a; /* bgElement */
+            border-radius: 9999px; /* rounded-full */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #475569;
+            margin-bottom: 0.75rem; /* mb-3 */
+            border: 2px solid #007bff; /* border-primary */
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* shadow-xl */
+            overflow: hidden;
         }
-        .section-title i {
-            margin-right: 0.5rem;
-            color: #3b82f6;
+        @media (min-width: 640px) { /* sm breakpoint */
+            .portrait-image-container {
+                width: 9rem; /* sm:w-36 */
+                height: 9rem; /* sm:h-36 */
+            }
         }
-        .notyf__toast {
-            border-radius: 0.375rem !important; /* Tailwind's rounded-md */
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06) !important; /* Tailwind's shadow-md */
+        .portrait-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .notyf__icon--success i, .notyf__icon--error i, .notyf__icon--info i { /* For FontAwesome icons */
-            font-size: 1.25em;
+        .portrait-image-container .fa-user-astronaut {
+            font-size: 3rem; /* fa-4x */
+            color: #007bff; /* text-primary */
+        }
+        .name-input { /* For character name */
+            font-size: 1.5rem; /* text-2xl */
+            line-height: 2rem;
+            font-weight: 700; /* bold */
+            background-color: transparent;
+            border: 0;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .name-input {
+                font-size: 1.875rem; /* sm:text-3xl */
+                line-height: 2.25rem;
+            }
         }
     </style>
 </head>
-<body>
-    <nav class="bg-dark shadow-lg sticky top-0 z-50 h-14 flex-shrink-0 border-b border-darkBorder">
-        <div class="max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 h-full">
+<body class="bg-bgBase text-textBody"> <!-- Applied Tailwind classes directly for robustness -->
+    <nav class="bg-bgSurface shadow-lg sticky top-0 z-50 h-[4.5rem] flex-shrink-0 border-b border-borderLight">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex justify-between items-center h-full">
                 <div class="flex items-center">
                     <a href="/dashboard" class="flex items-center group">
-                        <div class="bg-gradient-to-br from-primary to-accent w-8 h-8 rounded-lg flex items-center justify-center shadow-md group-hover:from-secondary group-hover:to-primary transition-all duration-300">
-                            <i class="fas fa-dice-d20 text-white text-md"></i>
+                        <div class="bg-gradient-to-br from-primary to-accent w-10 h-10 rounded-lg flex items-center justify-center shadow-md group-hover:from-primaryHover group-hover:to-purple-700 transition-all duration-300 transform group-hover:scale-105">
+                            <i class="fas fa-dice-d20 text-white text-xl"></i>
                         </div>
-                        <span class="ml-2.5 text-lg sm:text-xl font-bold text-white group-hover:text-blue-300 transition-colors">Neo<span class="text-blue-400 group-hover:text-blue-200 transition-colors">Corp</span></span>
+                        <span class="ml-3 text-xl sm:text-2xl font-bold text-textDisplay group-hover:text-primary transition-colors">Neo<span class="text-primary group-hover:text-primaryHover transition-colors">Corp</span></span>
                     </a>
-                    <span class="ml-3 sm:ml-4 text-gray-500 text-lg">/</span>
-                    <span class="ml-2 sm:ml-3 text-md sm:text-lg font-semibold text-white truncate max-w-[100px] xs:max-w-[150px] sm:max-w-xs"><%= character.info.name %></span>
+                    <span class="ml-2 sm:ml-4 text-textMuted text-xl sm:text-2xl font-light">/</span>
+                    <span class="ml-2 sm:ml-3 text-lg sm:text-xl font-semibold text-textDisplay truncate max-w-[100px] xs:max-w-[150px] sm:max-w-xs md:max-w-md"><%= character.info.name %></span>
                 </div>
                 <div class="flex items-center">
-                     <button type="submit" form="characterSheetForm" id="saveCharacterSheetButton" class="px-3 py-2 sm:px-4 text-xs sm:text-sm bg-success text-white font-semibold rounded-md shadow-md hover:bg-emerald-600 transition-all duration-200 flex items-center">
-                        <i class="fas fa-save sm:mr-2"></i> <span class="button-text hidden sm:inline">Salvar Ficha</span><span class="button-text-sm sm:hidden">Salvar</span>
+                     <button type="submit" form="characterSheetForm" id="saveCharacterSheetButton" class="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-success text-textOnPrimary font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-200 flex items-center">
+                        <i class="fas fa-save mr-0 sm:mr-2"></i> <span class="button-text hidden sm:inline">Salvar Ficha</span><span class="button-text-sm sm:hidden">Salvar</span>
                     </button>
                 </div>
             </div>
         </div>
     </nav>
 
-<form id="characterSheetForm" action="/character/<%= character.id %>/update" method="post" class="flex-grow overflow-hidden">
+<form id="characterSheetForm" action="/character/<%= character.id %>/update" method="post" class="flex-grow">
     <div id="newly-added-items-container" class="hidden"></div>
 
-    <main class="h-full p-2 sm:p-3 md:p-4 grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4">
+    <main class="w-full p-2 sm:p-3 md:p-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4">
         
-        <div class="md:col-span-3 bg-card p-3 sm:p-4 rounded-xl shadow-xl border border-darkBorder scrollable-column">
-            <div class="flex flex-col items-center mb-5">
-                <div class="w-28 h-28 sm:w-32 sm:h-32 bg-cardLight rounded-full flex items-center justify-center mb-3 border-2 border-primary shadow-lg">
-                    <% if (character.info.portraitUrl) { %>
-                        <img src="<%= character.info.portraitUrl %>" alt="Retrato de <%= character.info.name %>" class="w-full h-full rounded-full object-cover">
-                    <% } else { %>
-                        <i class="fas fa-user-astronaut fa-3x text-primary"></i>
-                    <% } %>
-                </div>
-                <input type="text" name="info_name" value="<%= character.info.name %>" class="text-xl sm:text-2xl font-bold bg-transparent border-0 focus:ring-0 focus:border-primary p-0 text-center w-full mb-1">
-                <div class="text-sm text-darkTextSecondary text-center w-full">
-                    <select name="classe" id="character-classe" class="bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block appearance-none text-sm text-center font-medium compact-input">
-                        <% const classes = ["Combatente", "Especialista", "Ocultista", "Mundano"]; %>
-                        <% classes.forEach(cls => { %>
-                            <option value="<%= cls.toLowerCase() %>" <%= character.classe.toLowerCase() === cls.toLowerCase() ? 'selected' : '' %>><%= cls %></option>
-                        <% }); %>
-                    </select>
-                    <span class="mx-1">•</span> NEX 
-                    <input type="number" name="nex" id="character-nex" value="<%= character.nex %>" min="0" max="99" class="w-12 text-center bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block text-sm font-medium compact-input">%
-                </div>
-                 <div class="text-[10px] text-gray-500 mt-1.5">ID: <%= character.id %></div>
-            </div>
-            
-            <h3 class="section-title"><i class="fas fa-shield-alt"></i>Atributos</h3>
-            <% const attributesData = { pre: "PRE", agi: "AGI", for: "FOR", vig: "VIG", int: "INT" }; %>
-            <% const attrLayout = [
-                ['pre'], 
-                ['agi', 'for'], 
-                ['vig', 'int'] 
-            ]; %>
-            <div class="space-y-2 mb-5">
-                <% attrLayout.forEach(row => { %>
-                    <div class="flex <%= row.length === 1 ? 'justify-center' : 'justify-around' %> gap-2">
-                        <% row.forEach(key => { %>
-                            <div class="attribute-box p-2 rounded-lg <%= row.length === 1 ? 'w-2/5 sm:w-1/3' : 'w-2/5 sm:w-2/5' %> text-center shadow">
-                                <label class="block text-xs text-darkTextSecondary uppercase tracking-wider font-medium"><%= attributesData[key] %></label>
-                                <input type="number" min="0" name="attributes_<%= key %>" id="attr-<%= key %>" value="<%= character.attributes[key] %>" class="text-lg sm:text-xl font-bold w-full text-center bg-transparent border-0 focus:ring-0 p-0 m-0 compact-input">
-                            </div>
-                        <% }); %>
-                    </div>
-                <% }); %>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="bg-cardLight p-3 rounded-lg shadow border border-darkBorder">
-                    <div class="flex items-center justify-center mb-1.5">
-                        <i class="fas fa-heart text-health mr-2 text-sm"></i>
-                        <span class="text-sm font-semibold text-darkTextPrimary">Pontos de Vida (PV)</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" name="pv" id="character-pv" value="<%= character.pv %>" class="stat-input w-1/2 text-health">
-                        <span class="text-darkTextSecondary text-lg font-medium">/</span>
-                        <input type="number" name="maxPv" id="character-maxPv" value="<%= character.maxPv %>" class="stat-input w-1/2 text-healthMax">
-                    </div>
-                </div>
-                <div class="bg-cardLight p-3 rounded-lg shadow border border-darkBorder">
-                     <div class="flex items-center justify-center mb-1.5">
-                        <i class="fas fa-brain text-sanity mr-2 text-sm"></i>
-                        <span class="text-sm font-semibold text-darkTextPrimary">Sanidade (PS)</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" name="ps" id="character-ps" value="<%= character.ps %>" class="stat-input w-1/2 text-sanity">
-                        <span class="text-darkTextSecondary text-lg font-medium">/</span>
-                        <input type="number" name="maxPs" id="character-maxPs" value="<%= character.maxPs %>" class="stat-input w-1/2 text-sanityMax">
-                    </div>
-                </div>
-                <div class="bg-cardLight p-3 rounded-lg shadow border border-darkBorder">
-                    <div class="flex items-center justify-center mb-1.5">
-                        <i class="fas fa-bolt text-peColor mr-2 text-sm"></i>
-                        <span class="text-sm font-semibold text-darkTextPrimary">Pontos de Esforço (PE)</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" name="pe" id="character-pe" value="<%= character.pe %>" class="stat-input w-1/2 text-peColor">
-                        <span class="text-darkTextSecondary text-lg font-medium">/</span>
-                        <input type="number" name="maxPe" id="character-maxPe" value="<%= character.maxPe %>" class="stat-input w-1/2 text-peMax">
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center justify-center space-x-2 mt-4">
-                <input type="checkbox" id="autoCalcStats" name="autoCalcStats" class="form-checkbox text-primary focus:ring-offset-card" checked>
-                <label for="autoCalcStats" class="text-xs text-darkTextSecondary cursor-pointer flex items-center"><i class="fas fa-calculator fa-fw mr-1.5 text-primary"></i>Calcular Máx. Auto</label>
-            </div>
-        </div>
-
-        <div class="md:col-span-4 bg-card p-3 sm:p-4 rounded-xl shadow-xl border border-darkBorder scrollable-column">
-            <h2 class="section-title"><i class="fas fa-running"></i>Perícias</h2>
-            <div class="space-y-2 sm:space-y-2.5 pr-1 sm:pr-1.5">
-                <% const skillOrder = [
-                    "acrobacia", "adestramento", "artes", "atletismo", "atualidades", "ciencias", "crime", 
-                    "diplomacia", "enganacao", "fortitude", "furtividade", "iniciativa", "intimidacao", 
-                    "intuicao", "investigacao", "luta", "medicina", "ocultismo", "percepcao", "pilotagem", 
-                    "pontaria", "profissao", "reflexos", "religiao", "sobrevivencia", "tatica", "tecnologia", "vontade"
-                ]; %>
-                <% skillOrder.forEach(skillKey => { 
-                    const skillName = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
-                %>
-                <div class="skill-item bg-cardLight p-2 sm:p-2.5 rounded-md shadow-sm flex justify-between items-center">
-                    <div class="flex items-center flex-grow">
-                        <button type="button" class="roll-skill-btn text-primary hover:text-secondary transition-colors mr-2 focus:outline-none p-1" data-skill-key="<%= skillKey %>" title="Rolar <%= skillName %>">
-                            <i class="fas fa-dice-d20 text-sm"></i>
-                        </button>
-                        <label class="text-sm font-medium text-darkTextPrimary cursor-default"><%= skillName %></label>
-                    </div>
-                    <input type="number" min="0" max="25" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" class="w-14 sm:w-16 text-right bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 text-sm compact-input">
-                </div>
-                <% }); %>
-            </div>
-        </div>
-
-        <div class="md:col-span-5 bg-card rounded-xl shadow-xl border border-darkBorder flex flex-col overflow-hidden">
-            <div class="flex-shrink-0 flex flex-wrap border-b border-darkBorder shadow-sm">
-                <button type="button" class="char-tab-btn flex-grow px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm font-semibold text-darkTextSecondary hover:text-darkTextPrimary focus:outline-none active-char-tab transition-all duration-150" data-tab="char-info"><i class="fas fa-user-circle sm:mr-1.5"></i> <span class="hidden sm:inline">Informações</span><span class="sm:hidden xs:inline">Info</span></button>
-                <button type="button" class="char-tab-btn flex-grow px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm font-semibold text-darkTextSecondary hover:text-darkTextPrimary focus:outline-none transition-all duration-150" data-tab="char-inventory"><i class="fas fa-briefcase sm:mr-1.5"></i> <span class="hidden sm:inline">Inventário</span><span class="sm:hidden xs:inline">Inv.</span></button>
-                <button type="button" class="char-tab-btn flex-grow px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm font-semibold text-darkTextSecondary hover:text-darkTextPrimary focus:outline-none transition-all duration-150" data-tab="char-powers"><i class="fas fa-bolt sm:mr-1.5"></i> <span class="hidden sm:inline">Poderes</span><span class="sm:hidden xs:inline">Poder</span></button>
-                <button type="button" class="char-tab-btn flex-grow px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm font-semibold text-darkTextSecondary hover:text-darkTextPrimary focus:outline-none transition-all duration-150" data-tab="char-rituals"><i class="fas fa-book sm:mr-1.5"></i> <span class="hidden sm:inline">Rituais</span><span class="sm:hidden xs:inline">Rit.</span></button>
-            </div>
-
-            <div class="flex-grow overflow-y-auto p-3 sm:p-4 scrollable-column !h-[calc(100vh_-_3.5rem_-_(2_*_1rem)_-_3.25rem)]">
-                <div id="char-info" class="tab-content-char active">
-                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-darkTextPrimary">Detalhes do Personagem</h2>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div><label for="char-age" class="block text-sm font-medium text-darkTextSecondary mb-1">Idade</label><input type="text" id="char-age" name="info_age" value="<%= character.info.age %>" class="w-full text-sm"></div>
-                        <div><label for="char-appearance" class="block text-sm font-medium text-darkTextSecondary mb-1">Aparência</label><textarea id="char-appearance" name="info_appearanceDescription" rows="4" class="w-full text-sm min-h-[80px]"><%= character.info.appearanceDescription %></textarea></div>
-                        <div><label for="char-description" class="block text-sm font-medium text-darkTextSecondary mb-1">História / Personalidade</label><textarea id="char-description" name="info_description" rows="5" class="w-full text-sm min-h-[100px]"><%= character.info.description %></textarea></div>
-                        <div><label for="char-pessoal-items" class="block text-sm font-medium text-darkTextSecondary mb-1">Itens Pessoais</label><textarea id="char-pessoal-items" name="info_pessoalItems" rows="5" class="w-full text-sm min-h-[100px]"><%= character.info.pessoalItems %></textarea></div>
-                    </div>
-                </div>
-
-                <div id="char-inventory" class="tab-content-char">
-                    <div class="flex justify-between items-center mb-3 sm:mb-4">
-                        <h2 class="text-lg sm:text-xl font-semibold text-darkTextPrimary">Inventário</h2>
-                        <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-secondary text-white font-semibold py-2 px-3 sm:py-2 sm:px-4 rounded-md flex items-center shadow hover:shadow-lg transition-all duration-150" data-type="item">
-                            <i class="fas fa-plus sm:mr-1.5 text-xs"></i> <span class="hidden sm:inline">Adicionar Item</span><span class="sm:hidden">Item</span>
-                        </button>
-                    </div>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <h3 class="text-md sm:text-lg font-semibold text-primary mb-2 flex items-center"><i class="fas fa-box-open fa-fw mr-2"></i>Itens (<span class="item-count text-darkTextPrimary"><%= character.itens.length %></span>)</h3>
-                            <div id="character-items-list" class="grid grid-cols-1 xl:grid-cols-2 gap-2 sm:gap-2.5">
-                            <% if (character.itens.length > 0) { %>
-                                <% character.itens.forEach(item => { %>
-                                <div class="p-2.5 sm:p-3 bg-cardLight rounded-lg border border-darkBorder shadow" data-item-id="<%= item.id %>">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-grow mr-2">
-                                            <h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= item.name %> 
-                                                <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> <%= item.category %>, <span class="text-infoLabel">Esp:</span> <%= item.storage %>)</span>
-                                            </h4>
-                                            <p class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%= item.description %></p>
-                                        </div>
-                                        <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-300 transition-colors flex-shrink-0" data-item-id="<%= item.id %>" data-item-type="item">
-                                            <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <% }); %>
-                            <% } else { %>
-                                <p class="no-items-text text-sm text-darkTextSecondary italic col-span-full text-center py-3">Nenhum item no inventário.</p>
-                            <% } %>
-                            </div>
+            <!-- COLUNA DA ESQUERDA: PERÍCIAS -->
+            <div class="md:col-span-3 panel p-3 sm:p-4 scrollable-column">
+                <h2 class="section-title-lg"><i class="fas fa-tasks"></i>Perícias</h2>
+                <div class="space-y-2.5">
+                    <% const skillOrder = [
+                        "acrobacia", "adestramento", "artes", "atletismo", "atualidades", "ciencias", "crime", 
+                        "diplomacia", "enganacao", "fortitude", "furtividade", "iniciativa", "intimidacao", 
+                        "intuicao", "investigacao", "luta", "medicina", "ocultismo", "percepcao", "pilotagem", 
+                        "pontaria", "profissao", "reflexos", "religiao", "sobrevivencia", "tatica", "tecnologia", "vontade"
+                    ]; %>
+                    <% skillOrder.forEach(skillKey => { 
+                        const skillName = skillKey.charAt(0).toUpperCase() + skillKey.slice(1);
+                    %>
+                    <div class="list-item-card p-2.5 sm:p-3 flex justify-between items-center">
+                        <div class="flex items-center flex-grow">
+                            <button type="button" class="roll-skill-btn text-primary hover:text-primaryHover transition-colors mr-2 sm:mr-3 focus:outline-none p-1 rounded-full hover:bg-bgHover" data-skill-key="<%= skillKey %>" title="Rolar <%= skillName %>">
+                                <i class="fas fa-dice-d20 text-sm sm:text-md"></i>
+                            </button>
+                            <label class="text-xs sm:text-sm font-medium text-textBody cursor-default"><%= skillName %></label>
                         </div>
-                        <hr class="border-darkBorder my-4 sm:my-5">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-md sm:text-lg font-semibold text-primary flex items-center"><i class="fas fa-crosshairs fa-fw mr-2"></i>Armas (<span class="weapon-count text-darkTextPrimary"><%= character.armas.length %></span>)</h3>
-                             <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-secondary text-white font-semibold py-2 px-3 sm:py-2 sm:px-4 rounded-md flex items-center shadow hover:shadow-lg transition-all duration-150" data-type="arma">
-                                <i class="fas fa-plus sm:mr-1.5 text-xs"></i> <span class="hidden sm:inline">Adicionar Arma</span><span class="sm:hidden">Arma</span>
+                        <input type="number" min="0" max="25" step="5" name="skills_<%= skillKey %>" value="<%= characterSkills[skillKey] %>" class="w-14 sm:w-16 text-right compact-input !bg-bgSurface !border-borderLight focus:!border-primary">
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- COLUNA CENTRAL: ABAS DE INVENTÁRIO, PODERES, RITUAIS -->
+            <div class="md:col-span-6 panel flex flex-col overflow-hidden"> <!-- overflow-hidden for desktop panel fixed height -->
+                <div class="flex-shrink-0 flex space-x-1 border-b border-borderLight shadow-sm px-2 sm:px-3 pt-1 sm:pt-2">
+                    <button type="button" class="char-tab-btn flex-grow focus:outline-none active-char-tab" data-tab="char-inventory"><i class="fas fa-briefcase text-xs sm:text-sm sm:mr-1.5"></i> <span class="hidden sm:inline">Inventário</span><span class="sm:hidden xs:inline">Inv.</span></button>
+                    <button type="button" class="char-tab-btn flex-grow focus:outline-none" data-tab="char-powers"><i class="fas fa-bolt text-xs sm:text-sm sm:mr-1.5"></i> <span class="hidden sm:inline">Poderes</span><span class="sm:hidden xs:inline">Poder</span></button>
+                    <button type="button" class="char-tab-btn flex-grow focus:outline-none" data-tab="char-rituals"><i class="fas fa-book-sparkles text-xs sm:text-sm sm:mr-1.5"></i> <span class="hidden sm:inline">Rituais</span><span class="sm:hidden xs:inline">Rit.</span></button>
+                </div>
+
+                <div class="flex-grow p-3 sm:p-4 tab-content-scroll-area"> <!-- Apply tab-content-scroll-area here for desktop -->
+                    <div id="char-inventory" class="tab-content-char active">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg sm:text-xl font-semibold text-textDisplay">Inventário</h2>
+                            <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-primaryHover text-textOnPrimary font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-150" data-type="item">
+                                <i class="fas fa-plus mr-0 sm:mr-1.5 text-xs"></i> <span class="hidden sm:inline">Adicionar Item</span><span class="sm:hidden">Item</span>
                             </button>
                         </div>
-                         <div id="character-weapons-list" class="grid grid-cols-1 xl:grid-cols-2 gap-2 sm:gap-2.5">
-                            <% if (character.armas.length > 0) { %>
-                                <% character.armas.forEach(weapon => { %>
-                                <div class="p-2.5 sm:p-3 bg-cardLight rounded-lg border border-darkBorder shadow" data-item-id="<%= weapon.id %>">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-grow mr-2">
-                                            <h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= weapon.name %></h4>
-                                            <p class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24"><%= weapon.description %></p>
-                                            <p class="text-xs mt-1 leading-relaxed">
-                                                <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= humanizeWeaponType(weapon.weaponType) %></span>, 
-                                                <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= humanizeGrip(weapon.grip) %></span>, 
-                                                <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= humanizeProficiency(weapon.proficiency) %></span><br>
-                                                <span class="text-infoLabel">Dano:</span> <span class="text-infoValue"><%= weapon.damageDice || '-' %></span>, 
-                                                <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue"><%= formatCritical(weapon.criticalChance, weapon.criticalMultiplier) %></span><br>
-                                                <span class="text-infoLabel">Esp:</span> <span class="text-infoValue"><%= weapon.storage %></span>, 
-                                                <span class="text-infoLabel">Cat:</span> <span class="text-infoValue"><%= weapon.category %></span>
-                                            </p>
+                        <div class="space-y-3">
+                            <div>
+                                <h3 class="text-md sm:text-lg font-semibold text-primary mb-2.5 flex items-center"><i class="fas fa-box-open fa-fw mr-2"></i>Itens (<span class="item-count text-textDisplay"><%= character.itens.length %></span>)</h3>
+                                <div id="character-items-list" class="space-y-2.5">
+                                <% if (character.itens.length > 0) { %>
+                                    <% character.itens.forEach(item => { %>
+                                    <div class="list-item-card" data-item-id="<%= item.id %>">
+                                        <div class="collapsible-trigger">
+                                            <div class="flex-grow mr-2">
+                                                <h4 class="font-semibold text-sm sm:text-base text-textDisplay"><%= item.name %> 
+                                                    <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> <%= item.category %>, <span class="text-infoLabel">Esp:</span> <%= item.storage %>)</span>
+                                                </h4>
+                                            </div>
+                                            <i class="fas fa-chevron-down chevron-icon text-textMuted text-xs"></i>
                                         </div>
-                                        <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-300 transition-colors flex-shrink-0" data-item-id="<%= weapon.id %>" data-item-type="arma">
-                                            <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
-                                        </button>
+                                        <div class="collapsible-content">
+                                            <div class="description-block"><%= item.description %></div>
+                                            <button type="button" class="delete-item-btn p-1.5 text-danger hover:text-red-300 transition-colors flex-shrink-0 rounded-md hover:bg-bgHover ml-auto block" data-item-id="<%= item.id %>" data-item-type="item" title="Remover Item">
+                                                <i class="fas fa-trash-alt text-sm"></i>
+                                            </button>
+                                        </div>
                                     </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p class="no-items-text text-sm text-textMuted italic text-center py-4">Nenhum item no inventário.</p>
+                                <% } %>
                                 </div>
-                                <% }); %>
-                            <% } else { %>
-                                <p class="no-weapons-text text-sm text-darkTextSecondary italic col-span-full text-center py-3">Nenhuma arma equipada.</p>
-                            <% } %>
+                            </div>
+                            <hr class="border-borderLight my-4">
+                            <div class="flex justify-between items-center mb-2.5">
+                                <h3 class="text-md sm:text-lg font-semibold text-primary flex items-center"><i class="fas fa-crosshairs fa-fw mr-2"></i>Armas (<span class="weapon-count text-textDisplay"><%= character.armas.length %></span>)</h3>
+                                <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-primaryHover text-textOnPrimary font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all" data-type="arma">
+                                    <i class="fas fa-plus mr-0 sm:mr-1.5 text-xs"></i> <span class="hidden sm:inline">Adicionar Arma</span><span class="sm:hidden">Arma</span>
+                                </button>
+                            </div>
+                            <div id="character-weapons-list" class="space-y-2.5">
+                                <% if (character.armas.length > 0) { %>
+                                    <% character.armas.forEach(weapon => { %>
+                                    <div class="list-item-card" data-item-id="<%= weapon.id %>">
+                                        <div class="collapsible-trigger">
+                                            <h4 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2"><%= weapon.name %></h4>
+                                            <i class="fas fa-chevron-down chevron-icon text-textMuted text-xs"></i>
+                                        </div>
+                                        <div class="collapsible-content">
+                                            <div class="description-block">
+                                                <p><%= weapon.description %></p>
+                                                <p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">
+                                                    <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue"><%= humanizeWeaponType(weapon.weaponType) %></span>, 
+                                                    <span class="text-infoLabel">Emp:</span> <span class="text-infoValue"><%= humanizeGrip(weapon.grip) %></span>, 
+                                                    <span class="text-infoLabel">Prof:</span> <span class="text-infoValue"><%= humanizeProficiency(weapon.proficiency) %></span><br>
+                                                    <span class="text-infoLabel">Dano:</span> <span class="text-infoValue"><%= weapon.damageDice || '-' %></span>, 
+                                                    <span class="text-infoLabel">Crítico:</span> <span class="text-infoValue"><%= formatCritical(weapon.criticalChance, weapon.criticalMultiplier) %></span><br>
+                                                    <span class="text-infoLabel">Esp:</span> <span class="text-infoValue"><%= weapon.storage %></span>, 
+                                                    <span class="text-infoLabel">Cat:</span> <span class="text-infoValue"><%= weapon.category %></span>
+                                                </p>
+                                            </div>
+                                            <button type="button" class="delete-item-btn p-1.5 text-danger hover:text-red-300 transition-colors flex-shrink-0 rounded-md hover:bg-bgHover ml-auto block" data-item-id="<%= weapon.id %>" data-item-type="arma" title="Remover Arma">
+                                                <i class="fas fa-trash-alt text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p class="no-weapons-text text-sm text-textMuted italic text-center py-4">Nenhuma arma equipada.</p>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="char-powers" class="tab-content-char">
-                    <div class="flex justify-between items-center mb-3 sm:mb-4">
-                        <h2 class="text-lg sm:text-xl font-semibold text-darkTextPrimary">Poderes & Habilidades (<span class="power-count"><%= character.poderes.length %></span>)</h2>
-                        <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-secondary text-white font-semibold py-2 px-3 sm:py-2 sm:px-4 rounded-md flex items-center shadow hover:shadow-lg transition-all duration-150" data-type="poder">
-                            <i class="fas fa-plus sm:mr-1.5 text-xs"></i><span class="hidden sm:inline"> Novo Poder</span><span class="sm:hidden">Poder</span>
-                        </button>
-                    </div>
-                    <div id="character-poderes-list" class="space-y-2 sm:space-y-2.5">
-                    <% if (character.poderes.length > 0) { %>
-                        <% character.poderes.forEach(poder => { %>
-                        <div class="p-2.5 sm:p-3 bg-cardLight rounded-lg border border-darkBorder shadow" data-item-id="<%= poder.id %>">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-grow mr-2">
-                                    <h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= poder.name %> 
+                    <div id="char-powers" class="tab-content-char">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg sm:text-xl font-semibold text-textDisplay">Poderes & Habilidades (<span class="power-count"><%= character.poderes.length %></span>)</h2>
+                            <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-primaryHover text-textOnPrimary font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg flex items-center shadow-md" data-type="poder">
+                                <i class="fas fa-plus mr-0 sm:mr-1.5 text-xs"></i><span class="hidden sm:inline"> Novo Poder</span><span class="sm:hidden">Poder</span>
+                            </button>
+                        </div>
+                        <div id="character-poderes-list" class="space-y-2.5">
+                        <% if (character.poderes.length > 0) { %>
+                            <% character.poderes.forEach(poder => { %>
+                            <div class="list-item-card" data-item-id="<%= poder.id %>">
+                                <div class="collapsible-trigger">
+                                    <h3 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2"><%= poder.name %> 
                                         <span class="text-xs text-infoValue font-normal"><%= poder.isHabilidade ? '(Habilidade)' : '(Poder)' %></span>
                                     </h3>
-                                    <div class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24 mt-0.5"><%- poder.description.replace(/\n/g, "<br>") %></div>
-                                    <% if(poder.fromClasse || poder.fromTrilha || poder.elemento) { %>
-                                    <p class="text-xs mt-1 leading-relaxed">
-                                        <% if(poder.fromClasse) { %><span class="text-infoLabel">Classe:</span> <span class="text-infoValue"><%= poder.fromClasse %>.</span> <% } %>
-                                        <% if(poder.fromTrilha) { %><span class="text-infoLabel">Trilha:</span> <span class="text-infoValue"><%= poder.fromTrilha %>.</span> <% } %>
-                                        <% if(poder.elemento) { %><span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= poder.elemento %>.</span> <% } %>
-                                    </p>
-                                    <% } %>
+                                    <i class="fas fa-chevron-down chevron-icon text-textMuted text-xs"></i>
                                 </div>
-                                <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-300 transition-colors flex-shrink-0" data-item-id="<%= poder.id %>" data-item-type="poder">
-                                    <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
-                                </button>
+                                <div class="collapsible-content">
+                                    <div class="description-block">
+                                        <%- poder.description.replace(/\n/g, "<br>") %>
+                                        <% if(poder.fromClasse || poder.fromTrilha || poder.elemento) { %>
+                                        <p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">
+                                            <% if(poder.fromClasse) { %><span class="text-infoLabel">Classe:</span> <span class="text-infoValue"><%= poder.fromClasse %>.</span> <% } %>
+                                            <% if(poder.fromTrilha) { %><span class="text-infoLabel">Trilha:</span> <span class="text-infoValue"><%= poder.fromTrilha %>.</span> <% } %>
+                                            <% if(poder.elemento) { %><span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= poder.elemento %>.</span> <% } %>
+                                        </p>
+                                        <% } %>
+                                    </div>
+                                    <button type="button" class="delete-item-btn p-1.5 text-danger hover:text-red-300 transition-colors flex-shrink-0 rounded-md hover:bg-bgHover ml-auto block" data-item-id="<%= poder.id %>" data-item-type="poder" title="Remover Poder">
+                                        <i class="fas fa-trash-alt text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="no-poderes-text text-sm text-textMuted italic text-center py-4">Nenhum poder ou habilidade.</p>
+                        <% } %>
                         </div>
-                        <% }); %>
-                    <% } else { %>
-                        <p class="no-poderes-text text-sm text-darkTextSecondary italic text-center py-3">Nenhum poder ou habilidade.</p>
-                    <% } %>
+                    </div>
+
+                    <div id="char-rituals" class="tab-content-char">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg sm:text-xl font-semibold text-textDisplay">Rituais Conhecidos (<span class="ritual-count"><%= character.rituais.length %></span>)</h2>
+                            <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-primaryHover text-textOnPrimary font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg flex items-center shadow-md" data-type="ritual">
+                                <i class="fas fa-plus mr-0 sm:mr-1.5 text-xs"></i><span class="hidden sm:inline"> Novo Ritual</span><span class="sm:hidden">Ritual</span>
+                            </button>
+                        </div>
+                        <div id="character-rituais-list" class="space-y-2.5">
+                        <% if (character.rituais.length > 0) { %>
+                            <% character.rituais.forEach(ritual => { %>
+                            <div class="list-item-card" data-item-id="<%= ritual.id %>">
+                                <div class="collapsible-trigger">
+                                    <h3 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2"><%= ritual.name %></h3>
+                                    <i class="fas fa-chevron-down chevron-icon text-textMuted text-xs"></i>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="description-block">
+                                        <%- ritual.description.replace(/\n/g, "<br>") %>
+                                        <p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">
+                                            <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue"><%= ritual.circle %></span>, 
+                                            <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= ritual.element %></span>, 
+                                            <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue"><%= ritual.range %></span>, 
+                                            <span class="text-infoLabel">Duração:</span> <span class="text-infoValue"><%= ritual.duration %></span>
+                                        </p>
+                                    </div>
+                                    <button type="button" class="delete-item-btn p-1.5 text-danger hover:text-red-300 transition-colors flex-shrink-0 rounded-md hover:bg-bgHover ml-auto block" data-item-id="<%= ritual.id %>" data-item-type="ritual" title="Remover Ritual">
+                                        <i class="fas fa-trash-alt text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="no-rituais-text text-sm text-textMuted italic text-center py-4">Nenhum ritual conhecido.</p>
+                        <% } %>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="char-rituals" class="tab-content-char">
-                     <div class="flex justify-between items-center mb-3 sm:mb-4">
-                        <h2 class="text-lg sm:text-xl font-semibold text-darkTextPrimary">Rituais Conhecidos (<span class="ritual-count"><%= character.rituais.length %></span>)</h2>
-                        <button type="button" class="open-modal-btn text-xs bg-primary hover:bg-secondary text-white font-semibold py-2 px-3 sm:py-2 sm:px-4 rounded-md flex items-center shadow hover:shadow-lg transition-all duration-150" data-type="ritual">
-                            <i class="fas fa-plus sm:mr-1.5 text-xs"></i><span class="hidden sm:inline"> Novo Ritual</span><span class="sm:hidden">Ritual</span>
-                        </button>
+            <!-- COLUNA DA DIREITA: INFO, ATRIBUTOS, STATUS, DETALHES -->
+            <div class="md:col-span-3 panel p-3 sm:p-4 scrollable-column">
+                <div class="flex flex-col items-center mb-5">
+                    <div class="portrait-image-container">
+                        <% if (character.info.portraitUrl) { %>
+                            <img src="<%= character.info.portraitUrl %>" alt="Retrato de <%= character.info.name %>">
+                        <% } else { %>
+                            <i class="fas fa-user-astronaut"></i>
+                        <% } %>
                     </div>
-                    <div id="character-rituais-list" class="space-y-2 sm:space-y-2.5">
-                     <% if (character.rituais.length > 0) { %>
-                        <% character.rituais.forEach(ritual => { %>
-                        <div class="p-2.5 sm:p-3 bg-cardLight rounded-lg border border-darkBorder shadow" data-item-id="<%= ritual.id %>">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-grow mr-2">
-                                    <h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary"><%= ritual.name %></h3>
-                                    <div class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24 mt-0.5"><%- ritual.description.replace(/\n/g, "<br>") %></div>
-                                    <p class="text-xs mt-1 leading-relaxed">
-                                        <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue"><%= ritual.circle %></span>, 
-                                        <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue"><%= ritual.element %></span>, 
-                                        <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue"><%= ritual.range %></span>, 
-                                        <span class="text-infoLabel">Duração:</span> <span class="text-infoValue"><%= ritual.duration %></span>
-                                    </p>
-                                </div>
-                                <button type="button" class="delete-item-btn p-1 text-danger hover:text-red-300 transition-colors flex-shrink-0" data-item-id="<%= ritual.id %>" data-item-type="ritual">
-                                    <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
-                                </button>
+                    <input type="text" name="info_name" value="<%= character.info.name %>" class="name-input p-0 text-center w-full mb-1 text-textDisplay placeholder-textMuted focus:ring-0 focus:border-primary">
+                    <div class="text-xs sm:text-sm text-textMuted text-center w-full mb-1">
+                        <select name="classe" id="character-classe" class="bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block appearance-none text-xs sm:text-sm text-center font-medium compact-input text-textBody">
+                            <% const classes = ["Combatente", "Especialista", "Ocultista", "Mundano"]; %>
+                            <% classes.forEach(cls => { %>
+                                <option value="<%= cls.toLowerCase() %>" <%= character.classe.toLowerCase() === cls.toLowerCase() ? 'selected' : '' %>><%= cls %></option>
+                            <% }); %>
+                        </select>
+                        <span class="mx-1 text-textMuted">•</span> <span class="font-medium text-textBody">NEX</span> 
+                        <input type="number" name="nex" id="character-nex" value="<%= character.nex %>" min="0" max="99" class="w-10 sm:w-12 text-center bg-transparent border-0 focus:ring-0 focus:border-primary p-0 m-0 inline-block text-xs sm:text-sm font-medium compact-input text-textBody">%
+                    </div>
+                    <div class="text-xs text-textMuted/70">ID: <%= character.id %></div>
+                </div>
+                
+                <h3 class="section-title-lg"><i class="fas fa-user-shield"></i>Atributos</h3>
+                <% const attributesData = { pre: "Presença", agi: "Agilidade", for: "Força", vig: "Vigor", int: "Intelecto" }; %>
+                <% const attrKeys = ["pre", "agi", "for", "vig", "int"]; %>
+                <div class="grid grid-cols-1 gap-2.5 sm:gap-3 mb-5">
+                    <% attrKeys.forEach(key => { %>
+                        <div class="bg-bgElement p-2.5 sm:p-3 rounded-lg border border-borderLight flex items-center justify-between">
+                            <label class="text-xs sm:text-sm font-medium text-textBody"><%= attributesData[key] %></label>
+                            <input type="number" min="0" name="attributes_<%= key %>" id="attr-<%= key %>" value="<%= character.attributes[key] %>" class="font-bold stat-input text-center !bg-bgSurface !border-borderLight focus:!border-primary">
+                        </div>
+                    <% }); %>
+                </div>
+                
+                <div class="space-y-3 sm:space-y-4 mb-5">
+                    <% const statusBars = [
+                        { label: "PV", icon: "fa-heart", color: "health", current: "pv", max: "maxPv", value: character.pv, maxValue: character.maxPv, maxColor: "healthMax" },
+                        { label: "PS", icon: "fa-brain", color: "sanity", current: "ps", max: "maxPs", value: character.ps, maxValue: character.maxPs, maxColor: "sanityMax" },
+                        { label: "PE", icon: "fa-bolt", color: "peColor", current: "pe", max: "maxPe", value: character.pe, maxValue: character.maxPe, maxColor: "peMax" }
+                    ]; %>
+                    <% statusBars.forEach(bar => { %>
+                    <div class="bg-bgElement p-3 rounded-lg border border-borderLight">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs sm:text-sm font-semibold text-textDisplay flex items-center"><i class="fas <%= bar.icon %> text-<%= bar.color %> mr-1.5 sm:mr-2"></i><%= bar.label %></span>
+                            <div class="flex items-center space-x-1 sm:space-x-1.5">
+                                <input type="number" name="<%= bar.current %>" id="character-<%= bar.current %>" value="<%= bar.value %>" class="stat-input text-<%= bar.color %>">
+                                <span class="text-textMuted text-md sm:text-lg font-medium">/</span>
+                                <input type="number" name="<%= bar.max %>" id="character-<%= bar.max %>" value="<%= bar.maxValue %>" class="stat-input text-<%= bar.maxColor %>">
                             </div>
                         </div>
-                        <% }); %>
-                    <% } else { %>
-                        <p class="no-rituais-text text-sm text-darkTextSecondary italic text-center py-3">Nenhum ritual conhecido.</p>
-                    <% } %>
                     </div>
+                    <% }); %>
+                </div>
+                <div class="flex items-center justify-center space-x-2 mt-2 mb-5">
+                    <input type="checkbox" id="autoCalcStats" name="autoCalcStats" class="form-checkbox text-primary focus:ring-offset-bgSurface" checked>
+                    <label for="autoCalcStats" class="text-xs text-textMuted cursor-pointer flex items-center"><i class="fas fa-calculator fa-fw mr-1 text-primary"></i>Calcular Máximos</label>
+                </div>
+
+                <h2 class="section-title-lg"><i class="fas fa-user-circle"></i>Detalhes</h2>
+                <div class="space-y-3 sm:space-y-4">
+                    <div><label for="char-age" class="block text-xs sm:text-sm font-medium text-textMuted mb-1">Idade</label><input type="text" id="char-age" name="info_age" value="<%= character.info.age %>" class="text-xs sm:text-sm placeholder-textMuted/70"></div>
+                    <div><label for="char-appearance" class="block text-xs sm:text-sm font-medium text-textMuted mb-1">Aparência</label><textarea id="char-appearance" name="info_appearanceDescription" rows="3" class="text-xs sm:text-sm min-h-[80px] sm:min-h-[100px] placeholder-textMuted/70"><%= character.info.appearanceDescription %></textarea></div>
+                    <div><label for="char-description" class="block text-xs sm:text-sm font-medium text-textMuted mb-1">História & Personalidade</label><textarea id="char-description" name="info_description" rows="4" class="text-xs sm:text-sm min-h-[100px] sm:min-h-[120px] placeholder-textMuted/70"><%= character.info.description %></textarea></div>
+                    <div><label for="char-pessoal-items" class="block text-xs sm:text-sm font-medium text-textMuted mb-1">Itens Pessoais</label><textarea id="char-pessoal-items" name="info_pessoalItems" rows="4" class="text-xs sm:text-sm min-h-[100px] sm:min-h-[120px] placeholder-textMuted/70"><%= character.info.pessoalItems %></textarea></div>
                 </div>
             </div>
         </div>
@@ -482,56 +535,43 @@
 </form>
 
 <div id="addItemModal" class="modal">
-    <div class="modal-content w-11/12 sm:w-5/6 md:w-2/3 lg:max-w-lg xl:max-w-xl p-4">
+    <div class="modal-content">
         <span class="modal-close-btn">×</span>
-        <h2 id="modal-title" class="text-xl sm:text-2xl font-semibold mb-4 sm:mb-5 text-darkTextPrimary">Adicionar</h2>
-        <div id="modal-search-bar" class="mb-3 sm:mb-4">
+        <h2 id="modal-title" class="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-textDisplay">Adicionar</h2>
+        <div id="modal-search-bar" class="mb-4">
             <div class="relative">
-                <input type="text" id="modal-search-input" placeholder="Buscar por nome..." class="w-full text-sm pl-10">
-                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-darkTextSecondary"></i>
+                <input type="text" id="modal-search-input" placeholder="Buscar por nome, descrição, categoria..." class="w-full text-sm pl-10 sm:pl-12 placeholder-textMuted/70">
+                 <i class="fas fa-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-textMuted text-sm"></i>
             </div>
         </div>
-        <div id="modal-item-list" class="space-y-2 max-h-60 sm:max-h-72 md:max-h-80 overflow-y-auto p-1 pr-1.5 text-sm sm:text-base">
+        <div id="modal-item-list" class="space-y-2 max-h-60 sm:max-h-72 md:max-h-80 overflow-y-auto p-0.5 pr-1 text-sm">
+            <!-- Conteúdo dinâmico aqui -->
         </div>
-        <div class="mt-4 sm:mt-5 flex justify-end space-x-2 sm:space-x-3">
-            <button type="button" id="modal-cancel-btn" class="px-3 py-2 sm:px-5 sm:py-2.5 text-sm bg-cardLight hover:bg-card text-white font-medium rounded-md shadow hover:shadow-md transition-all duration-150">Cancelar</button>
-            <button type="button" id="modal-add-selected-btn" class="px-3 py-2 sm:px-5 sm:py-2.5 text-sm bg-primary hover:bg-secondary text-white font-medium rounded-md shadow hover:shadow-md transition-all duration-150">Adicionar Selecionados</button>
+        <div class="mt-5 flex justify-end space-x-2 sm:space-x-3">
+            <button type="button" id="modal-cancel-btn" class="px-4 py-2 text-xs sm:text-sm bg-bgElement hover:bg-bgHover text-textBody font-medium rounded-lg shadow-sm">Cancelar</button>
+            <button type="button" id="modal-add-selected-btn" class="px-4 py-2 text-xs sm:text-sm bg-primary hover:bg-primaryHover text-textOnPrimary font-medium rounded-lg shadow-sm">Adicionar</button>
         </div>
     </div>
 </div>
 
-<!-- Notyf JS -->
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script>
     // Initialize Notyf
     const notyf = new Notyf({
         duration: 4000,
-        position: { x: 'right', y: 'top' },
+        position: { x: 'right', y: 'bottom' },
         types: [
-            { type: 'success', backgroundColor: '#10b981', icon: { className: 'fas fa-check-circle', tagName: 'i', color: 'white'} },
-            { type: 'error', backgroundColor: '#ef4444', icon: { className: 'fas fa-times-circle', tagName: 'i', color: 'white'} },
-            { type: 'info', backgroundColor: '#3b82f6', icon: { className: 'fas fa-info-circle', tagName: 'i', color: 'white'} }
+            { type: 'success', backgroundColor: tailwind.config.theme.extend.colors.success, icon: { className: 'fas fa-check-circle', tagName: 'i', color: 'white'} },
+            { type: 'error', backgroundColor: tailwind.config.theme.extend.colors.danger, icon: { className: 'fas fa-times-circle', tagName: 'i', color: 'white'} },
+            { type: 'info', backgroundColor: tailwind.config.theme.extend.colors.primary, icon: { className: 'fas fa-info-circle', tagName: 'i', color: 'white'} }
         ],
         dismissible: true
     });
 
-    function humanizeWeaponType(type) {
-        const map = { "corpo_a_corpo": "Corpo-a-Corpo", "arremessavel": "Arremessável", "ranged": "À Distância", "fire": "Arma de Fogo" };
-        return map[type] || type;
-    }
-    function humanizeGrip(grip) {
-        const map = { "leve": "Leve", "uma_mao": "Uma Mão", "duas_maos": "Duas Mãos" };
-        return map[grip] || grip;
-    }
-    function humanizeProficiency(proficiency) {
-        const map = { "simples": "Simples", "tatica": "Tática", "pesada": "Pesada" };
-        return map[proficiency] || proficiency;
-    }
-    function formatCritical(chance, multiplier) {
-        if (chance && multiplier) return `${chance}/${multiplier}x`;
-        if (multiplier) return `${multiplier}x`;
-        return "-";
-    }
+    function humanizeWeaponType(type) { const map = { "corpo_a_corpo": "Corpo-a-Corpo", "arremessavel": "Arremessável", "ranged": "À Distância", "fire": "Arma de Fogo" }; return map[type] || type; }
+    function humanizeGrip(grip) { const map = { "leve": "Leve", "uma_mao": "Uma Mão", "duas_maos": "Duas Mãos" }; return map[grip] || grip; }
+    function humanizeProficiency(proficiency) { const map = { "simples": "Simples", "tatica": "Tática", "pesada": "Pesada" }; return map[proficiency] || proficiency; }
+    function formatCritical(chance, multiplier) { if (chance && multiplier) return `${chance}/${multiplier}x`; if (multiplier) return `${multiplier}x`; return "-"; }
 
     const allPoderes = <%- JSON.stringify(allPoderes || []) %>;
     const allRituais = <%- JSON.stringify(allRituais || []) %>;
@@ -540,20 +580,85 @@
     const characterId = <%= character.id %>;
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Tab functionality
         const charTabButtons = document.querySelectorAll('.char-tab-btn');
         const tabContents = document.querySelectorAll('.tab-content-char');
         
         charTabButtons.forEach(button => {
             button.addEventListener('click', () => {
+                const targetTabId = button.getAttribute('data-tab');
+                
                 charTabButtons.forEach(btn => btn.classList.remove('active-char-tab'));
                 button.classList.add('active-char-tab');
-                tabContents.forEach(tab => tab.classList.remove('active'));
-                const tabContentElement = document.getElementById(button.getAttribute('data-tab'));
-                if (tabContentElement) {
-                    tabContentElement.classList.add('active');
-                }
+                
+                tabContents.forEach(tab => {
+                    if (tab.id === targetTabId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
             });
         });
+        // Ensure initial active tab is set (if any has .active-char-tab already)
+        const activeTabButton = document.querySelector('.char-tab-btn.active-char-tab');
+        if (activeTabButton) {
+            const activeTabContentId = activeTabButton.getAttribute('data-tab');
+            const activeTabContent = document.getElementById(activeTabContentId);
+            if (activeTabContent) {
+                 tabContents.forEach(tab => tab.classList.remove('active')); // Clear others
+                 activeTabContent.classList.add('active');
+            }
+        }
+
+
+        // Collapsible item functionality
+        function toggleCollapsible(triggerElement) {
+            const content = triggerElement.nextElementSibling;
+            const card = triggerElement.closest('.list-item-card');
+            const icon = triggerElement.querySelector('.chevron-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.style.maxHeight = null;
+                content.classList.remove('expanded');
+                if(card) card.classList.remove('expanded-item');
+                if(icon) {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            } else {
+                content.style.maxHeight = 'none'; 
+                const scrollHeight = content.scrollHeight;
+                content.style.maxHeight = null; 
+                
+                requestAnimationFrame(() => {
+                    content.style.maxHeight = scrollHeight + 'px';
+                    content.classList.add('expanded');
+                    if(card) card.classList.add('expanded-item');
+                    if(icon) {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            }
+        }
+
+        function setupCollapsibles(containerSelector) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            container.addEventListener('click', function(event) {
+                const trigger = event.target.closest('.collapsible-trigger');
+                if (trigger) {
+                    toggleCollapsible(trigger);
+                }
+            });
+        }
+        
+        ['#character-items-list', '#character-weapons-list', '#character-poderes-list', '#character-rituais-list'].forEach(selector => {
+            setupCollapsibles(selector);
+        });
+
 
         const modal = document.getElementById('addItemModal');
         const modalTitle = document.getElementById('modal-title');
@@ -566,42 +671,22 @@
         let currentModalType = ''; 
         let currentFullList = [];
 
-        function openModal(type) {
+        function openModal(type) { 
             currentModalType = type;
             modalItemList.innerHTML = ''; 
             modalSearchInput.value = ''; 
             let dataList;
             let titlePrefix = "Adicionar ";
-            let iconClass = "fas fa-question-circle";
+            let iconClass = "fas fa-question-circle"; 
 
             switch (type) {
-                case 'poder': 
-                    dataList = allPoderes; 
-                    titlePrefix += "Poder ou Habilidade"; 
-                    currentFullList = allPoderes;
-                    iconClass = "fas fa-bolt";
-                    break;
-                case 'ritual': 
-                    dataList = allRituais; 
-                    titlePrefix += "Ritual"; 
-                    currentFullList = allRituais; 
-                    iconClass = "fas fa-book-sparkles";
-                    break;
-                case 'item': 
-                    dataList = allItems; 
-                    titlePrefix += "Item ao Inventário"; 
-                    currentFullList = allItems; 
-                    iconClass = "fas fa-box-open";
-                    break;
-                case 'arma': 
-                    dataList = allArmas; 
-                    titlePrefix += "Arma ao Inventário"; 
-                    currentFullList = allArmas; 
-                    iconClass = "fas fa-crosshairs";
-                    break;
+                case 'poder': dataList = allPoderes; titlePrefix += "Poder ou Habilidade"; currentFullList = allPoderes; iconClass = "fas fa-bolt"; break;
+                case 'ritual': dataList = allRituais; titlePrefix += "Ritual"; currentFullList = allRituais; iconClass = "fas fa-book-sparkles"; break;
+                case 'item': dataList = allItems; titlePrefix += "Item ao Inventário"; currentFullList = allItems; iconClass = "fas fa-box-open"; break;
+                case 'arma': dataList = allArmas; titlePrefix += "Arma ao Inventário"; currentFullList = allArmas; iconClass = "fas fa-crosshairs"; break;
                 default: return;
             }
-            modalTitle.innerHTML = `<i class="${iconClass} text-primary mr-2"></i>${titlePrefix}`;
+            modalTitle.innerHTML = `<i class="${iconClass} text-primary mr-2"></i>${titlePrefix}`; // Adjusted mr
             populateModalList(dataList);
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -613,23 +698,23 @@
             const filteredItems = items.filter(item => !characterOwnedIds.has(String(item.id)));
 
             if (filteredItems.length === 0) {
-                 modalItemList.innerHTML = `<p class="text-darkTextSecondary italic text-center py-4 text-sm">Nenhum ${currentModalType} novo disponível ou todos já foram adicionados.</p>`;
+                 modalItemList.innerHTML = `<p class="text-textMuted italic text-center py-4 text-xs sm:text-sm">Nenhum ${currentModalType === 'poder' ? 'poder/habilidade' : currentModalType} novo disponível ou todos já foram adicionados.</p>`;
                  return;
             }
 
             filteredItems.forEach(item => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center p-2.5 sm:p-3 bg-cardLight hover:bg-darkBorder rounded-md cursor-pointer transition-colors duration-150 shadow-sm';
+                label.className = 'flex items-center p-2.5 bg-bgElement hover:bg-bgHover rounded-lg cursor-pointer transition-colors duration-150 shadow-sm';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.className = 'form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-primary rounded mr-2.5 sm:mr-3 focus:ring-primary focus:ring-offset-0 focus:ring-offset-cardLight';
+                checkbox.className = 'form-checkbox h-4 w-4 mr-2.5 sm:mr-3 focus:ring-primary focus:ring-offset-0 focus:ring-offset-bgElement';
                 checkbox.dataset.itemId = item.id;
                 checkbox.dataset.itemName = item.name;
                 checkbox.dataset.itemData = JSON.stringify(item);
 
                 const nameSpan = document.createElement('span');
-                nameSpan.className = 'text-darkTextPrimary font-medium text-sm sm:text-base flex-grow';
+                nameSpan.className = 'text-textBody font-medium text-xs sm:text-sm flex-grow';
                 nameSpan.textContent = item.name;
 
                 let details = '';
@@ -642,7 +727,7 @@
                 }
                 
                 const detailSpan = document.createElement('span');
-                detailSpan.className = 'ml-auto text-xs text-darkTextSecondary whitespace-nowrap';
+                detailSpan.className = 'ml-auto text-xs text-textMuted whitespace-nowrap pl-1.5 sm:pl-2';
                 detailSpan.textContent = details;
 
                 label.appendChild(checkbox);
@@ -663,7 +748,7 @@
             if (listElementId) {
                 const listContainer = document.getElementById(listElementId);
                 if (listContainer) { 
-                    listContainer.querySelectorAll(':scope > div[data-item-id]').forEach(el => {
+                    listContainer.querySelectorAll(':scope > .list-item-card[data-item-id]').forEach(el => {
                         ids.add(el.dataset.itemId);
                     });
                 }
@@ -671,10 +756,34 @@
             return ids;
         }
 
-
         modalSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const filtered = currentFullList.filter(item => item.name.toLowerCase().includes(searchTerm));
+            const filtered = currentFullList.filter(item => {
+                if (item.name.toLowerCase().includes(searchTerm)) return true;
+                if (item.description && typeof item.description === 'string' && item.description.toLowerCase().includes(searchTerm)) return true;
+
+                if (currentModalType === 'item') {
+                    if (String(item.category).includes(searchTerm)) return true;
+                    if (String(item.storage).includes(searchTerm)) return true;
+                } else if (currentModalType === 'arma') {
+                    if (String(item.category).includes(searchTerm)) return true;
+                    if (String(item.storage).includes(searchTerm)) return true;
+                    if (item.weaponType && humanizeWeaponType(item.weaponType).toLowerCase().includes(searchTerm)) return true;
+                    if (item.grip && humanizeGrip(item.grip).toLowerCase().includes(searchTerm)) return true;
+                    if (item.proficiency && humanizeProficiency(item.proficiency).toLowerCase().includes(searchTerm)) return true;
+                    if (item.damageDice && item.damageDice.toLowerCase().includes(searchTerm)) return true;
+                } else if (currentModalType === 'poder') {
+                    if (item.fromClasse && item.fromClasse.toLowerCase().includes(searchTerm)) return true;
+                    if (item.fromTrilha && item.fromTrilha.toLowerCase().includes(searchTerm)) return true;
+                    if (item.elemento && item.elemento.toLowerCase().includes(searchTerm)) return true;
+                } else if (currentModalType === 'ritual') {
+                    if (String(item.circle).includes(searchTerm)) return true;
+                    if (item.element && item.element.toLowerCase().includes(searchTerm)) return true;
+                    if (item.range && item.range.toLowerCase().includes(searchTerm)) return true;
+                    if (item.duration && item.duration.toLowerCase().includes(searchTerm)) return true;
+                }
+                return false; 
+            });
             populateModalList(filtered);
         });
 
@@ -689,34 +798,24 @@
         modalCloseBtn.onclick = closeModal;
         modalCancelBtn.onclick = closeModal;
         window.onclick = function(event) { if (event.target == modal) closeModal(); }
-        document.addEventListener('keydown', function(event) {
-            if (event.key === "Escape" && modal.style.display === 'block') {
-                closeModal();
-            }
-        });
-
+        document.addEventListener('keydown', function(event) { if (event.key === "Escape" && modal.style.display === 'block') closeModal(); });
 
         modalAddSelectedBtn.addEventListener('click', () => {
             const selectedCheckboxes = modalItemList.querySelectorAll('input[type="checkbox"]:checked');
-            let listContainerId, noItemsTextClass, countClass, noItemsMessage;
+            let listContainerId, noItemsTextClass, countClass;
             const itemType = currentModalType;
 
             switch (itemType) {
-                case 'poder': listContainerId = 'character-poderes-list'; noItemsTextClass = 'no-poderes-text'; countClass = 'power-count'; noItemsMessage = 'Nenhum poder ou habilidade.'; break;
-                case 'ritual': listContainerId = 'character-rituais-list'; noItemsTextClass = 'no-rituais-text'; countClass = 'ritual-count'; noItemsMessage = 'Nenhum ritual conhecido.'; break;
-                case 'item': listContainerId = 'character-items-list'; noItemsTextClass = 'no-items-text'; countClass = 'item-count'; noItemsMessage = 'Nenhum item no inventário.'; break;
-                case 'arma': listContainerId = 'character-weapons-list'; noItemsTextClass = 'no-weapons-text'; countClass = 'weapon-count'; noItemsMessage = 'Nenhuma arma equipada.'; break;
+                case 'poder': listContainerId = 'character-poderes-list'; noItemsTextClass = 'no-poderes-text'; countClass = 'power-count'; break;
+                case 'ritual': listContainerId = 'character-rituais-list'; noItemsTextClass = 'no-rituais-text'; countClass = 'ritual-count'; break;
+                case 'item': listContainerId = 'character-items-list'; noItemsTextClass = 'no-items-text'; countClass = 'item-count'; break;
+                case 'arma': listContainerId = 'character-weapons-list'; noItemsTextClass = 'no-weapons-text'; countClass = 'weapon-count'; break;
                 default: return;
             }
             const listContainer = document.getElementById(listContainerId);
             const countSpan = document.querySelector(`.${countClass}`); 
-
-            if(!listContainer) {
-                console.error("List container not found for type: ", itemType, "with ID:", listContainerId);
-                return;
-            }
+            if(!listContainer) { console.error("List container not found for type: ", itemType); return; }
             const noItemsText = listContainer.querySelector(`.${noItemsTextClass}`);
-
 
             selectedCheckboxes.forEach(checkbox => {
                 const itemId = checkbox.dataset.itemId;
@@ -731,46 +830,58 @@
 
                 if (noItemsText) noItemsText.remove();
 
-                const newItemDiv = document.createElement('div');
-                newItemDiv.className = 'p-2.5 sm:p-3 bg-cardLight rounded-lg border border-darkBorder shadow'; 
-                newItemDiv.dataset.itemId = itemId;
-                newItemDiv.dataset.isNew = "true"; 
+                const newItemCard = document.createElement('div');
+                newItemCard.className = 'list-item-card';
+                newItemCard.dataset.itemId = itemId;
+                newItemCard.dataset.isNew = "true";
 
-                const flexContainer = document.createElement('div');
-                flexContainer.className = 'flex justify-between items-start';
+                const triggerDiv = document.createElement('div');
+                triggerDiv.className = 'collapsible-trigger';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'collapsible-content';
 
-                const contentWrapper = document.createElement('div');
-                contentWrapper.className = 'flex-grow mr-2';
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'delete-item-btn p-1.5 text-danger hover:text-red-300 transition-colors flex-shrink-0 rounded-md hover:bg-bgHover ml-auto block';
+                deleteButton.dataset.itemId = itemId;
+                deleteButton.dataset.itemType = itemType;
+                deleteButton.title = `Remover ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`;
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt text-sm"></i>';
 
-                let contentHTML = '';
+                let triggerHTML = '';
+                let contentHTMLInner = '<div class="description-block">';
+
                 if (itemType === 'poder') {
-                    contentHTML = `<h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName} <span class="text-xs text-infoValue font-normal">${itemData.isHabilidade ? '(Habilidade)' : '(Poder)'}</span></h3>`;
-                    contentHTML += `<div class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24 mt-0.5">${itemData.description.replace(/\n/g, "<br>")}</div>`;
+                    triggerHTML = `<h3 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2">${itemName} <span class="text-xs text-infoValue font-normal">${itemData.isHabilidade ? '(Habilidade)' : '(Poder)'}</span></h3>`;
+                    contentHTMLInner += `${itemData.description.replace(/\n/g, "<br>")}`;
                     if(itemData.fromClasse || itemData.fromTrilha || itemData.elemento) {
-                         contentHTML += `<p class="text-xs mt-1 leading-relaxed">`;
-                         if(itemData.fromClasse) contentHTML += `<span class="text-infoLabel">Classe:</span> <span class="text-infoValue">${itemData.fromClasse}.</span> `;
-                         if(itemData.fromTrilha) contentHTML += `<span class="text-infoLabel">Trilha:</span> <span class="text-infoValue">${itemData.fromTrilha}.</span> `;
-                         if(itemData.elemento) contentHTML += `<span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.elemento}.</span> `;
-                         contentHTML += `</p>`;
+                         contentHTMLInner += `<p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">`;
+                         if(itemData.fromClasse) contentHTMLInner += `<span class="text-infoLabel">Classe:</span> <span class="text-infoValue">${itemData.fromClasse}.</span> `;
+                         if(itemData.fromTrilha) contentHTMLInner += `<span class="text-infoLabel">Trilha:</span> <span class="text-infoValue">${itemData.fromTrilha}.</span> `;
+                         if(itemData.elemento) contentHTMLInner += `<span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.elemento}.</span> `;
+                         contentHTMLInner += `</p>`;
                     }
                 } else if (itemType === 'ritual') {
-                    contentHTML = `<h3 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName}</h3>`;
-                    contentHTML += `<div class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24 mt-0.5">${itemData.description.replace(/\n/g, "<br>")}</div>`;
-                    contentHTML += `<p class="text-xs mt-1 leading-relaxed">
+                    triggerHTML = `<h3 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2">${itemName}</h3>`;
+                    contentHTMLInner += `${itemData.description.replace(/\n/g, "<br>")}`;
+                    contentHTMLInner += `<p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">
                         <span class="text-infoLabel">Círculo:</span> <span class="text-infoValue">${itemData.circle}</span>, 
                         <span class="text-infoLabel">Elemento:</span> <span class="text-infoValue">${itemData.element}</span>, 
                         <span class="text-infoLabel">Alcance:</span> <span class="text-infoValue">${itemData.range}</span>, 
                         <span class="text-infoLabel">Duração:</span> <span class="text-infoValue">${itemData.duration}</span>
                     </p>`;
                 } else if (itemType === 'item') {
-                    contentHTML = `<h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName} 
-                        <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> ${itemData.category}, <span class="text-infoLabel">Esp:</span> ${itemData.storage})</span>
-                        </h4>
-                        <p class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description}</p>`;
+                    triggerHTML = `<div class="flex-grow mr-2">
+                                        <h4 class="font-semibold text-sm sm:text-base text-textDisplay">${itemName} 
+                                            <span class="text-xs text-infoValue">(<span class="text-infoLabel">Cat:</span> ${itemData.category}, <span class="text-infoLabel">Esp:</span> ${itemData.storage})</span>
+                                        </h4>
+                                    </div>`;
+                    contentHTMLInner += `${itemData.description}`;
                 } else if (itemType === 'arma') {
-                     contentHTML = `<h4 class="font-semibold text-sm sm:text-base text-darkTextPrimary">${itemName}</h4>`;
-                     contentHTML += `<p class="text-xs sm:text-sm text-darkTextSecondary description-text max-h-16 sm:max-h-20 md:max-h-24">${itemData.description || '-'}</p>`;
-                     contentHTML += `<p class="text-xs mt-1 leading-relaxed">
+                     triggerHTML = `<h4 class="font-semibold text-sm sm:text-base text-textDisplay flex-grow mr-2">${itemName}</h4>`;
+                     contentHTMLInner += `<p>${itemData.description || '-'}</p>`;
+                     contentHTMLInner += `<p class="text-xs mt-1.5 sm:mt-2 leading-relaxed">
                         <span class="text-infoLabel">Tipo:</span> <span class="text-infoValue">${humanizeWeaponType(itemData.weaponType)}</span>, 
                         <span class="text-infoLabel">Emp:</span> <span class="text-infoValue">${humanizeGrip(itemData.grip)}</span>, 
                         <span class="text-infoLabel">Prof:</span> <span class="text-infoValue">${humanizeProficiency(itemData.proficiency)}</span><br>
@@ -780,19 +891,15 @@
                         <span class="text-infoLabel">Cat:</span> <span class="text-infoValue">${itemData.category}</span>
                     </p>`;
                 }
-                contentWrapper.innerHTML = contentHTML;
+                contentHTMLInner += '</div>'; // Close description-block
 
-                const deleteButton = document.createElement('button');
-                deleteButton.type = 'button';
-                deleteButton.className = 'delete-item-btn p-1 text-danger hover:text-red-300 transition-colors flex-shrink-0';
-                deleteButton.dataset.itemId = itemId;
-                deleteButton.dataset.itemType = itemType;
-                deleteButton.innerHTML = '<i class="fas fa-trash-alt text-xs sm:text-sm"></i>';
+                triggerDiv.innerHTML = triggerHTML + '<i class="fas fa-chevron-down chevron-icon text-textMuted text-xs"></i>';
+                contentDiv.innerHTML = contentHTMLInner;
+                contentDiv.appendChild(deleteButton); 
 
-                flexContainer.appendChild(contentWrapper);
-                flexContainer.appendChild(deleteButton);
-                newItemDiv.appendChild(flexContainer);
-                listContainer.appendChild(newItemDiv);
+                newItemCard.appendChild(triggerDiv);
+                newItemCard.appendChild(contentDiv);
+                listContainer.appendChild(newItemCard);
                 
                 if (countSpan) countSpan.textContent = parseInt(countSpan.textContent) + 1;
             });
@@ -802,14 +909,14 @@
         function handleDeleteItem(event) {
             const deleteButton = event.target.closest('.delete-item-btn');
             if (!deleteButton) return;
-            const itemDiv = deleteButton.closest('div[data-item-id]');
-            if (!itemDiv) return;
+            const itemCard = deleteButton.closest('.list-item-card[data-item-id]');
+            if (!itemCard) return;
 
             const itemId = deleteButton.dataset.itemId;
             const itemType = deleteButton.dataset.itemType;
-            const isNew = itemDiv.dataset.isNew === "true";
-            const listContainer = itemDiv.parentElement; 
-            itemDiv.remove(); 
+            const isNew = itemCard.dataset.isNew === "true";
+            const listContainer = itemCard.parentElement; 
+            itemCard.remove(); 
 
             if (isNew) {
                 const hiddenInputToRemove = newlyAddedItemsContainer.querySelector(`input[name="new_${itemType}_ids[]"][value="${itemId}"]`);
@@ -828,7 +935,7 @@
                 case 'ritual': countClass = 'ritual-count'; noItemsTextClass = 'no-rituais-text'; noItemsMessage = 'Nenhum ritual conhecido.'; break;
                 case 'item': countClass = 'item-count'; noItemsTextClass = 'no-items-text'; noItemsMessage = 'Nenhum item no inventário.'; break;
                 case 'arma': countClass = 'weapon-count'; noItemsTextClass = 'no-weapons-text'; noItemsMessage = 'Nenhuma arma equipada.'; break;
-                default: console.warn("Unknown item type for deletion:", itemType); return;
+                default: return;
             }
 
             const countSpan = document.querySelector(`.${countClass}`); 
@@ -839,62 +946,37 @@
             
             if (listContainer && listContainer.children.length === 0 && noItemsTextClass && noItemsMessage) {
                 const p = document.createElement('p');
-                p.className = `${noItemsTextClass} text-sm text-darkTextSecondary italic text-center py-3`;
-                if (listContainer.id === 'character-items-list' || listContainer.id === 'character-weapons-list') {
-                     p.classList.add('col-span-full');
-                }
+                p.className = `${noItemsTextClass} text-sm text-textMuted italic text-center py-4`;
                 p.textContent = noItemsMessage;
                 listContainer.appendChild(p);
             }
         }
         
-        const rightColumnTabContent = document.querySelector('.md\\:col-span-5 .flex-grow.overflow-y-auto');
-        if (rightColumnTabContent) {
-            rightColumnTabContent.addEventListener('click', handleDeleteItem);
+        const centerPanelTabContentContainer = document.querySelector('.md\\:col-span-6 .tab-content-scroll-area');
+        if (centerPanelTabContentContainer) {
+            centerPanelTabContentContainer.addEventListener('click', handleDeleteItem);
         }
 
-        // START: Skill Roll Functionality
+        // Skill Roll Functionality
         document.querySelectorAll('.roll-skill-btn').forEach(button => {
             button.addEventListener('click', async (event) => {
                 const skillKey = button.dataset.skillKey;
-                const skillName = button.closest('.skill-item').querySelector('label').textContent;
-                if (!skillKey) {
-                    console.error('Skill key not found for roll button.');
-                    notyf.error('Erro: Chave da perícia não encontrada.');
-                    return;
-                }
-
+                const skillLabel = button.closest('.list-item-card').querySelector('label');
+                const skillName = skillLabel ? skillLabel.textContent : 'Perícia Desconhecida';
+                if (!skillKey) { notyf.error('Erro: Chave da perícia não encontrada.'); return; }
                 const url = `/character/${characterId}/roll/${skillKey}`;
                 const iconElement = button.querySelector('i');
-
                 try {
                     button.disabled = true;
-                    iconElement.classList.remove('fa-dice-d20');
-                    iconElement.classList.add('fa-spinner', 'fa-spin');
-
+                    iconElement.classList.remove('fa-dice-d20'); iconElement.classList.add('fa-spinner', 'fa-spin');
                     const response = await fetch(url); 
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Servidor: ${response.status} ${response.statusText}. ${errorText}`);
-                    }
+                    if (!response.ok) { const errorText = await response.text(); throw new Error(`Servidor: ${response.status} ${response.statusText}. ${errorText || ''}`); }
                     const result = await response.json(); 
-                    
-                    notyf.success({
-                        message: `<strong>${skillName}: ${result.value}</strong><br>${result.stringValue}`,
-                        icon: { className: 'fas fa-dice-d20', tagName: 'i', color: 'white'} // Custom icon for roll
-                    });
-
-                } catch (error) {
-                    console.error(`Falha ao executar a rolagem de ${skillName}:`, error);
-                    notyf.error(`Erro ao rolar ${skillName}: ${error.message}`);
-                } finally {
-                    button.disabled = false;
-                    iconElement.classList.add('fa-dice-d20');
-                    iconElement.classList.remove('fa-spinner', 'fa-spin');
-                }
+                    notyf.success({ message: `<strong>${skillName}: ${result.value}</strong><br><span class="text-xs">${result.stringValue}</span>`, icon: { className: 'fas fa-dice-d20', tagName: 'i', color: 'white'} });
+                } catch (error) { console.error(`Falha ao rolar ${skillName}:`, error); notyf.error(`Erro ao rolar ${skillName}: ${error.message}`);
+                } finally { button.disabled = false; iconElement.classList.add('fa-dice-d20'); iconElement.classList.remove('fa-spinner', 'fa-spin'); }
             });
         });
-        // END: Skill Roll Functionality
 
         const autoCalcCheckbox = document.getElementById('autoCalcStats');
         const maxPvInput = document.getElementById('character-maxPv');
@@ -904,187 +986,97 @@
         const nexInput = document.getElementById('character-nex');
         const vigInput = document.getElementById('attr-vig');
         const preInput = document.getElementById('attr-pre');
-        const intInput = document.getElementById('attr-int'); 
         const characterSheetForm = document.getElementById('characterSheetForm');
         const saveButton = document.getElementById('saveCharacterSheetButton');
         const saveButtonIcon = saveButton.querySelector('i');
         const saveButtonText = saveButton.querySelector('.button-text');
         const saveButtonTextSm = saveButton.querySelector('.button-text-sm');
 
-
         characterSheetForm.addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            // Ensure disabled inputs are re-enabled if autoCalc is checked, so their values are submitted
+            event.preventDefault(); 
             const autoCalcWasChecked = autoCalcCheckbox.checked;
-            if (autoCalcWasChecked) {
-                maxPvInput.disabled = false;
-                maxPsInput.disabled = false;
-                maxPeInput.disabled = false;
-            }
-
+            if (autoCalcWasChecked) { maxPvInput.disabled = false; maxPsInput.disabled = false; maxPeInput.disabled = false; }
             const formData = new FormData(characterSheetForm);
             const jsonData = {};
-
             for (const [key, value] of formData.entries()) {
                 if (key.endsWith('[]')) {
                     const actualKey = key.slice(0, -2);
-                    if (!jsonData[actualKey]) {
-                        jsonData[actualKey] = [];
-                    }
+                    if (!jsonData[actualKey]) jsonData[actualKey] = [];
                     jsonData[actualKey].push(value);
                 } else {
-                    if (jsonData[key] === undefined) {
-                        jsonData[key] = value;
-                    } else if (Array.isArray(jsonData[key])) {
-                        jsonData[key].push(value);
-                    } else {
-                        jsonData[key] = [jsonData[key], value];
-                    }
+                    if (jsonData[key] === undefined) jsonData[key] = value;
+                    else if (Array.isArray(jsonData[key])) jsonData[key].push(value);
+                    else jsonData[key] = [jsonData[key], value];
                 }
             }
+            const arrayKeys = [ 'new_item_ids', 'deleted_item_ids', 'new_arma_ids', 'deleted_arma_ids', 'new_poder_ids', 'deleted_poder_ids', 'new_ritual_ids', 'deleted_ritual_ids' ];
+            arrayKeys.forEach(arrKey => { if (!jsonData[arrKey]) jsonData[arrKey] = []; });
             
-            const arrayKeys = [
-                'new_item_ids', 'deleted_item_ids',
-                'new_arma_ids', 'deleted_arma_ids',
-                'new_poder_ids', 'deleted_poder_ids',
-                'new_ritual_ids', 'deleted_ritual_ids'
-            ];
-            arrayKeys.forEach(arrKey => {
-                if (!jsonData[arrKey]) {
-                    jsonData[arrKey] = [];
-                }
-            });
-            
-            // UI update for loading state
             saveButton.disabled = true;
-            saveButtonIcon.classList.remove('fa-save');
-            saveButtonIcon.classList.add('fa-spinner', 'fa-spin');
+            saveButtonIcon.classList.remove('fa-save'); saveButtonIcon.classList.add('fa-spinner', 'fa-spin');
             if (saveButtonText) saveButtonText.textContent = 'Salvando...';
             if (saveButtonTextSm) saveButtonTextSm.textContent = 'Salvando...';
 
-
             try {
-                // Json
-                const response = await fetch(characterSheetForm.action, {
-                    method: characterSheetForm.method,
-                    body: JSON.stringify(jsonData),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
+                const response = await fetch(characterSheetForm.action, { method: characterSheetForm.method, body: JSON.stringify(jsonData), headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }});
                 if (response.ok) {
                     notyf.success('Ficha salva com sucesso!');
-                    // Clear temporary client-side markers and containers
                     document.querySelectorAll('[data-is-new="true"]').forEach(el => el.removeAttribute('data-is-new'));
-                    newlyAddedItemsContainer.innerHTML = ''; // Clear new and deleted IDs
-                } else {
-                    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao salvar.' }));
-                    notyf.error(`Erro ao salvar: ${errorData.message || response.statusText}`);
-                }
-            } catch (error) {
-                console.error('Erro na requisição de salvar:', error);
-                notyf.error('Erro de rede ou servidor indisponível ao tentar salvar.');
+                    newlyAddedItemsContainer.innerHTML = ''; 
+                } else { const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido.' })); notyf.error(`Erro: ${errorData.message || response.statusText}`); }
+            } catch (error) { console.error('Erro ao salvar:', error); notyf.error('Erro de rede ou servidor.');
             } finally {
-                // Restore button state
                 saveButton.disabled = false;
-                saveButtonIcon.classList.add('fa-save');
-                saveButtonIcon.classList.remove('fa-spinner', 'fa-spin');
+                saveButtonIcon.classList.add('fa-save'); saveButtonIcon.classList.remove('fa-spinner', 'fa-spin');
                 if (saveButtonText) saveButtonText.textContent = 'Salvar Ficha';
                 if (saveButtonTextSm) saveButtonTextSm.textContent = 'Salvar';
-
-
-                // Re-apply disabled state if autoCalc was checked
-                if (autoCalcWasChecked) {
-                    toggleAutoCalc(); // This will re-disable them if checkbox is still checked
-                }
+                if (autoCalcWasChecked) toggleAutoCalc();
             }
         });
 
         function calculateMaxStats() {
             if (!autoCalcCheckbox.checked) return;
-
             const classe = classeSelect.value;
             const nex = parseInt(nexInput.value) || 0;
             const vig = parseInt(vigInput.value) || 0;
             const pre = parseInt(preInput.value) || 0;
-            
-            let calculatedMaxPv = 0;
-            let calculatedMaxPs = 0;
-            let calculatedMaxPe = 0;
-            const nexStep = Math.floor(nex / 5) - 1;
-            
+            let calculatedMaxPv = 0, calculatedMaxPs = 0, calculatedMaxPe = 0;
+            const nexIncrements = Math.max(0, Math.floor(nex / 5) -1);
             switch (classe) {
-                case 'combatente':
-                    calculatedMaxPv = (20 + vig) + (nexStep > 0 ? (nexStep * (4 + vig)) : 0);
-                    calculatedMaxPs = 12 + (nexStep > 0 ? (nexStep * 3) : 0);
-                    calculatedMaxPe = (2 + pre) + (nexStep > 0 ? (nexStep * (1 + pre)) : 0);
-                    break;
-                case 'especialista':
-                    calculatedMaxPv = (16 + vig) +  (nexStep > 0 ? (nexStep * (3 + vig)) : 0);
-                    calculatedMaxPs = 16 + (nexStep > 0 ? (nexStep * 4) : 0);
-                    calculatedMaxPe = (3 + pre) + (nexStep > 0 ? (nexStep * (2 + pre)) : 0);
-                    break;
-                case 'ocultista':
-                    calculatedMaxPv = (12 + vig) + (nexStep > 0 ? (nexStep * (2 + vig)) : 0);
-                    calculatedMaxPs = 20 + (nexStep > 0 ? (nexStep * 5) : 0);
-                    calculatedMaxPe = (4 + pre) + (nexStep > 0 ? (nexStep * (3 + pre)) : 0);
-                    break; 
-                case 'mundano': 
-                default:
-                    calculatedMaxPv = (8 + vig);
-                    calculatedMaxPs = 8;
-                    calculatedMaxPe = (1 + pre);
+                case 'combatente': calculatedMaxPv = (20 + vig) + (nexIncrements * (4 + vig)); calculatedMaxPs = 12 + (nexIncrements * 3); calculatedMaxPe = (2 + pre) + (nexIncrements * (1 + pre)); break;
+                case 'especialista': calculatedMaxPv = (16 + vig) + (nexIncrements * (3 + vig)); calculatedMaxPs = 16 + (nexIncrements * 4); calculatedMaxPe = (3 + pre) + (nexIncrements * (2 + pre)); break;
+                case 'ocultista': calculatedMaxPv = (12 + vig) + (nexIncrements * (2 + vig)); calculatedMaxPs = 20 + (nexIncrements * 5); calculatedMaxPe = (4 + pre) + (nexIncrements * (3 + pre)); break; 
+                case 'mundano': default: calculatedMaxPv = (8 + vig); calculatedMaxPs = 8; calculatedMaxPe = (1 + pre);
             }
-            
-            maxPvInput.value = Math.max(1, calculatedMaxPv);
-            maxPsInput.value = Math.max(1, calculatedMaxPs);
-            maxPeInput.value = Math.max(1, calculatedMaxPe);
+            maxPvInput.value = Math.max(1, calculatedMaxPv); maxPsInput.value = Math.max(1, calculatedMaxPs); maxPeInput.value = Math.max(1, calculatedMaxPe);
         }
 
         function toggleAutoCalc() {
             const isDisabled = autoCalcCheckbox.checked;
-            maxPvInput.disabled = isDisabled;
-            maxPsInput.disabled = isDisabled;
-            maxPeInput.disabled = isDisabled;
-
-            if (isDisabled) {
-                calculateMaxStats();
-            }
+            maxPvInput.disabled = isDisabled; maxPsInput.disabled = isDisabled; maxPeInput.disabled = isDisabled;
+            if (isDisabled) calculateMaxStats();
         }
 
         autoCalcCheckbox.addEventListener('change', toggleAutoCalc);
         const statInputsToWatch = [classeSelect, nexInput, vigInput, preInput];
-       
         statInputsToWatch.forEach(input => {
             if (input) { 
                 input.addEventListener('input', calculateMaxStats);
-                if (input.tagName === 'SELECT') {
-                    input.addEventListener('change', calculateMaxStats);
-                }
+                if (input.tagName === 'SELECT') input.addEventListener('change', calculateMaxStats);
             }
         });
-        
         toggleAutoCalc(); 
 
         for(let input of document.querySelectorAll("input:not([type='submit']), select, textarea")) {
-            if(input.type === "textarea") continue; 
+            if(input.tagName.toLowerCase() === "textarea") continue; 
             input.addEventListener("keydown", (e) => {
                 if(e.key === "Enter") {
                     e.preventDefault();
-                    const formElements = Array.from(characterSheetForm.elements)
-                                           .filter(el => !el.hidden && !el.disabled && typeof el.focus === 'function');
+                    const formElements = Array.from(characterSheetForm.elements).filter(el => !el.hidden && !el.disabled && typeof el.focus === 'function' && el.tabIndex !== -1 && window.getComputedStyle(el).display !== 'none');
                     const currentIndex = formElements.indexOf(e.target);
                     const nextElement = formElements[currentIndex + 1];
-                    
-                    if (nextElement) {
-                        nextElement.focus();
-                    } else {
-                        // Optionally, if it's the last element, submit the form or focus the save button
-                        // saveButton.focus(); 
-                    }
+                    if (nextElement) nextElement.focus();
+                    else saveButton.focus(); // Focus save button if it's the last element
                 }
             });
         }
