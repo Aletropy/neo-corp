@@ -7,6 +7,7 @@ import Ritual from "../Data/Models/Ritual";
 import Item from "../Data/Models/Items";
 import Arma from "../Data/Models/Weapon";
 import DiceInterpreter, { EvaluationResult } from "../Dice/DiceInterpreter";
+import SessionHandler from "../Session/SessionHandler";
 
 declare module 'express-session' {
      interface SessionData {
@@ -55,6 +56,8 @@ characterRoutes.get("/:id/roll/:pericia", AuthMiddleware, async (req, res) => {
         roll = new DiceInterpreter().Interpret(`>[${diceCount}d20] + ${skillValue}`);
 
     console.log(`Rolled for character ${(character.get("info") as any).name}: ${roll.stringValue}`)
+    
+    SessionHandler.PropagateRoll(req.session.user!, character, roll)
 
     res.status(200).json(roll);
 });

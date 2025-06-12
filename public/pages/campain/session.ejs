@@ -4,12 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoCorp - Sessão: <%= campaignName %>
-    </title> <!-- Passar o nome da campanha -->
+    <title>NeoCorp - Sessão: <%= campaignName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        tailwind.config = { // Mesma configuração de cores do character.txt
+        tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
@@ -140,51 +139,18 @@
                 <h2 class="text-sm sm:text-base font-semibold mb-2 text-center text-primary flex-shrink-0">Jogadores
                     Online</h2>
                 <div id="player-list" class="player-list-container space-y-2.5 overflow-y-auto pr-1">
-                    <!-- Jogadores serão adicionados aqui via JS -->
-                    <!-- Exemplo de item de jogador (para referência) -->
-                    <!-- 
-                    <div class="player-item bg-cardLight p-2 rounded-md border border-darkBorder" data-player-id="PLAYER_ID_HERE">
-                        <div class="flex items-center">
-                            <img src="/img/default_portrait.png" alt="Retrato" class="w-10 h-10 rounded-full mr-2 object-cover border-2 border-primary">
-                            <div>
-                                <p class="text-xs font-semibold text-darkTextPrimary">Nome do Jogador</p>
-                                <div class="text-health text-[10px] leading-tight">
-                                    PV: <span class="font-medium">15</span> / <span class="font-medium">20</span>
-                                    <div class="w-full h-1.5 progress-bar-bg rounded-full mt-0.5">
-                                        <div class="progress-bar-fg rounded-full" style="width: 75%;"></div>
-                                    </div>
-                                </div>
-                                <div class="text-sanity text-[10px] leading-tight mt-1">
-                                    PS: <span class="font-medium">18</span> / <span class="font-medium">20</span>
-                                    <div class="w-full h-1.5 progress-bar-bg rounded-full mt-0.5">
-                                        <div class="progress-bar-fg rounded-full" style="width: 90%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                     -->
                 </div>
             </div>
-
-            <!-- Log de Rolagens -->
+            <img src="/img/lcroom.png" id="rpgimg" hidden alt="">
             <div
                 class="bg-rollLogBg p-3 rounded-lg shadow-lg border border-darkBorder flex-shrink-0 roll-log-container flex flex-col">
                 <h3 class="text-xs sm:text-sm font-semibold mb-1.5 text-center text-blue-400 flex-shrink-0">Rolagens
                     Recentes</h3>
                 <div id="dice-roll-log" class="space-y-1.5 overflow-y-auto pr-1 text-[10px] sm:text-xs flex-grow">
-                    <!-- Rolagens serão adicionadas aqui via JS -->
-                    <!-- Exemplo de item de rolagem (para referência) -->
-                    <!--
-                    <div class="roll-item text-darkTextSecondary">
-                        <span class="text-blue-400 font-medium">JogadorX:</span> rolou 1d20 (<span class="text-white">15</span>) + 5 = <span class="text-lg text-green-400 font-bold">20</span> para <span class="italic">Ataque</span>.
-                    </div>
-                    -->
                 </div>
             </div>
         </aside>
 
-        <!-- Área Central: Canvas do Mapa -->
         <section
             class="flex-grow bg-card rounded-lg shadow-lg border border-darkBorder flex items-center justify-center p-1">
             <canvas id="rpg-map-canvas" class="bg-darker rounded max-w-full max-h-full">
@@ -193,7 +159,6 @@
         </section>
     </main>
 
-    <!-- Dados da sessão embutidos para o JS -->
     <script>
         var CAMPAIGN_ID = "<%= campaignId %>";
         var CHARACTER = `<%- JSON.stringify(character) %>`;

@@ -48,7 +48,7 @@ app.use("/character", characterRoutes);
 app.use("/campain", campainRoutes);
 routes(app);
 
-SessionHandler(io);
+SessionHandler.initialize(io);
 
 http.createServer(function (req, res) {
     res.writeHead(301, {Location: `https://${req.headers["host"]}${req.url}`});

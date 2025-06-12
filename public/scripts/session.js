@@ -89,15 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const rollEl = document.createElement('div');
         rollEl.className = 'roll-item text-darkTextSecondary';
 
-        // Exemplo: { rollerName: "JogadorX", dice: "1d20", rolls: [15], modifier: 5, total: 20, description: "Ataque" }
-        // Personalize a formatação da mensagem conforme necessário
-        let rollDetails = data.rolls ? `(${data.rolls.join(', ')})` : '';
-        let modifierText = data.modifier ? (data.modifier > 0 ? ` + ${data.modifier}` : ` - ${Math.abs(data.modifier)}`) : '';
+        let rollDetails = data.rollDetails ? data.rollDetails.split("=")[0] : '';
         let descriptionText = data.description ? ` para <span class="italic">${data.description}</span>` : '';
 
         rollEl.innerHTML = `
             <span class="text-blue-400 font-medium">${data.rollerName || 'Sistema'}:</span> 
-            rolou ${data.dice} ${rollDetails}${modifierText} = <span class="text-lg text-green-400 font-bold">${data.total}</span>${descriptionText}.
+            rolou ${rollDetails} = <span class="text-lg text-green-400 font-bold">${data.total}</span>${descriptionText}.
         `;
         diceRollLogEl.appendChild(rollEl);
         diceRollLogEl.scrollTop = diceRollLogEl.scrollHeight; // Auto-scroll
@@ -122,11 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!ctx) return;
         ctx.clearRect(0, 0, rpgMapCanvas.width, rpgMapCanvas.height);
 
-        // Desenho de placeholder
-        ctx.fillStyle = '#1e293b'; // card
+        const image = document.getElementById("rpgimg");
+        ctx.drawImage(image, 0, 0, rpgMapCanvas.width, rpgMapCanvas.height);
+
+        ctx.fillStyle = '#1e293b55'; // card
         ctx.fillRect(0, 0, rpgMapCanvas.width, rpgMapCanvas.height);
 
-        ctx.strokeStyle = '#334155'; // darkBorder
+        ctx.strokeStyle = '#33415555'; // darkBorder
         ctx.lineWidth = 1;
 
         // Grid simples (opcional)
@@ -147,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = '#e2e8f0'; // darkTextPrimary
         ctx.font = '16px Inter';
         ctx.textAlign = 'center';
-        ctx.fillText('Carregando assets...', rpgMapCanvas.width / 2, rpgMapCanvas.height / 2);
     }
 
     // Event listeners
