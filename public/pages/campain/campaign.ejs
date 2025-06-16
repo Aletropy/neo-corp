@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,68 +32,110 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
             /* Updated for dark mode */
-            background: linear-gradient(to bottom, #0f172a, #1e293b); /* slate-900 to slate-800 */
+            background: linear-gradient(to bottom, #0f172a, #1e293b);
+            /* slate-900 to slate-800 */
             min-height: 100vh;
-            color: #e2e8f0; /* Default text color: slate-200 */
+            color: #e2e8f0;
+            /* Default text color: slate-200 */
         }
-        
+
         .card {
             transition: all 0.3s ease;
             /* Adjusted shadow for dark mode - can be subtle or a light glow */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         .card:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
         }
-        
-        .player-card:hover { /* Already uses card styles, but can be distinct if needed */
+
+        .player-card:hover {
+            /* Already uses card styles, but can be distinct if needed */
             transform: translateY(-3px);
-            box-shadow: 0 10px 15px rgba(0,0,0, 0.3);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         .status-indicator {
             animation: pulse 1.5s infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
         }
-        
+
         .session-item {
-            border-left: 3px solid #3b82f6; /* primary color - blue-500 */
+            border-left: 3px solid #3b82f6;
+            /* primary color - blue-500 */
             transition: all 0.3s ease;
         }
-        
+
         .session-item:hover {
-            border-left: 3px solid #2563eb; /* secondary color - blue-600 */
-            background-color: #334155; /* slate-700 (darkCardHover) */
+            border-left: 3px solid #2563eb;
+            /* secondary color - blue-600 */
+            background-color: #334155;
+            /* slate-700 (darkCardHover) */
+        }
+
+        /* Adicione isso dentro da sua tag <style> existente */
+        .styled-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .styled-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+            /* slate-800 or darkCard */
+            border-radius: 10px;
+        }
+
+        .styled-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            /* slate-600 */
+            border-radius: 10px;
+        }
+
+        .styled-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+            /* slate-500 */
         }
     </style>
 </head>
+
 <body class="min-h-screen text-darkTextPrimary"> <!-- Default text color set in CSS, can override with Tailwind -->
     <!-- Navbar -->
-    <nav class="bg-darkCard shadow-md py-4"> <!-- Changed bg-white to bg-darkCard, shadow-sm to shadow-md for better visibility -->
+    <nav class="bg-darkCard shadow-md py-4">
+        <!-- Changed bg-white to bg-darkCard, shadow-sm to shadow-md for better visibility -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center">
+                    <div
+                        class="bg-gradient-to-r from-blue-500 to-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center">
                         <i class="fas fa-cube text-white"></i>
                     </div>
                     <!-- Changed text-gray-800 to text-darkTextPrimary -->
-                    <span class="ml-3 text-xl font-bold text-darkTextPrimary">Neo<span class="text-blue-500">Corp</span></span>
+                    <span class="ml-3 text-xl font-bold text-darkTextPrimary">Neo<span
+                            class="text-blue-500">Corp</span></span>
                 </div>
                 <div class="flex items-center">
                     <div class="ml-3 relative">
                         <div class="flex items-center">
-                            <div class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
-                                <span class="font-medium"><%=(user.username.charAt(0) + user.username.charAt(1))%></span>
+                            <div
+                                class="ml-2 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                                <span class="font-medium">
+                                    <%=(user.username.charAt(0) + user.username.charAt(1))%>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -106,14 +149,19 @@
         <!-- Campaign Header -->
         <div class="text-center mb-10">
             <!-- Changed text-gray-800 to text-darkTextPrimary -->
-            <h1 class="text-3xl md:text-4xl font-bold text-darkTextPrimary mb-4"><%= campain.name %></h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-darkTextPrimary mb-4">
+                <%= campain.name %>
+            </h1>
             <!-- Adjusted status badge colors -->
             <div class="inline-flex items-center justify-center px-5 py-2 rounded-full 
                         <%= campain.active ? 'bg-green-700 bg-opacity-30' : 'bg-gray-700 bg-opacity-40' %> 
                         border <%= campain.active ? 'border-green-500' : 'border-gray-600' %>">
-                <span class="status-indicator w-3 h-3 rounded-full mr-2 <%= campain.active ? 'bg-green-400' : 'bg-gray-500' %>"></span>
+                <span
+                    class="status-indicator w-3 h-3 rounded-full mr-2 <%= campain.active ? 'bg-green-400' : 'bg-gray-500' %>"></span>
                 <!-- Changed text-gray-700 to text-darkTextSecondary for lighter text on dark badge -->
-                <span class="font-medium text-darkTextSecondary"><%= campain.active ? 'Sessão em Andamento' : 'Campanha Inativa' %></span>
+                <span class="font-medium text-darkTextSecondary">
+                    <%= campain.active ? 'Sessão em Andamento' : 'Campanha Inativa' %>
+                </span>
             </div>
         </div>
 
@@ -123,38 +171,47 @@
             <div class="lg:col-span-2">
                 <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
                 <div class="card bg-darkCard rounded-xl p-6">
-                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Visão Geral</h2>
-                    
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Visão Geral
+                    </h2>
+
                     <div class="mb-8">
                         <!-- Changed text-gray-600 to text-darkTextSecondary -->
-                        <p class="campaign-description text-darkTextSecondary leading-relaxed"><%= campain.description %></p>
+                        <p class="campaign-description text-darkTextSecondary leading-relaxed">
+                            <%= campain.description %>
+                        </p>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Changed bg-blue-50 to bg-darkCardHover or a slightly different dark shade -->
                         <div class="bg-darkCardHover p-4 rounded-lg">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3">
                                     <i class="fas fa-crown text-white"></i>
                                 </div>
                                 <div>
                                     <!-- Adjusted text colors -->
                                     <div class="text-darkTextSecondary text-sm">Mestre do Jogo</div>
-                                    <div class="text-darkTextPrimary font-medium"><%= campain.gameMaster %></div>
+                                    <div class="text-darkTextPrimary font-medium">
+                                        <%= campain.gameMaster %>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Changed bg-blue-50 to bg-darkCardHover -->
                         <div class="bg-darkCardHover p-4 rounded-lg">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
                                     <i class="fas fa-dice-d20 text-white"></i>
                                 </div>
                                 <div>
                                     <!-- Adjusted text colors -->
                                     <div class="text-darkTextSecondary text-sm">Sistema</div>
-                                    <div class="text-darkTextPrimary font-medium"><%= campain.system %></div>
+                                    <div class="text-darkTextPrimary font-medium">
+                                        <%= campain.system %>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -162,8 +219,9 @@
                 </div>
 
                 <div class="card bg-darkCard rounded-xl p-6 mt-8">
-                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Histórico de Sessões</h2>
-                    
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Histórico
+                        de Sessões</h2>
+
                     <div class="space-y-4">
                         <!-- <div class="session-item p-4 rounded-lg border border-darkBorder"> bg-white removed, using style for hover
                             <div class="flex justify-between items-center">
@@ -180,81 +238,144 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Column - Players & Actions -->
             <div class="space-y-8">
                 <!-- Players Card -->
                 <!-- Changed bg-white to bg-darkCard, border-gray-100 to border-darkBorder -->
                 <div class="card bg-darkCard rounded-xl p-6">
-                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Jogadores</h2>
-                    
+                    <h2 class="text-2xl font-bold mb-6 pb-3 border-b border-darkBorder text-darkTextPrimary">Jogadores
+                    </h2>
+
                     <div class="players-grid grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-2">
                         <% for(let character of campain.players) { %>
                             <!-- Changed bg-blue-50 to bg-darkCardHover, border-blue-100 to border-darkBorder or specific blue border -->
-                            <div class="player-card bg-darkCardHover rounded-lg p-4 transition-all duration-300 cursor-pointer border border-darkBorder">
+                            <div
+                                class="player-card bg-darkCardHover rounded-lg p-4 transition-all duration-300 cursor-pointer border border-darkBorder">
                                 <div class="flex items-center">
-                                    <div class="player-avatar w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold mr-3">
+                                    <div
+                                        class="player-avatar w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold mr-3">
                                         <%= character.charAt(0) %>
                                     </div>
                                     <div class="player-info">
                                         <!-- Changed text-gray-800 to text-darkTextPrimary -->
-                                        <span class="player-name font-medium text-darkTextPrimary"><%= character %></span>
+                                        <span class="player-name font-medium text-darkTextPrimary">
+                                            <%= character %>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        <% } %>
+                            <% } %>
                     </div>
                 </div>
-                
+
                 <!-- Action Button - Gradients should look fine on dark, text is already white -->
                 <% if(campain.active) { %>
-                    <button id="joinButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                    <button id="joinButton"
+                        class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                         <i class="fas fa-play mr-2"></i> Entrar na Sessão
                     </button>
-                <% } else if(!campain.active && user.id == campain.gameMasterId) { %>
-                    <button id="openButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <i class="fas fa-door-open mr-2"></i> Abrir Sessão
-                    </button>
-                <% } %>
-                    <button id="backButton" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
-                    </button>
+                    <% } else if(!campain.active && user.id==campain.gameMasterId) { %>
+                        <button id="openButton"
+                            class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                            <i class="fas fa-door-open mr-2"></i> Abrir Sessão
+                        </button>
+                        <% } %>
+                            <% if(user.id==campain.gameMasterId) { %>
+                                <button id="inviteButton"
+                                    class="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                    <i class="fas fa-envelope mr-2"></i> Convidar Jogadores
+                                </button>
+                                <% } %>
+                                    <button id="backButton"
+                                        class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                        <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
+                                    </button>
             </div>
         </div>
     </div>
-    
+
+    <!-- Modal de Convidar Jogadores -->
+    <div id="invitePlayerModal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-darkCard p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-darkTextPrimary">Convidar Jogadores</h3>
+                <button id="closeInviteModal" class="text-darkTextSecondary hover:text-darkTextPrimary text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="inviteForm">
+                <div class="mb-6 max-h-72 overflow-y-auto pr-2 styled-scrollbar">
+                    <p class="text-darkTextSecondary mb-3 text-sm">Selecione os personagens para adicionar à campanha:
+                    </p>
+                    <% if (typeof allCharacters !=='undefined' && allCharacters.length> 0) { %>
+                        <% allCharacters.forEach(function(character, index) { %>
+
+                            <% if(!campain.charactersIds.includes(character.id)) { %>
+                                <div
+                                class="flex items-center justify-between p-3 my-1 rounded-md hover:bg-darkCardHover transition-colors duration-200 border border-transparent hover:border-darkBorder">
+                                <label for="char-<%= index %>-<%= character.id %>"
+                                    class="text-darkTextPrimary flex-grow cursor-pointer">
+                                    <%= character.info.name %>
+                                </label>
+                                <input type="checkbox" id="char-<%= index %>-<%= character.id %>"
+                                name="selectedCharacters" value="<%= character.id || character %>" class="form-checkbox h-5 w-5 text-primary rounded border-darkBorder focus:ring-primary
+                                bg-darkCard checked:bg-primary checked:border-transparent">
+                            </div>
+                            <% } %>
+                            <% }); %>
+                            <% } else { %>
+                                <p class="text-darkTextSecondary text-center py-4">Nenhum personagem disponível para
+                                    convite.</p>
+                                    <% } %>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancelInviteButton"
+                        class="px-6 py-3 rounded-lg text-darkTextSecondary hover:bg-darkCardHover border border-darkBorder transition-colors duration-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="sendInviteButton"
+                        class="px-6 py-3 rounded-lg bg-primary hover:bg-secondary text-white font-semibold transition-colors duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-paper-plane mr-2"></i>Enviar Convites
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Fim do Modal -->
+
     <script>
         document.getElementById('backButton')?.addEventListener('click', () => {
             window.location.href = "/dashboard"
         })
-        
+
         document.getElementById('joinButton')?.addEventListener('click', () => {
-            // Show loading state
             const btn = document.getElementById('joinButton');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Conectando...';
             btn.disabled = true;
-            
-            // Logic to join session
+
             fetch(`/campain/<%= campain.id %>/join`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-            .then(response => {
-                if(response.ok) {
-                    window.location.href = `/campain/session/<%= campain.id %>`;
-                } else {
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = `/campain/session/<%= campain.id %>`;
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
+                });
         });
 
         document.getElementById('openButton')?.addEventListener('click', () => {
@@ -263,27 +384,128 @@
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Conectando...';
             btn.disabled = true;
-            
+
             fetch(`/campain/<%= campain.id %>/open`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            })  
-            .then(response => {
-                if(response.ok) {
-                    window.location.href = `/campain/session/<%= campain.id %>`;
-                } else {
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = `/campain/session/<%= campain.id %>`;
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
+                });
         });
+
+        const inviteButton = document.getElementById('inviteButton');
+        const invitePlayerModal = document.getElementById('invitePlayerModal');
+        const closeInviteModalButton = document.getElementById('closeInviteModal');
+        const cancelInviteButton = document.getElementById('cancelInviteButton');
+        const inviteForm = document.getElementById('inviteForm');
+        const sendInviteButton = document.getElementById('sendInviteButton');
+
+        function openInviteModal() {
+            if (invitePlayerModal) {
+                invitePlayerModal.classList.remove('hidden');
+                invitePlayerModal.querySelector('.transform').classList.remove('scale-95', 'opacity-0');
+                invitePlayerModal.querySelector('.transform').classList.add('scale-100', 'opacity-100');
+            }
+        }
+
+        function closeInviteModal() {
+            if (invitePlayerModal) {
+                invitePlayerModal.classList.add('hidden');
+                invitePlayerModal.querySelector('.transform').classList.remove('scale-100', 'opacity-100');
+                invitePlayerModal.querySelector('.transform').classList.add('scale-95', 'opacity-0');
+                inviteForm.reset();
+            }
+        }
+
+        if (inviteButton) {
+            inviteButton.addEventListener('click', openInviteModal);
+        }
+
+        if (closeInviteModalButton) {
+            closeInviteModalButton.addEventListener('click', closeInviteModal);
+        }
+        if (cancelInviteButton) {
+            cancelInviteButton.addEventListener('click', closeInviteModal);
+        }
+
+        if (invitePlayerModal) {
+            invitePlayerModal.addEventListener('click', (event) => {
+                if (event.target === invitePlayerModal) {
+                    closeInviteModal();
+                }
+            });
+        }
+
+        if (inviteForm) {
+            inviteForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const selectedCheckboxes = inviteForm.querySelectorAll('input[name="selectedCharacters"]:checked');
+                const charactersToInvite = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+                if (charactersToInvite.length === 0) {
+                    alert('Por favor, selecione pelo menos um personagem para convidar.');
+                    return;
+                }
+
+                const originalButtonText = sendInviteButton.innerHTML;
+                sendInviteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+                sendInviteButton.disabled = true;
+
+                const campaignId = '<%= campain.id %>';
+
+                fetch(`/campain/${campaignId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ characters: charactersToInvite })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; }).catch(() => {
+                                throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Convites enviados com sucesso:', data);
+                        alert('Jogadores convidados com sucesso!');
+                        closeInviteModal();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao enviar convites:', error);
+                        let errorMessage = 'Ocorreu um erro ao enviar os convites.';
+                        if (error.message) {
+                            errorMessage = error.message; // Mensagem de erro da API se disponível
+                        } else if (typeof error === 'string') {
+                            errorMessage = error;
+                        } else if (error.error && typeof error.error === 'string') {
+                            errorMessage = error.error; // Se a API retornar { "error": "mensagem" }
+                        }
+                        alert(`Erro: ${errorMessage}`); // Exemplo simples
+                    })
+                    .finally(() => {
+                        sendInviteButton.innerHTML = originalButtonText;
+                        sendInviteButton.disabled = false;
+                    });
+            });
+        }
     </script>
 </body>
+
 </html>
