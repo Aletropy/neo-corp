@@ -1,112 +1,113 @@
-# NeoCorp RPG - Plataforma VTT para Ordem Paranormal
+# NeoCorp RPG - VTT Platform for Ordem Paranormal
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Uma plataforma completa de Virtual Tabletop (VTT) desenvolvida para facilitar sessões de RPG de mesa online, com foco em interatividade em tempo real e gerenciamento detalhado de personagens para o sistema "Ordem Paranormal". A aplicação é construída com uma stack moderna e robusta, incluindo Node.js, Express, TypeScript e Socket.io no backend, e EJS com Tailwind CSS no frontend.
+A comprehensive Virtual Tabletop (VTT) platform developed to facilitate online tabletop RPG sessions, with a focus on real-time interactivity and detailed character management for the "Ordem Paranormal" system. The application is built with a modern and robust stack, including Node.js, Express, TypeScript, and Socket.io on the backend, with EJS and Tailwind CSS on the frontend.
 
+*Note: "Ordem Paranormal" is a popular Brazilian tabletop RPG system.*
 
-## ✨ Funcionalidades Principais
+## ✨ Core Features
 
-*   **🎲 Interpretador Avançado de Dados:** Um parser e interpretador de expressões de dados construído do zero, com suporte a operações complexas como `>[2d20] + 5`, permitindo rolagens filtradas (pegando o maior resultado) e cálculos matemáticos.
-*   **👥 Sessões em Tempo Real:** Utilização de WebSockets via **Socket.io** para sincronizar ações como rolagens de dados e listas de jogadores entre todos os participantes de uma campanha instantaneamente.
-*   **👤 Gestão Completa de Personagens:** Criação, visualização e edição detalhada de fichas de personagem, incluindo atributos, perícias, poderes, rituais, armas e inventário.
-*   **🌍 Campanhas e Mestres de Jogo:** Sistema de criação e gerenciamento de campanhas, com distinção de papéis entre Mestre (Admin) e Jogador. O mestre pode visualizar e gerenciar todos os personagens e dados da campanha.
-*   **🛡️ Base de Dados Robusta:** Modelagem de dados completa com **Sequelize ORM** e **PostgreSQL**, com seeding automático de dados base (poderes, rituais, armas, etc.) a partir de arquivos JSON.
-*   **🔐 Autenticação e Segurança:** Sistema de login com hash de senhas (bcrypt) e gerenciamento de sessão via `express-session`, com middlewares para proteção de rotas e diferenciação de permissões de administrador.
-*   **🎨 Frontend Dinâmico:** Interface renderizada no servidor com **EJS** e estilizada com **Tailwind CSS**, oferecendo uma experiência de usuário limpa e responsiva.
-*   **💡 Sistema de Sugestões:** Funcionalidade que permite aos usuários enviar sugestões (de itens, regras, etc.), que podem ser visualizadas pelo administrador.
+*   **🎲 Advanced Dice Parser:** A custom-built dice expression parser and interpreter that supports complex operations like `>[2d20] + 5`, allowing for filtered rolls (e.g., taking the highest result) and mathematical calculations.
+*   **👥 Real-time Sessions:** Utilizes WebSockets via **Socket.io** to instantly synchronize actions, such as dice rolls and player lists, among all campaign participants.
+*   **👤 Complete Character Management:** Create, view, and edit detailed character sheets, including attributes, skills, powers, rituals, weapons, and inventory.
+*   **🌍 Campaigns and Game Masters:** A system for creating and managing campaigns with distinct roles for Game Master (Admin) and Player. The GM can view and manage all characters and dice rolls within the campaign.
+*   **🛡️ Robust Database:** Full data modeling using **Sequelize ORM** and **PostgreSQL**, with automatic seeding of base game data (powers, rituals, weapons, etc.) from JSON files.
+*   **🔐 Authentication & Security:** Login system with password hashing (bcrypt) and session management via `express-session`, featuring middlewares for route protection and role-based permission handling.
+*   **🎨 Dynamic Frontend:** A server-side rendered interface using **EJS** and styled with **Tailwind CSS**, providing a clean and responsive user experience.
+*   **💡 Suggestion System:** A feature allowing users to submit suggestions (for items, rules, etc.) that can be reviewed by the administrator.
 
-## 🛠️ Stack de Tecnologias
+## 🛠️ Tech Stack
 
-| Área         | Tecnologias Principais                                       |
+| Area         | Core Technologies                                            |
 |--------------|--------------------------------------------------------------|
 | **Backend**  | Node.js, Express.js, TypeScript, Socket.IO                   |
 | **Database** | PostgreSQL, Sequelize (ORM)                                  |
 | **Frontend** | EJS (Server-Side Rendering), Tailwind CSS, JavaScript (DOM)  |
-| **Auth**     | `express-session`, `bcrypt.js`, Middlewares customizados     |
-| **DevOps**   | `dotenv` para variáveis de ambiente, `https` para SSL         |
+| **Auth**     | `express-session`, `bcrypt.js`, Custom Middlewares           |
+| **DevOps**   | `dotenv` for environment variables, `https` for SSL           |
 
-## 🚀 Como Executar o Projeto Localmente
+## 🚀 How to Run The Project Locally
 
-Siga os passos abaixo para configurar e rodar a aplicação em seu ambiente de desenvolvimento.
+Follow the steps below to set up and run the application in your development environment.
 
-### Pré-requisitos
-*   [Node.js](https://nodejs.org/) (versão 18.x ou superior)
-*   [PostgreSQL](https://www.postgresql.org/download/) (um servidor de banco de dados rodando localmente ou em um container Docker)
+### Prerequisites
+*   [Node.js](https://nodejs.org/) (version 18.x or higher)
+*   [PostgreSQL](https://www.postgresql.org/download/) (a database server running locally or in a Docker container)
 
-### 1. Clonar o Repositório
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Aletropy/neo-corp.git
 cd neo-corp
 ```
 
-### 2. Instalar Dependências
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configurar o Banco de Dados
-1.  Acesse seu servidor PostgreSQL.
-2.  Crie um novo banco de dados. Ex: `CREATE DATABASE neocorp_rpg;`.
-3.  **Nota:** O código usa `sequelize.sync({ alter: true })`, que irá criar e/ou alterar as tabelas automaticamente na primeira execução.
+### 3. Set Up the Database
+1.  Access your PostgreSQL server.
+2.  Create a new database. Ex: `CREATE DATABASE neocorp_rpg;`.
+3.  **Note:** The code uses `sequelize.sync({ alter: true })`, which will automatically create and/or alter tables on the first run.
 
-### 4. Configurar Variáveis de Ambiente
-Crie um arquivo chamado `.env` na raiz do projeto e preencha com as suas credenciais, seguindo o modelo abaixo.
+### 4. Configure Environment Variables
+Create a file named `.env` in the project root and fill it with your credentials, using the template below.
 
 ```ini
 # .env
 
-# Banco de Dados PostgreSQL
-DB_USER=seu_usuario_postgres
-DB_PASSWORD=sua_senha_postgres
-DB_DATABASE=neocorp_rpg # O nome do banco que você criou
+# PostgreSQL Database
+DB_USER=your_postgres_user
+DB_PASSWORD=your_postgres_password
+DB_DATABASE=neocorp_rpg # The name of the database you created
 
-# Configurações da Aplicação
+# Application Settings
 EXPRESS_IP=127.0.0.1
 HTTPS_PORT=8000
 HTTP_PORT=8001
-SECRET=uma_string_secreta_muito_forte_para_sessoes # Troque por um valor seguro
+SECRET=a_very_strong_secret_string_for_sessions # Change to a secure value
 
-# Certificados SSL (necessário para HTTPS)
-# Para desenvolvimento, você pode gerar certificados autoassinados.
+# SSL Certificates (required for HTTPS)
+# For development, you can generate self-signed certificates.
 # Ex: openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes
-SSL_KEY=caminho/para/sua/key.pem
-SSL_CERT=caminho/para/sua/cert.pem
+SSL_KEY=path/to/your/key.pem
+SSL_CERT=path/to/your/cert.pem
 ```
 
-### 5. Compilar o TypeScript
+### 5. Compile TypeScript
 
 ```bash
 npm run build
 ```
 
-### 6. Iniciar o Servidor
+### 6. Start the Server
 
 ```bash
 npm start
 ```
-O servidor será iniciado em `https://localhost:8000` (HTTPS) e um servidor de redirecionamento em `http://localhost:8001`.
+The server will start on `https://localhost:8000` (HTTPS), with a redirect server on `http://localhost:8001`.
 
-O sistema criará automaticamente um usuário **Admin** (usuário: `Admin`, senha: `Admin`) e um usuário **Default** (usuário: `Default`, senha: `Default`) na primeira inicialização.
+The system will automatically create an **Admin** user (username: `Admin`, password: `Admin`) and a **Default** user (username: `Default`, password: `Default`) on the first launch.
 
-## 📂 Estrutura do Projeto
+## 📂 Project Structure
 
-A estrutura do projeto foi organizada para manter uma separação clara de responsabilidades:
+The project is organized to maintain a clear separation of concerns:
 
 ```
 /src
-├── Core/             # Configurações centrais (Config.ts)
-├── Data/             # Lógica de dados
-│   ├── Models/       # Modelos do Sequelize (User.ts, Character.ts, etc.)
-│   └── Database.ts   # Conexão e inicialização do Sequelize
-├── Dice/             # Implementação do interpretador de dados customizado
-├── Enum/             # Enums reutilizáveis para regras do jogo
-├── Middlewares/      # Middlewares do Express (auth.ts)
-├── Session/          # Lógica de tempo real com Socket.io (SessionHandler.ts)
-├── routes/           # Definições de rotas do Express
-└── main.ts           # Ponto de entrada da aplicação
-/public/              # Arquivos estáticos e views EJS
+├── Core/             # Core settings (Config.ts)
+├── Data/             # Data logic
+│   ├── Models/       # Sequelize models (User.ts, Character.ts, etc.)
+│   └── Database.ts   # Sequelize connection and initialization
+├── Dice/             # Custom dice parser implementation
+├── Enum/             # Reusable enums for game rules
+├── Middlewares/      # Express middlewares (auth.ts)
+├── Session/          # Real-time logic with Socket.io (SessionHandler.ts)
+├── routes/           # Express route definitions
+└── main.ts           # Application entry point
+/public/              # Static files and EJS views
 └── ...
 ```
